@@ -1,0 +1,37 @@
+{
+  "name": "nuxt-app",
+  "dependencies": {
+    "@iconify-json/ion": "^1.1.18",
+    "@iconify-json/uil": "^1.1.8",
+    "@nuxt/image": "^1.7.0",
+    "@nuxt/ui": "^2.17.0",
+    "@nuxtjs/sanity": "^1.11.5",
+    "@nuxtjs/tailwindcss": "^6.12.1",
+    "@samk-dev/nuxt-vcalendar": "^1.0.4",
+    "@sidebase/nuxt-auth": "^0.8.1",
+    "bcrypt": "^5.1.1",
+    "csvtojson": "^2.0.10",
+    "formidable": "^3.5.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.5.1",
+    "mongoose-autopopulate": "^1.1.0",
+    "nuxt": "^3.12.4",
+    "vue": "latest"
+  },
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@nuxtjs/color-mode": "^3.4.2",
+    "@types/bcrypt": "^5.0.2",
+    "@types/csvtojson": "^2.0.0",
+    "@types/formidable": "^3.4.5",
+    "@types/jsonwebtoken": "^9.0.6"
+  }
+}
