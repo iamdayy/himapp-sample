@@ -2,9 +2,6 @@
 definePageMeta({
     layout: 'client',
 });
-
-const { refresh } = useAuth()
-
 </script>
 <template>
     <section class="relative min-h-screen px-6 pt-10 pb-8 isolate">
