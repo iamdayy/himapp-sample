@@ -5,7 +5,7 @@ export const useProjects = () => {
   const page = ref<number>(1);
   const perPage = ref<number>(10);
   const { canMeRegister } = useCanMeRegister();
-  const { user } = useAuth();
+  const { data: user } = useAuth();
   const { data, refresh: refreshProjects } = useAsyncData(() =>
     $fetch<IProjectResponse>("/api/project", {
       query: {

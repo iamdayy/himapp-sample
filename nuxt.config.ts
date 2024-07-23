@@ -21,12 +21,17 @@ export default defineNuxtConfig({
     "@sidebase/nuxt-auth",
     "@samk-dev/nuxt-vcalendar",
     "@nuxtjs/sanity",
+    "nuxt-echarts",
   ],
   ui: {
     icons: ["heroicons", "uil", "ion"],
   },
   tailwindcss: {
     cssPath: "~/assets/css/tailwind.css",
+  },
+  echarts: {
+    charts: ["LineChart"],
+    components: ["DatasetComponent", "GridComponent", "TooltipComponent"],
   },
   auth: {
     baseURL: "/api",
@@ -45,7 +50,7 @@ export default defineNuxtConfig({
         cookieName: "auth.token",
         headerName: "Authorization",
         maxAgeInSeconds: 36000,
-        sameSiteAttribute: "strict",
+        sameSiteAttribute: "lax",
       },
       refreshToken: {
         refreshRequestTokenPointer: "/refreshToken",

@@ -6,6 +6,7 @@ import { UserModel } from "../models/UserModel";
 export const checkSession = async (payload: string) => {
   try {
     const session = await SessionModel.findOne({ token: payload });
+
     if (!session) {
       throw createError({
         statusMessage: "Unauthenticated!",

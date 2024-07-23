@@ -7,7 +7,7 @@ export function $api<T>(
   return $fetch<T>(request, {
     ...opts,
     headers: {
-      authorization: auth.token.value ? `Bearer ${auth.token.value}` : "",
+      authorization: auth.token.value ? auth.token.value : "",
       ...opts?.headers,
     },
   });

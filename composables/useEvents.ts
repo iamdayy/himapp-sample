@@ -5,7 +5,7 @@ export const useEvents = () => {
   const { data: events, refresh: refreshEvents } = useAsyncData(() =>
     $api<IEvent[]>("/api/event")
   );
-  const { user } = useAuth();
+  const { data: user } = useAuth();
   const eventsMe = computed<IEvent[]>(() => {
     return user.value?.profile.events;
   });
