@@ -7,7 +7,7 @@ export const useProjects = () => {
   const { canMeRegister } = useCanMeRegister();
   const { data: user } = useAuth();
   const { data, refresh: refreshProjects } = useAsyncData(() =>
-    $fetch<IProjectResponse>("/api/project", {
+    $api<IProjectResponse>("/api/project", {
       query: {
         page: page.value,
         perPage: perPage.value,

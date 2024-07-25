@@ -4,9 +4,9 @@
 <template>
     <footer class="w-full pt-8 mb-4">
         <div class="container">
-            <div class="flex flex-wrap">
+            <div class="flex items-center">
+                <NuxtImg class="object-contain w-42" src="/img/logo.png" alt="Logo" />
                 <div class="w-full px-4">
-                    <NuxtImg class="object-contain w-24" src="/img/logo.png" alt="Logo" />
                     <h4 class="text-3xl font-bold text-gray-600 text-uppercase dark:text-gray-300">Himpunan Mahasiswa
                         Informatika</h4>
                     <h5 class="mt-0 mb-2 text-lg text-gray-500 dark:text-gray-400">

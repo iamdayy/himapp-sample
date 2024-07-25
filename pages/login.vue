@@ -27,7 +27,7 @@ const login = async () => {
         signIn({
             username: Form.value.username,
             password: Form.value.password
-        }, { callbackUrl: '/' });
+        }, { callbackUrl: '/dashboard' });
     } catch (error: any) {
         toast.add({ title: "Failed to login, please chek username/password" })
     }

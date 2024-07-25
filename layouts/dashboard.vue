@@ -104,23 +104,12 @@ const items = computed(() => isLoggedIn.value ? itemsIsLogged : itemsNotLogged);
                             </template>
                         </UDropdown>
                     </div>
-                    <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
-                        id="navbar-user">
-                        <ul
-                            class="flex flex-col p-4 mt-4 font-medium border border-gray-300 rounded-lg shadow-md md:p-0 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-transparent md:shadow-none">
-                            <li v-for="nav, i in navigation" :key="i">
-                                <a :href="nav.href"
-                                    class="block px-3 py-2 font-sans font-semibold text-gray-700 bg-transparent rounded md:p-0 dark:text-gray-200">{{
-                                        nav.name }}</a>
-                            </li>
-                        </ul>
-                    </div>
                 </div>
             </nav>
         </ClientOnly>
 
         <main>
-            <div class="px-3 py-6 mx-auto sm:px-6 lg:px-8 dark:bg-indigo-900/40 bg-gray-200/40">
+            <div class="px-3 py-6 pt-20 mx-auto sm:px-6 lg:px-8 dark:bg-indigo-900/40 bg-gray-200/40">
                 <slot />
                 <Footer />
             </div>

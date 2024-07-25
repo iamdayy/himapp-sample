@@ -30,9 +30,9 @@ export const useStats = () => {
   return {
     eventsMe,
     projectsMe,
-    EventPercentage,
-    ProjectPercentage,
+    allCanMeRegister,
     all,
-    allPercentage,
+    eventsCanMeRegistered,
+    ProjectsCanMeRegistered,
   };
 };

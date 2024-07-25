@@ -4,8 +4,8 @@ definePageMeta({
     layout: false
 });
 const colorMode = useColorMode();
-const { allPercentage, all, eventsMe, EventPercentage, projectsMe, ProjectPercentage } = useStats()
-const { status, data: user } = useAuth();
+const { all, eventsMe, projectsMe, allCanMeRegister, eventsCanMeRegistered, ProjectsCanMeRegistered } = useStats()
+const { status, data: user, signOut } = useAuth();
 const Project = computed<IProject | undefined>(() => {
     return projectsMe.value?.find((project) => new Date(project.deadline) > new Date(Date.now()))
 });
@@ -47,6 +47,7 @@ const itemsIsLogged = [
     }],
     [{
         label: 'Sign out',
+        slot: 'SignOut',
         icon: 'i-heroicons-arrow-right-start-on-rectangle'
     }]
 ]
@@ -91,8 +92,9 @@ const links = [
     ],
     [
         {
-            label: 'Examples',
-            icon: 'i-heroicons-light-bulb'
+            label: 'Events',
+            icon: 'i-heroicons-light-bulb',
+            to: '/dashboard/events'
         },
         {
             label: 'Help',
@@ -113,11 +115,12 @@ onMounted(() => {
         }
 
         carouselRef.value.next()
-    }, 3000)
+    }, 30000);
+
 })
 </script>
 <template>
-    <div class="min-h-full">
+    <div class="">
         <ClientOnly>
             <nav
                 class="absolute z-10 w-full bg-white border-gray-200 md:bg-transparent bg-opacity-35 backdrop-blur-md md:border-none">
@@ -151,33 +154,31 @@ onMounted(() => {
                                     <span class="truncate">{{ item.label }}</span>
                                 </NuxtLink>
                             </template>
+
+                            <template #SignOut="{ item }">
+                                <UButton @click="signOut({ callbackUrl: '/login' })">
+                                    <UIcon :name="item.icon" v-if="item.icon"
+                                        class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto me-2" />
+                                    <span class="truncate">{{ item.label }}</span>
+                                </UButton>
+                            </template>
                         </UDropdown>
-                    </div>
-                    <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
-                        id="navbar-user">
-                        <ul
-                            class="flex flex-col p-4 mt-4 font-medium border border-gray-300 rounded-lg shadow-md md:p-0 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-transparent md:shadow-none">
-                            <li v-for="nav, i in navigation" :key="i">
-                                <a :href="nav.href"
-                                    class="block px-3 py-2 font-sans font-semibold text-gray-700 bg-transparent rounded md:p-0 dark:text-gray-200">{{
-                                        nav.name }}</a>
-                            </li>
-                        </ul>
                     </div>
                 </div>
             </nav>
         </ClientOnly>
         <main>
             <div class="px-3 py-6 pt-20 mx-auto sm:px-6 lg:px-8  dark:bg-indigo-900/40 bg-gray-200/40">
-                <div class="flex px-4 py-3 w-full gap-3">
+                <div class="flex px-4 py-3 w-full space-x-6">
                     <UCard class="max-w-md md:block hidden w-full"
                         :ui="{ divide: 'divide-y divide-gray-200/60 dark:divide-gray-800/60' }">
                         <template #header>
                             <div class="flex w-full gap-2">
                                 <UAvatar :src="user.profile.avatar" size="3xl" />
                                 <div>
-                                    <h2 class="text-4xl font-extrabold text-gray-800 dark:text-white">{{ user.username
-                                        }}
+                                    <h2 class="text-4xl font-extrabold text-gray-800 dark:text-white">{{
+                                        user.username
+                                    }}
                                     </h2>
                                     <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">{{
                                         user.profile.NIM }}
@@ -191,8 +192,8 @@ onMounted(() => {
                             </template>
                         </UVerticalNavigation>
                     </UCard>
-                    <div class="w-full">
-                        <div class="w-full flex gap-2 mb-3">
+                    <div class="w-full space-y-6">
+                        <div class="w-full flex gap-2">
                             <UCard class="w-full">
                                 <template #header>
                                     <h2 class="text-xl font-semibold dark:text-gray-200">Registered</h2>
@@ -201,45 +202,45 @@ onMounted(() => {
                                     <h2 class="text-3xl text-bold text-gray-700 dark:text-gray-400">{{ all }}</h2>
                                     <UIcon name="i-heroicons-globe-alt" class="text-6xl" />
                                 </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                    <div class="bg-blue-600 h-2.5 rounded-full" :style="`width: ${allPercentage}%`">
-                                    </div>
-                                </div>
+                                <ClientOnly>
+                                    <UMeter :value="all" :max="allCanMeRegister" indicator />
+                                </ClientOnly>
                             </UCard>
                             <UCard class="w-full">
                                 <template #header>
                                     <h2 class="text-xl font-semibold dark:text-gray-200">Events</h2>
                                 </template>
                                 <div class="flex w-full justify-between items-center mb-2">
-                                    <h2 class="text-3xl text-bold text-gray-700 dark:text-gray-400">{{ eventsMe.length
+                                    <h2 class="text-3xl text-bold text-gray-700 dark:text-gray-400">{{
+                                        eventsMe.length
                                         }}</h2>
                                     <UIcon name="i-heroicons-calendar" class="text-6xl" />
                                 </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                    <div class="bg-blue-600 h-2.5 rounded-full" :style="`width: ${EventPercentage}%`">
-                                    </div>
-                                </div>
+                                <ClientOnly>
+                                    <UMeter :value="eventsMe.length" :max="eventsCanMeRegistered?.length" indicator />
+                                </ClientOnly>
                             </UCard>
                             <UCard class="w-full">
                                 <template #header>
                                     <h2 class="text-xl font-semibold dark:text-gray-200">Projects</h2>
                                 </template>
                                 <div class="flex w-full justify-between items-center mb-2">
-                                    <h2 class="text-3xl text-bold text-gray-700 dark:text-gray-400">{{ projectsMe.length
+                                    <h2 class="text-3xl text-bold text-gray-700 dark:text-gray-400">{{
+                                        projectsMe.length
                                         }}</h2>
-                                    <UIcon name="i-heroicons-calendar" class="text-6xl" />
+                                    <UIcon name="i-heroicons-code-bracket" class="text-6xl" />
                                 </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                    <div class="bg-blue-600 h-2.5 rounded-full" :style="`width: ${ProjectPercentage}%`">
-                                    </div>
-                                </div>
+                                <ClientOnly>
+                                    <UMeter :value="projectsMe.length" :max="ProjectsCanMeRegistered?.length"
+                                        indicator />
+                                </ClientOnly>
                             </UCard>
                         </div>
                         <UCard>
                             <template #header>
                                 <div class="flex w-full justify-between">
                                     <h2 class="text-xl font-semibold dark:text-gray-200">Events</h2>
-                                    <NuxtLink to="">
+                                    <NuxtLink to="/dashboard/events">
                                         see more...
                                     </NuxtLink>
                                 </div>
@@ -249,7 +250,7 @@ onMounted(() => {
                                 :prev-button="{ color: 'gray', icon: 'i-heroicons-arrow-left-20-solid', }"
                                 :next-button="{ color: 'gray', icon: 'i-heroicons-arrow-right-20-solid', class: '-right-12' }"
                                 arrows class="rounded-lg overflow-hidden">
-                                <div class="px-8">
+                                <div class="px-16">
                                     <span
                                         class="mt-4 text-sm text-gray-400 whitespace-nowrap dark:text-white">Title</span>
                                     <h3
@@ -326,18 +327,7 @@ onMounted(() => {
                                 <span class="mt-4 text-sm text-gray-400 whitespace-nowrap dark:text-white">Public</span>
                                 <h3 class="self-center text-gray-500 text-md whitespace-nowrap dark:text-white">
                                     {{ Project?.canSee }}
-                                    <!-- <Icon name="solar:check-circle-bold" class="w-6 h-6 text-green-400" v-if="!Project" />
-              <Icon name="solar:close-circle-bold" class="w-6 h-6 text-red-600" v-else /> -->
                                 </h3>
-                                <!-- <div>
-              <div class="flex justify-between mb-1">
-                <span class="text-base font-medium text-blue-700 dark:text-white">Flowbite</span>
-                <span class="text-sm font-medium text-blue-700 dark:text-white">45%</span>
-              </div>
-              <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
-              </div>
-            </div> -->
                             </div>
                         </UCard>
                     </div>
