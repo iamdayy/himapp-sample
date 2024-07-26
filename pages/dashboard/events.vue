@@ -1,15 +1,22 @@
 <script setup lang='ts'>
-import { ModalsAddEvents, ModalsRegisteredEvents } from "#components";
+import { ModalsAddEvents, ModalsEditEvents, ModalsRegisteredUsers } from "#components";
 import type { IEvent, IProfile } from "~/types";
-const toast = useToast();
-const Modal = useModal();
+
 definePageMeta({
     middleware: "auth",
     layout: 'dashboard'
 })
+
 useHead({
     title: "Dashboard | Himatika"
 });
+
+const toast = useToast();
+const Modal = useModal();
+
+const colorMode = useColorMode();
+const isDarkMode = computed(() => colorMode.value == 'dark' ? true : false);
+
 
 const { canMeRegister } = useCanMeRegister();
 
@@ -26,14 +33,26 @@ const registerForm = ref({
     NIM: user.value?.profile.NIM,
     id: ""
 })
-
-const Event = ref<IEvent | null>(null);
-const event = computed<IEvent | null>({
+const Event = ref<IEvent>();
+const event = computed<IEvent>({
     get() {
         if (Event.value) {
             return Event.value;
         }
-        return null;
+        const parseDate = (date: string) => new Date(date.replace(/(\d{2})\/(\d{2})\/(\d{4})/g, '$2/$1/$3'));
+
+        const diff = (date: any, now: Date) => (parseDate(date).getTime() - now.getTime());
+
+        const evs = events.value?.sort(({ date: date1 }, { date: date2 }) => {
+            const diff1 = diff(date1, new Date);
+            const diff2 = diff(date2, new Date);
+            if (diff1 < 0) return 1;
+            if (diff2 < 0) return -1;
+
+            return diff1 - diff2;
+        });
+        const eventsNow = evs![0];
+        return eventsNow!;
     },
     set(newVal) {
         Event.value = newVal
@@ -42,14 +61,11 @@ const event = computed<IEvent | null>({
 const pickDetail = (id: string) => {
     if (events.value) {
         const index = events.value.findIndex((event) => event.title === id);
-        Event.value = events.value[index];
+        event.value = events.value[index];
     }
 }
 
-const pickDay = (day: any) => {
-    pickDate.value = day.day;
-}
-const pickDate = ref<number | null>(null);
+const pickDate = ref<Date | null>(null);
 
 const attributes = computed(() => [
     ...<[]>events.value?.map(event => ({
@@ -73,16 +89,25 @@ const isMeRegistered = (event: IEvent) => {
     }
 }
 
-const newEvent = () => {
+const AddModal = () => {
     Modal.open(ModalsAddEvents, {
         "onTrigger-refresh"() {
             refreshEvents();
         }
     })
 }
-const registeredEvent = () => {
-    Modal.open(ModalsRegisteredEvents, {
-        registered: Event.value?.registered,
+
+const EditModal = () =>
+    Modal.open(ModalsEditEvents, {
+        event: event.value,
+        "onTrigger-refresh"() {
+            refreshEvents();
+        }
+    })
+
+const registeredModal = () => {
+    Modal.open(ModalsRegisteredUsers, {
+        registered: event.value?.registered,
         onChangeCheckItem(val) {
             selectedRegistered.value = val
         }
@@ -110,44 +135,48 @@ const register = async (id: string) => {
                 Agenda
             </h2>
         </div>
-        <UCard class="mt-6">
-            <UButton label="New" class="mx-auto" @click="newEvent" v-if="isAdmin || isDept" />
-            <div class="flex flex-col w-full gap-3 px-8 py-12 md:flex-row">
-                <VCalendar :attributes="attributes" class="mx-auto shadow-lg md:max-w-sm" transparent
-                    @dayclick="pickDay" :is-dark="{ selector: ':root', darkClass: 'dark' }">
-                    <template #footer>
-                        <div class="px-2 pb-3">
-                            <div class="mx-auto">
-                                <div class="pt-2 border-t border-gray-800 dark:border-gray-700">
-                                    <div v-for="event, i in events?.filter((event: IEvent) => new Date(event.date).getDate() == pickDate)"
-                                        :key="i"
-                                        class="flex flex-col gap-2 px-4 py-2 cursor-pointer sm:gap-6 sm:flex-row sm:items-center hover:bg-gray-200 rounded-3xl"
-                                        @click="pickDetail(event.title)">
-                                        <p
-                                            class="text-sm font-normal text-gray-500 sm:text-right dark:text-gray-400 shrink-0">
-                                            {{ `${new Date(event.date).getHours()}:${new Date(event.date).getMinutes()}`
-                                            }}
-                                        </p>
-                                        <h3 class="text-lg font-semibold text-gray-600 dark:text-white">
-                                            {{ event.title }}
-                                        </h3>
+        <UCard class="px-8 mt-6">
+            <UButton label="New" size="xl" class="text-2xl my-3 font-bold text-gray-700 dark:text-gray-700"
+                :ui="{ rounded: 'rounded-full' }" @click="AddModal" v-if="isAdmin || isDept" block />
+            <div class="flex flex-col w-full gap-3 py-12 md:flex-row">
+                <ClientOnly>
+                    <VCalendar :attributes="attributes" class="mx-auto shadow-lg md:max-w-sm" v-if="events"
+                        @dayclick="(day: any) => pickDate = day.date" :is-dark="isDarkMode">
+                        <template #footer>
+                            <div class="px-2 pb-3">
+                                <div class="mx-auto">
+                                    <div class="pt-2 border-t border-gray-800 dark:border-gray-700">
+                                        <div v-for="event, i in events?.filter((event: IEvent) => new Date(event.date).toDateString() == new Date(pickDate!).toDateString())"
+                                            :key="i"
+                                            class="flex flex-col gap-2 px-4 py-2 cursor-pointer sm:gap-6 sm:flex-row sm:items-center hover:bg-gray-200 rounded-3xl"
+                                            @click="pickDetail(event.title)">
+                                            <p
+                                                class="text-sm font-normal text-gray-500 sm:text-right dark:text-gray-400 shrink-0">
+                                                {{ `${new Date(event.date).getHours()}:${new
+                                                    Date(event.date).getMinutes()}`
+                                                }}
+                                            </p>
+                                            <h3 class="text-lg font-semibold text-gray-600 dark:text-white">
+                                                {{ event.title }}
+                                            </h3>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </template>
-                </VCalendar>
+                        </template>
+                    </VCalendar>
+                </ClientOnly>
                 <div class="w-full px-8 py-4 bg-gray-100 border border-gray-400 rounded-lg shadow-lg dark:bg-gray-800">
-                    <h5 v-if="!Event"
+                    <h5 v-if="!event"
                         class="my-24 mb-4 text-3xl font-semibold text-center text-yellow-300 dark:text-yellow-200">No
                         Agenda
                         Selected</h5>
                     <div v-else>
                         <div class="flex justify-between w-full">
-                            <h5 class="mb-4 text-2xl font-medium text-gray-500 dark:text-gray-400">{{ Event?.title }}
+                            <h5 class="mb-4 text-2xl font-medium text-gray-500 dark:text-gray-400">{{ event?.title }}
                             </h5>
-                            <!-- <ModalsEventsEdit :identifier="Event._id as string" @trigger-refresh="refreshEvents"
-                                v-if="isAdmin || isDept" /> -->
+                            <UButton icon="i-heroicons-pencil-square" variant="link" @click="EditModal"
+                                v-if="isAdmin || isDept" />
                         </div>
                         <ul role="list" class="space-y-5 my-7">
                             <li class="flex items-center">
@@ -155,37 +184,37 @@ const register = async (id: string) => {
                                     class="flex-shrink-0 w-4 h-4 text-blue-600 dark:text-blue-500" />
                                 <span
                                     class="text-base font-normal leading-tight text-gray-500 dark:text-gray-400 ms-3">{{
-                                        new Date(Event.date).toLocaleDateString() }}</span>
+                                        new Date(event.date).toLocaleDateString() }}</span>
                             </li>
                             <li class="flex items-center">
                                 <Icon name="solar:clock-circle-outline"
                                     class="flex-shrink-0 w-4 h-4 text-blue-600 dark:text-blue-500" />
                                 <span
                                     class="text-base font-normal leading-tight text-gray-500 dark:text-gray-400 ms-3">{{
-                                        new Date(Event?.date).toLocaleTimeString() }}</span>
+                                        new Date(event?.date).toLocaleTimeString() }}</span>
                             </li>
                             <li class="flex">
                                 <Icon name="solar:map-point-outline"
                                     class="flex-shrink-0 w-4 h-4 text-blue-600 dark:text-blue-500" />
                                 <span
                                     class="text-base font-normal leading-tight text-gray-500 dark:text-gray-400 ms-3">{{
-                                        Event?.at }}</span>
+                                        event?.at }}</span>
                             </li>
                             <li class="flex">
                                 <Icon name="solar:eye-outline"
                                     class="flex-shrink-0 w-4 h-4 text-blue-600 dark:text-blue-500" />
                                 <span
                                     class="text-base font-normal leading-tight text-gray-500 dark:text-gray-400 ms-3">{{
-                                        Event?.canSee }}</span>
+                                        event?.canSee }}</span>
                             </li>
                             <li class="flex">
                                 <Icon name="solar:document-outline"
                                     class="flex-shrink-0 w-4 h-4 text-blue-600 dark:text-blue-500" />
                                 <span
                                     class="text-base font-normal leading-tight text-gray-500 dark:text-gray-400 ms-3">{{
-                                        Event?.description }}</span>
+                                        event?.description }}</span>
                             </li>
-                            <li v-if="Event.committee">
+                            <li v-if="event.committee">
                                 <span class="flex">
                                     <Icon name="solar:users-group-two-rounded-outline"
                                         class="flex-shrink-0 w-4 h-4 text-blue-600 dark:text-blue-500" />
@@ -197,31 +226,31 @@ const register = async (id: string) => {
                                     <table
                                         class="w-full text-sm text-left text-gray-500 bg-gray-100 rtl:text-right dark:text-gray-400 dark:bg-gray-700">
                                         <tbody>
-                                            <tr v-for="event, i in Event.committee">
+                                            <tr v-for="ev, i in event.committee">
                                                 <td class="px-6 py-4 border-gray-200 border-e dark:border-gray-600">
-                                                    {{ (event.user as IProfile).fullName }}
+                                                    {{ (ev.user as IProfile).fullName }}
                                                 </td>
                                                 <td class="px-6 py-4 border-gray-200 border-e dark:border-gray-600">
                                                     as
                                                 </td>
                                                 <td class="px-6 py-4">
-                                                    {{ event.job }}
+                                                    {{ ev.job }}
                                                 </td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
                             </li>
-
-                            <UButton label="Registered" class="mx-auto" block @click="registeredEvent"
-                                v-if="isAdmin || isDept" />
+                            <li v-if="event.registered">
+                                <UButton label="Registered"
+                                    class="mx-auto text-xl text-gray-700 font-semibold dark:text-gray-700" block
+                                    @click="registeredModal" v-if="isAdmin || isDept" />
+                            </li>
                         </ul>
-                        <button type="submit"
-                            v-if="canMeRegister(Event.canRegister, Event.date) && !isMeRegistered(Event)"
-                            @click="register(Event?._id as string)"
-                            class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                            Register this
-                        </button>
+                        <UButton type="submit"
+                            v-if="canMeRegister(event.canRegister, event.date) && !isMeRegistered(event)"
+                            class="text-2xl my-3 font-semibold" variant="outline" block
+                            @click="register(event?._id as string)" label="Register This" />
                     </div>
                 </div>
             </div>

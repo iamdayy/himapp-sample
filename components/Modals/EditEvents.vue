@@ -1,38 +1,35 @@
 <script setup lang='ts'>
+import type { PropType } from 'vue';
 import type { IEvent } from '~/types';
 import type { IProfileResponse } from '~/types/IResponse';
 
-const toast = useToast();
-const modal = useModal();
 const { data: profile } = await useAsyncData(() => $api<IProfileResponse>("/api/profile"));
+
+const toast = useToast();
+
+const modal = useModal();
+
+const props = defineProps({
+    event: {
+        type: Object as PropType<IEvent>,
+        required: true
+    },
+})
 
 const emits = defineEmits(['trigger-refresh']);
 
-const newEvent = ref<IEvent>({
-    title: "",
-    date: new Date(),
-    at: "",
-    description: "",
-    canSee: "All",
-    committee: [
-        {
-            job: "chief",
-            user: ""
-        }
-    ],
-    canRegister: "No"
-});
+const Event = ref<IEvent>(props.event);
 
 const addCommittee = () => {
-    if (!newEvent.value.committee) {
-        newEvent.value.committee = [
+    if (!Event.value.committee) {
+        Event.value.committee = [
             {
                 job: "",
                 user: ""
             }
         ]
     } else {
-        newEvent.value.committee?.push({
+        Event.value.committee?.push({
             job: "",
             user: ""
         });
@@ -40,19 +37,23 @@ const addCommittee = () => {
 }
 
 const deleteCommittee = (i: number) => {
-    newEvent.value.committee?.splice(i, 1);
+    Event.value.committee?.splice(i, 1);
 }
 
 const addEvent = async () => {
     try {
-        const added = await $api("/api/event", {
-            method: "post",
-            body: newEvent.value,
+        const edited = await $api("/api/event", {
+            method: "put",
+            body: Event.value,
+            query: {
+                id: Event.value._id
+            }
         });
-        toast.add({ title: "Success add new event at " + new Date(newEvent.value.date).toLocaleDateString() });
+        toast.add({ title: "Success edit new event at " + new Date(Event.value.date).toLocaleDateString() });
         emits('trigger-refresh');
+        modal.close();
     } catch (error: any) {
-        toast.add({ title: "Failed to add new Event" });
+        toast.add({ title: "Failed to edit new Event" });
     }
 }
 
@@ -65,7 +66,7 @@ const getNameFromNIM = (NIM?: number) => {
         <UCard>
             <template #header>
                 <div class="flex w-full justify-between">
-                    <h2 class="text-xl font-semibold dark:text-gray-200">New Event</h2>
+                    <h2 class="text-xl font-semibold dark:text-gray-200">Edit Event {{ Event.title }}</h2>
                     <UButton icon="i-heroicons-x-mark" :padded="false" variant="link" color="gray"
                         @click="modal.close" />
                 </div>
@@ -76,31 +77,30 @@ const getNameFromNIM = (NIM?: number) => {
                         <div class="col-span-6">
                             <label for="title"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title</label>
-                            <UInput type="text" name="title" id="title" v-model="newEvent.title" required />
+                            <UInput type="text" name="title" id="title" v-model="Event.title" required />
                         </div>
                         <div class="col-span-3">
                             <label for="date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date
                                 & Time</label>
-                            <div class="flex items-center gap-2 w-full justify-between">
-                                <VDatePicker id="date" v-model="newEvent.date" mode="dateTime">
-                                    <template #default="{ togglePopover }">
-                                        <UButton icon="i-heroicons-calendar" @click="togglePopover" />
-                                    </template>
-                                </VDatePicker>
-                                <span class="text-md font-semibold text-gray-900 dark:text-gray-300">{{ new
-                                    Date(newEvent.date).toLocaleDateString() }}</span>
-                            </div>
+                            <VDatePicker id="date" v-model="Event.date" mode="dateTime">
+                                <template #default="{ togglePopover }">
+                                    <button class="px-3 py-2 text-sm font-semibold text-white bg-blue-500 rounded-md"
+                                        @click="togglePopover">
+                                        Select date
+                                    </button>
+                                </template>
+                            </VDatePicker>
                         </div>
                         <div class="col-span-3">
                             <label for="at"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">At</label>
-                            <UInput type="text" name="at" id="at" v-model="newEvent.at" required />
+                            <UInput type="at" name="at" id="at" v-model="Event.at" required />
                         </div>
                         <div class="col-span-3">
                             <label for="canSee" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Can
                                 See</label>
                             <USelect id="canSee" :options="['Admin', 'Departement', 'Internal', 'All', 'External']"
-                                v-model="newEvent.canSee" />
+                                v-model="Event.canSee" required />
                         </div>
                         <div class="col-span-3">
                             <label for="canRegister"
@@ -108,25 +108,25 @@ const getNameFromNIM = (NIM?: number) => {
                                 Register</label>
                             <USelect id="canRegister"
                                 :options="['Admin', 'Departement', 'Internal', 'All', 'External', 'No']"
-                                v-model="newEvent.canRegister" />
+                                v-model="Event.canRegister" required />
                         </div>
                         <div class="col-span-6">
                             <label for="description"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
-                            <UTextarea id="description" :rows="4" v-modal="newEvent.description" />
+                            <UTextarea id="description" rows="4" v-model="Event.description" />
                         </div>
                         <div class="col-span-6">
                             <label for="committee"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contributors</label>
                             <div id="committee" class="ms-2">
-                                <div v-for="committee, i in newEvent.committee" :key="i" class="mb-2">
-                                    <div class="flex items-end">
+                                <div v-for="committee, i in Event.committee" :key="i" class="mb-2">
+                                    <div class="flex">
                                         <div class="flex items-center w-full gap-2">
                                             <div class="w-3/4">
                                                 <label :for="`${committee.job}-job`"
                                                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Job</label>
                                                 <UInput :type="`${committee.job}-job`" :name="`${committee.job}-job`"
-                                                    :id="`${committee.job}-job`" v-model="newEvent.committee![i].job"
+                                                    :id="`${committee.job}-job`" v-model="Event.committee![i].job"
                                                     required />
                                             </div>
                                             <div class="w-1/4">
@@ -134,7 +134,7 @@ const getNameFromNIM = (NIM?: number) => {
                                                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIM</label>
                                                 <UInput :type="`${committee.job}-profile`"
                                                     :name="`${committee.job}-profile`" :id="`${committee.job}-profile`"
-                                                    v-model="newEvent.committee![i].user" required />
+                                                    v-model="Event.committee![i].user" required />
                                             </div>
                                         </div>
                                         <UButton @click="deleteCommittee(i)" icon="i-heroicons-trash"
@@ -143,14 +143,14 @@ const getNameFromNIM = (NIM?: number) => {
                                     </div>
                                     <label :for="`${committee.job}-profile`"
                                         class="block text-sm font-medium text-gray-900 dark:text-white">{{
-                                            getNameFromNIM(newEvent.committee![i].user as number) }}</label>
+                                            getNameFromNIM(Event.committee![i].user as number) }}</label>
                                 </div>
                                 <UButton @click="addCommittee" label="Add Committee" icon="i-heroicons-plus" block
                                     trailing />
                             </div>
                         </div>
                     </div>
-                    <UButton type="submit" @click.prevent="addEvent" label="Save" icon="i-heroicons-clipboard" block
+                    <UButton type="submit" @click.prevent="addEvent" labe="Save" icon="i-heroicons-clipboard" block
                         trailing />
                 </div>
             </div>

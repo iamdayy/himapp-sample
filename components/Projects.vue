@@ -32,7 +32,7 @@ watch(page, () => {
                                         }}</time>
                                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{
                                         item.title
-                                        }}</h3>
+                                    }}</h3>
                                     <p v-if="item.description"
                                         class="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">
                                         {{ item.description }}
@@ -118,7 +118,7 @@ watch(page, () => {
                 </UAccordion>
             </ol>
         </div>
-        <UPagination size="sm" v-model="page" :total="totalProjects" @change="refreshProjects" show-last show-first />
+        <UPagination size="sm" v-model="page" :total="totalProjects" show-last show-first />
     </UCard>
 </template>
 <style scoped></style>

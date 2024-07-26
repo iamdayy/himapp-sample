@@ -35,10 +35,12 @@ const itemsIsLogged = [
         to: '/dashboard'
     }, {
         label: 'Events',
-        icon: 'i-heroicons-calendar'
+        icon: 'i-heroicons-calendar',
+        to: '/dashboard/events'
     }, {
         label: 'Projects',
-        icon: 'i-heroicons-code-bracket'
+        icon: 'i-heroicons-code-bracket',
+        to: '/dashboard/projects'
     }],
     [{
         label: 'Sign out',
@@ -96,9 +98,8 @@ const items = computed(() => isLoggedIn.value ? itemsIsLogged : itemsNotLogged);
                                 </NuxtLink>
                             </template>
                             <template #SignOut="{ item }">
-                                <UButton @click="signOut({ callbackUrl: '/login' })">
-                                    <UIcon :name="item.icon" v-if="item.icon"
-                                        class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto me-2" />
+                                <UButton @click="signOut({ callbackUrl: '/login' })" :icon="item.icon" variant="link"
+                                    color="gray" :padded="false">
                                     <span class="truncate">{{ item.label }}</span>
                                 </UButton>
                             </template>

@@ -3,6 +3,9 @@ import type { ILink, IProfile, IProject } from "~/types";
 definePageMeta({
     layout: false
 });
+useHead({
+    title: 'Dahsboard'
+})
 const colorMode = useColorMode();
 const { all, eventsMe, projectsMe, allCanMeRegister, eventsCanMeRegistered, ProjectsCanMeRegistered } = useStats()
 const { status, data: user, signOut } = useAuth();
@@ -37,13 +40,16 @@ const itemsIsLogged = [
     }],
     [{
         label: 'Dashboard',
-        icon: 'i-heroicons-rectangle-group'
+        icon: 'i-heroicons-rectangle-group',
+        to: '/dashboard'
     }, {
         label: 'Events',
-        icon: 'i-heroicons-calendar'
+        icon: 'i-heroicons-calendar',
+        to: '/dashboard/events'
     }, {
         label: 'Projects',
-        icon: 'i-heroicons-code-bracket'
+        icon: 'i-heroicons-code-bracket',
+        to: '/dashboard/projects'
     }],
     [{
         label: 'Sign out',
@@ -93,12 +99,13 @@ const links = [
     [
         {
             label: 'Events',
-            icon: 'i-heroicons-light-bulb',
+            icon: 'i-heroicons-calendar',
             to: '/dashboard/events'
         },
         {
-            label: 'Help',
-            icon: 'i-heroicons-question-mark-circle'
+            label: 'Projects',
+            icon: 'i-heroicons-code-bracket',
+            to: '/dashboard/projects'
         }
     ]
 ]
@@ -156,9 +163,8 @@ onMounted(() => {
                             </template>
 
                             <template #SignOut="{ item }">
-                                <UButton @click="signOut({ callbackUrl: '/login' })">
-                                    <UIcon :name="item.icon" v-if="item.icon"
-                                        class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto me-2" />
+                                <UButton @click="signOut({ callbackUrl: '/login' })" :icon="item.icon" variant="link"
+                                    color="gray" :padded="false">
                                     <span class="truncate">{{ item.label }}</span>
                                 </UButton>
                             </template>
@@ -291,7 +297,7 @@ onMounted(() => {
                             <template #header>
                                 <div class="flex w-full justify-between">
                                     <h2 class="text-xl font-semibold dark:text-gray-200">Projects</h2>
-                                    <NuxtLink to="">
+                                    <NuxtLink to="/dashboard/projects">
                                         see more...
                                     </NuxtLink>
                                 </div>
