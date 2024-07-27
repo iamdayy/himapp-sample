@@ -15,26 +15,29 @@ const { canMeRegister } = useCanMeRegister();
 const RegisterPopover = ref<boolean>(false);
 const selectedRegistered = ref<Array<any>>([]);
 const Project = ref<IProject>();
-const project = computed<IProject>({
+const project = computed<IProject | undefined>({
     get() {
         if (Project.value) {
             return Project.value;
         }
-        const parseDate = (date: string) => new Date(date.replace(/(\d{2})\/(\d{2})\/(\d{4})/g, '$2/$1/$3'));
+        if (projects.value) {
 
-        const diff = (date: any, now: Date) => Math.abs(parseDate(date).getTime() - now.getTime());
+            const parseDate = (date: string) => new Date(date.replace(/(\d{2})\/(\d{2})\/(\d{4})/g, '$2/$1/$3'));
 
-        const projs = projects.value?.sort(({ deadline: date1 }, { deadline: date2 }) => {
-            const diff1 = diff(date1, new Date);
-            const diff2 = diff(date2, new Date);
-            if (diff1 < 0) return 1;
-            if (diff2 < 0) return -1;
+            const diff = (date: any, now: Date) => Math.abs(parseDate(date).getTime() - now.getTime());
 
-            return diff1 - diff2;
-        });
+            const projs = projects.value?.sort(({ deadline: date1 }, { deadline: date2 }) => {
+                const diff1 = diff(date1, new Date);
+                const diff2 = diff(date2, new Date);
+                if (diff1 < 0) return 1;
+                if (diff2 < 0) return -1;
 
-        const projectsNow = projs![0];
-        return projectsNow;
+                return diff1 - diff2;
+            });
+
+            const projectsNow = projs![0];
+            return projectsNow;
+        }
     },
     set(newVal) {
         Project.value = newVal;
@@ -137,9 +140,9 @@ definePageMeta({
                             Date(project.deadline).toDateString() }}</span>
                     </button>
                     <div class="flex w-full justify-between my-2">
+                        <USelect label="per Page" :options="[5, 10, 20]" v-model="perPage" />
                         <UPagination size="sm" color="gray" v-model="page" :total="totalProjects" show-last
                             show-first />
-                        <USelect label="per Page" :options="[5, 10, 20]" v-model="perPage" />
                     </div>
                 </div>
                 <div class="w-full px-8 py-4 bg-gray-100 border border-gray-400 rounded-lg shadow-lg dark:bg-gray-800">

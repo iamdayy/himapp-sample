@@ -7,6 +7,9 @@ page.value = 1;
 watch(page, () => {
     refreshProjects();
 })
+watch(perPage, () => {
+    refreshProjects();
+})
 </script>
 <template>
     <UCard>
@@ -32,7 +35,7 @@ watch(page, () => {
                                         }}</time>
                                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{
                                         item.title
-                                    }}</h3>
+                                        }}</h3>
                                     <p v-if="item.description"
                                         class="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">
                                         {{ item.description }}
@@ -118,7 +121,10 @@ watch(page, () => {
                 </UAccordion>
             </ol>
         </div>
-        <UPagination size="sm" v-model="page" :total="totalProjects" show-last show-first />
+        <div class="flex w-full justify-between my-2">
+            <USelect label="per Page" :options="[5, 10, 20]" v-model="perPage" />
+            <UPagination size="sm" color="gray" v-model="page" :total="totalProjects" show-last show-first />
+        </div>
     </UCard>
 </template>
 <style scoped></style>

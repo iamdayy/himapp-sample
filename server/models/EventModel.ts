@@ -17,7 +17,7 @@ const CommitteeSchema = new Schema<ICommitteeSchema>({
     ref: "Profile",
     autopopulate: {
       model: ProfileModel,
-      select: "NIM avatar fullName class semester",
+      select: "NIM avatar fullName email class semester createdAt",
     },
   },
 });
@@ -29,7 +29,7 @@ const registeredSchema = new Schema<IRegisteredSchema>({
     ref: "Profile",
     autopopulate: {
       model: ProfileModel,
-      select: "NIM avatar fullName class semester",
+      select: "NIM avatar fullName email class semester createdAt",
     },
   },
   task: {

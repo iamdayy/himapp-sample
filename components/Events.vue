@@ -8,25 +8,28 @@ const isDarkMode = computed(() => colorMode.value == 'dark' ? true : false);
 const { data: events } = useAsyncData(() => $fetch<IEvent[]>("/api/event"));
 const date = ref<Date>();
 const Event = ref<IEvent>();
-const event = computed<IEvent>({
+const event = computed<IEvent | undefined>({
     get() {
         if (Event.value) {
             return Event.value;
         }
-        const parseDate = (date: string) => new Date(date.replace(/(\d{2})\/(\d{2})\/(\d{4})/g, '$2/$1/$3'));
+        if (events.value) {
+            const parseDate = (date: string) => new Date(date.replace(/(\d{2})\/(\d{2})\/(\d{4})/g, '$2/$1/$3'));
 
-        const diff = (date: any, now: Date) => (parseDate(date).getTime() - now.getTime());
+            const diff = (date: any, now: Date) => (parseDate(date).getTime() - now.getTime());
+            const evs = events.value?.sort(({ date: date1 }, { date: date2 }) => {
+                const diff1 = diff(date1, new Date);
+                const diff2 = diff(date2, new Date);
+                if (diff1 < 0) return 1;
+                if (diff2 < 0) return -1;
 
-        const evs = events.value?.sort(({ date: date1 }, { date: date2 }) => {
-            const diff1 = diff(date1, new Date);
-            const diff2 = diff(date2, new Date);
-            if (diff1 < 0) return 1;
-            if (diff2 < 0) return -1;
+                return diff1 - diff2;
+            });
+            const eventsNow = evs![0];
+            return eventsNow!;
 
-            return diff1 - diff2;
-        });
-        const eventsNow = evs![0];
-        return eventsNow!;
+        }
+        return undefined;
     },
     set(newVal) {
         Event.value = newVal

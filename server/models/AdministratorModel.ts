@@ -30,8 +30,7 @@ export const AdministratorMemberSchema = new Schema<IAdministratorMemberSchema>(
       ref: "Profile",
       autopopulate: {
         model: ProfileModel,
-        select:
-          "NIM avatar email fullName class semester enteredYear createdAt",
+        select: "NIM avatar fullName email class semester createdAt",
       },
     },
   }

@@ -106,6 +106,11 @@ const links = [
             label: 'Projects',
             icon: 'i-heroicons-code-bracket',
             to: '/dashboard/projects'
+        },
+        {
+            label: 'Users',
+            icon: 'i-heroicons-users',
+            to: '/administrators/users'
         }
     ]
 ]

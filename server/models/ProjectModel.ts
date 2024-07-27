@@ -14,7 +14,7 @@ const contributorSchema = new Schema<IContributorSchema>({
     ref: "Profile",
     autopopulate: {
       model: ProfileModel,
-      select: "NIM avatar fullName class semester",
+      select: "NIM avatar fullName email class semester createdAt",
     },
   },
   job: {
@@ -30,7 +30,7 @@ const registeredSchema = new Schema<IRegisteredSchema>({
     ref: "Profile",
     autopopulate: {
       model: ProfileModel,
-      select: "NIM avatar fullName class semester",
+      select: "NIM avatar fullName email class semester createdAt",
     },
   },
   task: {
