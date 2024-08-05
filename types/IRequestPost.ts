@@ -1,3 +1,4 @@
+import type { SortOrder } from "mongoose";
 import type { IEvent, IProfile } from ".";
 
 interface IReqQueryPaginate {
@@ -21,10 +22,14 @@ export interface IReqAuth extends IReqRegister, IReqLogin {
 }
 
 export interface IReqProfileQuery extends IReqQueryPaginate {
-  NIM: string;
-  fullName: string;
-  // NIM: number;
+  NIM: number;
+  search: string;
+  sort: "enteredYear" | "class" | "semester" | "fullName" | "createdAt";
+  order: SortOrder;
   email: string;
+  filterBy: "enteredYear" | "class" | "semester";
+  filter: string;
+  deleted: "false" | "true";
 }
 
 export interface IReqProfile extends IProfile {}

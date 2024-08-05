@@ -31,6 +31,9 @@ export const AdministratorMemberSchema = new Schema<IAdministratorMemberSchema>(
       autopopulate: {
         model: ProfileModel,
         select: "NIM avatar fullName email class semester createdAt",
+        match: {
+          status: "active",
+        },
       },
     },
   }

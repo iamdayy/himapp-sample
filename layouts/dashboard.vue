@@ -5,6 +5,10 @@ const { status, data: user, signOut } = useAuth();
 
 const isLoggedIn = computed(() => status.value == 'authenticated' ? true : false);
 const isDarkMode = computed(() => colorMode.value == 'light' ? true : false);
+
+const router = useRouter();
+const route = useRoute();
+
 const changeMode = () => {
     if (colorMode.value == 'light') {
         colorMode.value = 'dark';
@@ -68,9 +72,11 @@ const items = computed(() => isLoggedIn.value ? itemsIsLogged : itemsNotLogged);
             <nav
                 class="absolute z-10 w-full bg-white border-gray-200 md:bg-transparent bg-opacity-35 backdrop-blur-md md:border-none">
                 <div class="flex flex-wrap items-center justify-between p-4 mx-auto">
-                    <NuxtLink to="/" class="flex items-center space-x-3 rtl:space-x-reverse">
+                    <NuxtLink to="/" class="flex items-center space-x-3 rtl:space-x-reverse" v-if="route.path == '/'">
                         <NuxtImg src="/img/logo.png" class="h-8" alt="Logo" />
                     </NuxtLink>
+                    <UButton icon="i-heroicons-chevron-left" size="xl" variant="link" color="gray" v-else
+                        @click="router.back()" />
                     <div class="flex items-center space-x-3 md:order-2 md:space-x-0 rtl:space-x-reverse">
                         <UToggle on-icon="i-heroicons-sun" off-icon="i-heroicons-moon" :model-value="isDarkMode"
                             @change="changeMode" size="lg" class="mr-4" />

@@ -1,4 +1,4 @@
-import type { IAdministrator, IPeriod, IProfile } from "~/types";
+import type { IPeriod } from "~/types";
 
 export const useRole = (canAccess?: string[]) => {
   const { data: user, status } = useAuth();
@@ -9,16 +9,12 @@ export const useRole = (canAccess?: string[]) => {
     role.value = null;
     if (status.value == "authenticated") {
       const NIM = user.value?.profile.NIM;
-      const isAdministrator = user.value?.profile
-        .isAdministrator as IAdministrator;
+      const isAdministrator = user.value?.profile.isAdministrator;
       if (!isAdministrator) {
         role.value = "Member";
       }
       if (isAdministrator) {
-        role.value =
-          isAdministrator.AdministratorMembers.find(
-            (member) => (member.profile as IProfile).NIM === NIM
-          )?.role || "Member";
+        role.value = isAdministrator.role;
         isAdmin.value = true;
         period.value = isAdministrator.period!;
       }

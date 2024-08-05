@@ -1,29 +1,44 @@
+import { SortOrder } from "mongoose";
+import { AdministratorModel } from "~/server/models/AdministratorModel";
 import { ProfileModel } from "~/server/models/ProfileModel";
+import { IAdministrator, IEvent, IProfile, IProject } from "~/types";
 import { IReqProfileQuery } from "~/types/IRequestPost";
+
+type ISortable = {
+  [key: string]: SortOrder;
+};
+
 export default defineEventHandler(async (event) => {
   try {
-    let { NIM, perPage, page, fullName, email } =
+    let { NIM, perPage, page, order, sort, search, filter, filterBy, deleted } =
       getQuery<IReqProfileQuery>(event);
-
     if (NIM && !perPage && !page) {
       const profile = await ProfileModel.findOne({ NIM });
       return profile;
     }
 
     let query = {};
-    if (fullName) {
+    let sortOpt = {};
+    if (deleted == "false") {
       query = {
-        fullName: {
-          $regex: `.*${fullName}.*`,
-          $options: `i`,
-        },
+        ...query,
+        status: { $nin: "deleted" },
       };
     }
-    if (email) {
+    if (order && sort) {
+      sortOpt = { [sort]: order };
+    }
+    if (filter && filterBy) {
       query = {
-        email: {
-          $regex: `.*${email}.*`,
-          $options: `i`,
+        ...query,
+        [filterBy]: filter,
+      };
+    }
+    if (search) {
+      query = {
+        ...query,
+        $text: {
+          $search: search,
         },
       };
     }
@@ -42,27 +57,65 @@ export default defineEventHandler(async (event) => {
         statusMessage: "You must be admin / departement to access this",
       });
     }
-    if (NIM) {
-      query = {
-        $expr: {
-          $regexMatch: {
-            input: { $toString: "$NIM" },
-            regex: new RegExp(NIM),
-          },
-        },
-      };
-    }
     const length = await ProfileModel.countDocuments(query);
+    let filters = null;
+    if (filterBy) {
+      const profiles = await ProfileModel.find();
+      filters = [
+        ...new Set(profiles.map((v) => (filterBy ? v[filterBy] : null))),
+      ];
+    }
+
     const profiles = await ProfileModel.find(query)
-      .populate("events", "title")
-      .populate("projects", "title")
-      .populate("isDepartement", "departement period")
-      .populate("isAdministrator")
+      .populate({
+        path: "events",
+        select: "title date at description -_id",
+        transform: (doc: IEvent, id) => ({
+          title: doc.title,
+          date: doc.date,
+          at: doc.at,
+          description: doc.description,
+        }),
+      })
+      .populate({
+        path: "projects",
+        select: "title deadline description -_id",
+        transform: (doc: IProject) => ({
+          title: doc.title,
+          deadline: doc.deadline,
+          description: doc.description,
+        }),
+      })
+      .populate({
+        path: "isDepartement",
+        select: "departement period -_id",
+        options: { autopopulate: false },
+      })
+      .populate({
+        path: "isAdministrator",
+        model: AdministratorModel,
+        transform: (doc: IAdministrator, id) => {
+          if (doc) {
+            return {
+              role: doc.AdministratorMembers.find(
+                (adm) => (adm.profile as IProfile).id == id
+              )?.role,
+              period: doc.period,
+            };
+          }
+          return null;
+        },
+      })
+      .select(
+        "NIM avatar fullName email class semester enteredYear createdAt status"
+      )
+      .sort(sortOpt)
       .skip((page - 1) * perPage)
       .limit(perPage);
     return {
       profiles,
       length,
+      filters,
     };
   } catch (error: any) {
     return createError({

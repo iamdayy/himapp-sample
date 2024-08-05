@@ -23,9 +23,10 @@ export interface IAddress {
 }
 
 export interface IProfile {
+  id?: string;
   NIM: number;
   fullName: string;
-  avatar: string;
+  avatar?: string;
   class: string;
   semester: number;
   birth: {
@@ -38,11 +39,14 @@ export interface IProfile {
   phone: string;
   email: string;
   address: IAddress;
-  isRegistered: boolean;
+  status?: "active" | "inactive" | "free" | "deleted";
   enteredYear?: number;
   events?: IEvent[];
   projects?: IProject[];
-  isAdministrator?: IAdministrator;
+  isAdministrator?: {
+    role: string;
+    period: IPeriod;
+  };
   isDepartement?: IDepartement;
 }
 

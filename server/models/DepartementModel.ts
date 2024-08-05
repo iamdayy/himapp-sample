@@ -12,6 +12,9 @@ const departementSchema = new Schema<IDepartementSchema>({
     autopopulate: {
       model: ProfileModel,
       select: "NIM avatar fullName email class semester createdAt",
+      match: {
+        status: "active",
+      },
     },
   },
   departement: {

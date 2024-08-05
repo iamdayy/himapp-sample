@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { Types } from "mongoose";
 import { UserModel } from "~/server/models/UserModel";
+import { ProfileModel } from "../models/ProfileModel";
 import { setSession } from "../utils/Sessions";
 
 export default defineEventHandler(async (event) => {
@@ -18,6 +19,15 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 401,
       message: "Please check your password",
+    });
+  }
+  const profile = await ProfileModel.findOne({ NIM: user.profile.NIM });
+
+  if (profile?.status != "active") {
+    const deleted = await UserModel.deleteOne({ username: body.username });
+    throw createError({
+      statusCode: 406,
+      statusMessage: `Your membership is ${profile?.status}, so this user is deleted`,
     });
   }
   const token = jwt.sign({ user: user._id }, "HimatikaUser", {

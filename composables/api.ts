@@ -4,6 +4,9 @@ export function $api<T>(
 ) {
   const auth = useAuth();
 
+  if (!auth.token.value) {
+    auth.refresh();
+  }
   return $fetch<T>(request, {
     ...opts,
     headers: {

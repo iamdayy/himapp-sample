@@ -1,5 +1,8 @@
 import mongoose, { Schema } from "mongoose";
 import { IAddressSchema, IProfileSchema } from "~/types/ISchemas";
+import { EventModel } from "./EventModel";
+import { ProjectModel } from "./ProjectModel";
+import { UserModel } from "./UserModel";
 const AddressSchema = new Schema<IAddressSchema>({
   fullAddress: String,
   village: String,
@@ -64,9 +67,10 @@ const profileSchema = new Schema<IProfileSchema>(
     address: {
       type: AddressSchema,
     },
-    isRegistered: {
-      type: Boolean,
-      required: true,
+    status: {
+      type: String,
+      enum: ["active", "inactive", "free", "deleted"],
+      default: "free",
     },
   },
   {
@@ -88,11 +92,17 @@ profileSchema.virtual("projects", {
   ref: "Project",
   localField: "_id",
   foreignField: "registered.profile",
+  match: {
+    deadline: { $gte: new Date() },
+  },
 });
 profileSchema.virtual("events", {
   ref: "Event",
   localField: "_id",
   foreignField: "registered.profile",
+  match: {
+    date: { $gte: new Date() },
+  },
 });
 profileSchema.virtual("isAdministrator", {
   ref: "Administrator",
@@ -100,7 +110,7 @@ profileSchema.virtual("isAdministrator", {
   foreignField: "AdministratorMembers.profile",
   justOne: true,
   match: {
-    "period.end": { $gte: new Date(Date.now()) },
+    "period.end": { $gte: new Date() },
   },
 });
 profileSchema.virtual("isDepartement", {
@@ -109,11 +119,48 @@ profileSchema.virtual("isDepartement", {
   foreignField: "profile",
   justOne: true,
   match: {
-    "period.end": { $gte: new Date(Date.now()) },
+    "period.end": { $gte: new Date() },
   },
 });
 
 profileSchema.index({ NIM: "text", fullName: "text", email: "text" });
+
+profileSchema.post("save", async function (next) {
+  const profile = this;
+  const profileId = this._id;
+  if (profile.status == "deleted") {
+    await ProjectModel.updateMany(
+      {
+        $or: [
+          { "contributors.profile": profileId },
+          { "registered.profile": profileId },
+        ],
+      },
+      {
+        $pull: {
+          contributors: { profile: profileId },
+          registered: { profile: profileId },
+        },
+      }
+    );
+    await EventModel.updateMany(
+      {
+        $or: [
+          { "committee.user": profileId },
+          { "registered.profile": profileId },
+        ],
+      },
+      {
+        $pull: {
+          committee: { user: profileId },
+          registered: { profile: profileId },
+        },
+      }
+    );
+    await UserModel.findOneAndDelete({ profile: profileId });
+  }
+});
+
 export const ProfileModel = mongoose.model<IProfileSchema>(
   "Profile",
   profileSchema

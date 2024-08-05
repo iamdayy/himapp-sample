@@ -5,7 +5,6 @@ import {
   IProjectSchema,
   IRegisteredSchema,
 } from "~/types/ISchemas";
-import { ProfileModel } from "./ProfileModel";
 
 const contributorSchema = new Schema<IContributorSchema>({
   profile: {
@@ -13,8 +12,10 @@ const contributorSchema = new Schema<IContributorSchema>({
     required: true,
     ref: "Profile",
     autopopulate: {
-      model: ProfileModel,
       select: "NIM avatar fullName email class semester createdAt",
+      match: {
+        status: "active",
+      },
     },
   },
   job: {
@@ -29,8 +30,10 @@ const registeredSchema = new Schema<IRegisteredSchema>({
     required: true,
     ref: "Profile",
     autopopulate: {
-      model: ProfileModel,
       select: "NIM avatar fullName email class semester createdAt",
+      match: {
+        status: "active",
+      },
     },
   },
   task: {
@@ -68,7 +71,10 @@ const projectSchema = new Schema<IProjectSchema>(
       default: "No",
       enum: ["Admin", "Departement", "Internal", "All", "External", "No"],
     },
-    registered: [registeredSchema],
+    registered: {
+      type: [registeredSchema],
+      default: [],
+    },
     createdAt: Date,
     updatedAt: Date,
   },

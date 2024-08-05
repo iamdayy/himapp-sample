@@ -26,7 +26,13 @@ export const findProfileAndMarkRegister = async (id: Types.ObjectId) => {
         message: "Profile not found",
       });
     }
-    profile.isRegistered = true;
+    if (profile.status != "free") {
+      throw createError({
+        statusCode: 404,
+        message: "This profile cannot be registered",
+      });
+    }
+    profile.status = "active";
     profile.save();
   } catch (error: any) {
     throw createError({

@@ -19,9 +19,9 @@ export default defineEventHandler(async (event): Promise<IRegisterResponse> => {
     ...body,
     profile: profileId,
   };
+  await findProfileAndMarkRegister(profileId);
   const user = new UserModel(form);
   const registered = await user.save();
-  await findProfileAndMarkRegister(profileId);
   if (!registered) {
     throw createError({
       statusCode: 401,

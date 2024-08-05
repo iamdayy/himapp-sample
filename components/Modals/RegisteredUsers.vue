@@ -66,9 +66,32 @@ watch(selectedRegistered, () => {
     emit('changeCheckItem', selectedRegistered);
 })
 const generateXlsx = async () => {
-    const excel = new Excel<IRegistered[]>('registered-event');
-    await excel.generate(props.registered!);
-    excel.download();
+    try {
+        const response = await $fetch<Blob>('/api/sheet/export', {
+            method: "post",
+            headers: {
+                'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            },
+            body: {
+                title: "Registered-User",
+                data: selectedRegistered.value || props.registered
+            }
+        })
+        const blob = response;
+        if (!blob) {
+            return
+        }
+        const title = `Registered-users-${new Date()}`
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download',
+            `${title}-${new Date()}.xlsx`); // Nama file yang diunduh
+        document.body.appendChild(link);
+        link.click();
+    } catch (error) {
+
+    }
 }
 
 

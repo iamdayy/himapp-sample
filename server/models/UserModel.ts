@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import mongoose, { Model, Schema, Types } from "mongoose";
 import mongooseAutoPopulate from "mongoose-autopopulate";
-import { IUser } from "~/types";
+import { IAdministrator, IProfile, IUser } from "~/types";
 import { IUserSchema } from "~/types/ISchemas";
 import { AdministratorModel } from "./AdministratorModel";
 import { DepartementModel } from "./DepartementModel";
@@ -35,7 +35,11 @@ const userSchema = new Schema<IUserSchema, IUserModel, IUserMethods>({
     type: Types.ObjectId,
     ref: "Profile",
     autopopulate: {
+      match: {
+        status: "active",
+      },
       model: ProfileModel,
+      select: "-_id",
       populate: [
         {
           path: "projects",
@@ -48,6 +52,16 @@ const userSchema = new Schema<IUserSchema, IUserModel, IUserMethods>({
         {
           path: "isAdministrator",
           model: AdministratorModel,
+          transform: (doc: IAdministrator, id: any) => {
+            if (doc) {
+              return {
+                role: doc.AdministratorMembers.find(
+                  (adm) => (adm.profile as IProfile).id == id
+                )?.role,
+                period: doc.period,
+              };
+            }
+          },
         },
         {
           path: "isDepartement",
