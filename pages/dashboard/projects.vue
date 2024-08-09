@@ -104,7 +104,7 @@ const EditModal = () => {
 }
 
 useHead({
-    title: "Projects | Himatika"
+    title: "Projects"
 });
 watch(page, () => {
     refreshProjects();
@@ -113,8 +113,8 @@ watch(perPage, () => {
     refreshProjects();
 })
 definePageMeta({
-    middleware: "auth",
-    layout: 'dashboard'
+    layout: 'dashboard',
+    middleware: 'auth'
 });
 </script>
 <template>

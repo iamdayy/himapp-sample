@@ -3,8 +3,12 @@ import { ModalsAddProfile, ModalsConfirmation, ModalsEditProfile } from '#compon
 import type { IProfileResponse } from '~/types/IResponse';
 
 definePageMeta({
-    layout: 'dashboard'
+    layout: 'dashboard',
+    middleware: 'auth'
 });
+useHead({
+    title: 'Users'
+})
 
 const { isAdmin } = useRole();
 const { isDept } = useDept();

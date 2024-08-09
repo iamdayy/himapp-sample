@@ -22,6 +22,7 @@ export default defineNuxtConfig({
     "@samk-dev/nuxt-vcalendar",
     "@nuxtjs/sanity",
     "nuxt-echarts",
+    "nuxt-pdfmake",
   ],
   ui: {
     icons: ["heroicons", "uil", "ion"],

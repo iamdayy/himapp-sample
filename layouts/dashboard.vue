@@ -25,13 +25,14 @@ const navigation: ILink[] = [
 ] as ILink[]
 const itemsIsLogged = [
     [{
-        label: 'User',
+        label: user.value.username,
         slot: 'account',
         disabled: true
     }],
     [{
         label: 'Profile',
-        icon: 'i-heroicons-user'
+        icon: 'i-heroicons-user',
+        to: '/dashboard/profile'
     }],
     [{
         label: 'Dashboard',
@@ -65,6 +66,11 @@ const itemsNotLogged = [
     ]
 ]
 const items = computed(() => isLoggedIn.value ? itemsIsLogged : itemsNotLogged);
+useHead({
+    titleTemplate(title) {
+        return title + ' | Himatika Dashboard'
+    },
+});
 </script>
 <template>
     <div class="min-h-full">
@@ -91,7 +97,7 @@ const items = computed(() => isLoggedIn.value ? itemsIsLogged : itemsNotLogged);
                                         Signed in as
                                     </p>
                                     <p class="truncate font-medium text-gray-900 dark:text-white">
-                                        {{ user.profile.username }}
+                                        {{ item.label }}
                                     </p>
                                 </div>
                             </template>

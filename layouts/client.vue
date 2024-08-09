@@ -1,4 +1,9 @@
 <script setup lang='ts'>
+useHead({
+    titleTemplate(title) {
+        return title + ' | Himatika'
+    },
+})
 import type { ILink } from "~/types";
 const { status, data: user, signOut } = useAuth();
 const isLoggedIn = computed(() => status.value == 'authenticated' ? true : false);
@@ -23,13 +28,14 @@ const navigation: ILink[] = [
 ] as ILink[]
 const itemsIsLogged = [
     [{
-        label: 'User',
+        label: user.value.username,
         slot: 'account',
         disabled: true
     }],
     [{
         label: 'Profile',
-        icon: 'i-heroicons-user'
+        icon: 'i-heroicons-user',
+        to: '/dashboard/profile'
     }],
     [{
         label: 'Dashboard',
@@ -43,7 +49,6 @@ const itemsIsLogged = [
         label: 'Projects',
         icon: 'i-heroicons-code-bracket',
         to: '/dashboard/projects'
-
     }],
     [{
         label: 'Sign out',
@@ -90,7 +95,7 @@ const items = computed(() => isLoggedIn.value ? itemsIsLogged : itemsNotLogged);
                                         Signed in as
                                     </p>
                                     <p class="truncate font-medium text-gray-900 dark:text-white">
-                                        {{ user.profile.username }}
+                                        {{ item.label }}
                                     </p>
                                 </div>
                             </template>

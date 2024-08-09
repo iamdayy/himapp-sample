@@ -1,5 +1,6 @@
 import formidable from "formidable";
 import fs from "fs";
+import { readFiles } from "h3-formidable";
 import { IncomingMessage } from "http";
 import path from "path";
 import { ProfileModel } from "~/server/models/ProfileModel";
@@ -31,11 +32,7 @@ const getAvatar = (req: IncomingMessage): Promise<string> => {
           Math.round(Math.random() * 100000) +
           files.avatar[0].originalFilename!;
         oldPath = files.avatar[0].filepath;
-        newPath = `${path.join(
-          config.public.mount,
-          BASE_AVATAR_FOLDER,
-          imageName
-        )}`;
+        newPath = `${path.join(config.mount, BASE_AVATAR_FOLDER, imageName)}`;
         imageUrl = `/${BASE_AVATAR_FOLDER}/${imageName}`;
         fs.copyFileSync(oldPath, newPath);
         resolve(imageUrl);
@@ -52,8 +49,15 @@ const getAvatar = (req: IncomingMessage): Promise<string> => {
 
 export default defineEventHandler(async (event) => {
   try {
-    const user = await ensureAuth(event);
+    const { files } = await readFiles(event);
     const { NIM } = getQuery(event);
+    const avatarFile = files.avatar![0];
+    const BASE_AVATAR_FOLDER = "img/avatars";
+    let imageUrl = "";
+    let oldPath = "";
+    let newPath = "";
+
+    const user = await ensureAuth(event);
     if (user.profile.NIM != NIM) {
       throw createError({
         statusCode: 403,
@@ -68,20 +72,31 @@ export default defineEventHandler(async (event) => {
       });
     }
     if (profile.avatar) {
-      const exist = fs.existsSync(
-        `${path.join(config.public.mount, profile.avatar)}`
-      );
+      const exist = fs.existsSync(`${path.join(config.mount, profile.avatar)}`);
       if (exist) {
-        fs.rmSync(`${path.join(config.public.mount, profile.avatar)}`);
+        fs.rmSync(`${path.join(config.mount, profile.avatar)}`);
       }
     }
-    const avatar = await getAvatar(event.node.req);
-    profile.avatar = avatar;
+    if (avatarFile.mimetype?.startsWith("image/")) {
+      let imageName =
+        Date.now() +
+        Math.round(Math.random() * 100000) +
+        avatarFile.originalFilename!;
+      oldPath = avatarFile.filepath;
+      newPath = `${path.join(config.mount, BASE_AVATAR_FOLDER, imageName)}`;
+      fs.copyFileSync(oldPath, newPath);
+      imageUrl = `/${BASE_AVATAR_FOLDER}/${imageName}`;
+    } else {
+      throw createError({
+        statusMessage: "Please upload nothing but images.",
+      });
+    }
+    profile.avatar = imageUrl;
     await profile.save();
     return {
       statusCode: 200,
       statusMessage: `Avatar ${profile.NIM} updated`,
-      avatar,
+      avatar: profile.avatar,
     };
   } catch (error: any) {
     return createError({

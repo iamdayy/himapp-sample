@@ -1,10 +1,11 @@
 <script setup lang='ts'>
 import type { ILink, IProfile, IProject } from "~/types";
 definePageMeta({
-    layout: false
+    layout: false,
+    middleware: 'auth'
 });
 useHead({
-    title: 'Dahsboard'
+    title: 'Home | Himatika Dahsboard'
 })
 const colorMode = useColorMode();
 const { all, eventsMe, projectsMe, allCanMeRegister, eventsCanMeRegistered, ProjectsCanMeRegistered } = useStats()
@@ -36,7 +37,8 @@ const itemsIsLogged = [
     }],
     [{
         label: 'Profile',
-        icon: 'i-heroicons-user'
+        icon: 'i-heroicons-user',
+        to: '/dashboard/profile'
     }],
     [{
         label: 'Dashboard',
@@ -69,7 +71,7 @@ const itemsNotLogged = [
         }
     ]
 ]
-const links = [
+const links = computed(() => [
     [
         {
             label: user.value.profile.fullName,
@@ -113,7 +115,7 @@ const links = [
             to: '/administrators/users'
         }
     ]
-]
+])
 const items = computed(() => isLoggedIn.value ? itemsIsLogged : itemsNotLogged);
 
 const carouselRef = ref()
@@ -184,18 +186,20 @@ onMounted(() => {
                     <UCard class="max-w-md md:block hidden w-full"
                         :ui="{ divide: 'divide-y divide-gray-200/60 dark:divide-gray-800/60' }">
                         <template #header>
-                            <div class="flex w-full gap-2">
-                                <UAvatar :src="user.profile.avatar" size="3xl" />
-                                <div>
-                                    <h2 class="text-4xl font-extrabold text-gray-800 dark:text-white">{{
-                                        user.username
-                                    }}
-                                    </h2>
-                                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">{{
-                                        user.profile.NIM }}
-                                    </h2>
+                            <NuxtLink to="/dashboard/profile">
+                                <div class="flex w-full gap-2">
+                                    <UAvatar :src="user.profile.avatar" size="3xl" />
+                                    <div>
+                                        <h2 class="text-4xl font-extrabold text-gray-800 dark:text-white">{{
+                                            user.username
+                                            }}
+                                        </h2>
+                                        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">{{
+                                            user.profile.NIM }}
+                                        </h2>
+                                    </div>
                                 </div>
-                            </div>
+                            </NuxtLink>
                         </template>
                         <UVerticalNavigation :links="links">
                             <template #default="{ link }">
@@ -224,7 +228,7 @@ onMounted(() => {
                                 <div class="flex w-full justify-between items-center mb-2">
                                     <h2 class="text-3xl text-bold text-gray-700 dark:text-gray-400">{{
                                         eventsMe.length
-                                        }}</h2>
+                                    }}</h2>
                                     <UIcon name="i-heroicons-calendar" class="text-6xl" />
                                 </div>
                                 <ClientOnly>
@@ -238,7 +242,7 @@ onMounted(() => {
                                 <div class="flex w-full justify-between items-center mb-2">
                                     <h2 class="text-3xl text-bold text-gray-700 dark:text-gray-400">{{
                                         projectsMe.length
-                                        }}</h2>
+                                    }}</h2>
                                     <UIcon name="i-heroicons-code-bracket" class="text-6xl" />
                                 </div>
                                 <ClientOnly>

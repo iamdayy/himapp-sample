@@ -6,7 +6,6 @@ definePageMeta({
     layout: "client"
 });
 
-
 const query = groq`*[_type == "post" && slug.current == $slug][0] {
     title,
     "mainImage": mainImage.asset._ref,
@@ -30,7 +29,7 @@ const { data: details } = await useSanityQuery<IPost>(query, {
     slug: route.params.slug
 });
 useHead({
-    title: details.value?.title + " | Himatika"
+    title: details.value?.title
 });
 </script>
 <template>

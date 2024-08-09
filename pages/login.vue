@@ -35,8 +35,6 @@ const login = async () => {
 useHead({
     title: "Login | Himatika"
 });
-onMounted(() => {
-})
 </script>
 <template>
     <div

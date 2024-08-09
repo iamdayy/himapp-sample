@@ -3,12 +3,12 @@ import { ModalsAddEvents, ModalsEditEvents, ModalsRegisteredUsers } from "#compo
 import type { IEvent, IProfile } from "~/types";
 
 definePageMeta({
-    middleware: "auth",
-    layout: 'dashboard'
+    layout: 'dashboard',
+    middleware: 'auth'
 })
 
 useHead({
-    title: "Dashboard | Himatika"
+    title: "Dashboard"
 });
 
 const toast = useToast();

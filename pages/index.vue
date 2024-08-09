@@ -3,6 +3,9 @@ definePageMeta({
     layout: 'client',
     auth: false
 });
+useHead({
+    title: 'Home'
+})
 </script>
 <template>
     <section class="relative min-h-screen px-6 pt-10 pb-8 isolate">

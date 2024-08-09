@@ -8,6 +8,12 @@ export default defineEventHandler(async (event) => {
   try {
     const { files } = await readFiles(event);
     const file = files.file![0].filepath;
+    if (!file) {
+      throw createError({
+        statusCode: 402,
+        statusMessage: "Please attach file in the form",
+      });
+    }
 
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile(file);

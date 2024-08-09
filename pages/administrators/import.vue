@@ -3,7 +3,11 @@ import { ModalsEditProfile } from '#components';
 import type { IProfile } from '~/types';
 
 definePageMeta({
-    layout: 'dashboard'
+    layout: 'dashboard',
+    middleware: 'auth'
+});
+useHead({
+    title: "Import"
 })
 
 // Columns
