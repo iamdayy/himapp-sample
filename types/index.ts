@@ -120,18 +120,18 @@ export interface IProject {
   registered?: IRegistered[];
 }
 
+// Interface untuk Post
 export interface IPost {
   title: string;
-  mainImage: any;
-  body: any[];
-  slug: string;
+  mainImage: string; // Diasumsikan menyimpan URL gambar
+  body: string;
+  slug?: string;
   categories: {
     title: string;
     description: string;
   }[];
-  author: {
-    name: string;
-  };
-  publishedAt: any;
-  related: IPost[];
+  author?: Types.ObjectId | IProfile | number;
+  published?: boolean;
+  publishedAt?: Date;
+  related?: IPost[]; // Virtual field untuk related posts
 }

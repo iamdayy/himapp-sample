@@ -96,7 +96,7 @@ const AddModal = () => {
 }
 const EditModal = () => {
     Modal.open(ModalsEditProject, {
-        Project: Project.value,
+        Project: project.value,
         "onTriggerRefresh"() {
             refreshProjects();
         }
@@ -125,8 +125,8 @@ definePageMeta({
             </h2>
         </div>
         <UCard class="mt-6">
-            <div class="flex flex-row-reverse justify-between px-8 gap-8 items-center">
-                <UButton label="Add Project" class="text-xl text-gray-700 font-semibold dark:text-gray-700"
+            <div class="flex flex-row-reverse items-center justify-between gap-8 px-8">
+                <UButton label="Add Project" class="text-xl font-semibold text-gray-700 dark:text-gray-700"
                     @click="AddModal" v-if="isAdmin || isDept" icon="i-heroicons-plus" trailing />
             </div>
             <div class="flex flex-col w-full gap-3 px-8 py-12 md:flex-row">
@@ -139,7 +139,7 @@ definePageMeta({
                         {{ project.title }} | <span class="font-light text-md ms-2">{{ new
                             Date(project.deadline).toDateString() }}</span>
                     </button>
-                    <div class="flex w-full justify-between my-2">
+                    <div class="flex justify-between w-full my-2">
                         <USelect label="per Page" :options="[5, 10, 20]" v-model="perPage" />
                         <UPagination size="sm" color="gray" v-model="page" :total="totalProjects" show-last
                             show-first />
@@ -163,7 +163,8 @@ definePageMeta({
                                     class="flex-shrink-0 w-4 h-4 text-blue-600 dark:text-blue-500" />
                                 <span
                                     class="text-base font-normal leading-tight text-gray-500 dark:text-gray-400 ms-3">{{
-                                        new Date(project?.deadline!).toDateString() }}</span>
+                                        new Date(project?.deadline!).toLocaleDateString('id-Id', { dateStyle: 'full' })
+                                    }}</span>
                             </li>
                             <li class="flex">
                                 <Icon name="solar:eye-outline"
@@ -192,9 +193,7 @@ definePageMeta({
                             <li class="flex">
                                 <Icon name="solar:document-outline"
                                     class="flex-shrink-0 w-4 h-4 text-blue-600 dark:text-blue-500" />
-                                <span
-                                    class="text-base font-normal leading-tight text-gray-500 dark:text-gray-400 ms-3">{{
-                                        project?.description }}</span>
+                                <TiptapShow :content="project.description" />
                             </li>
                             <li v-if="project?.contributors">
                                 <span class="flex">
@@ -225,20 +224,20 @@ definePageMeta({
                             </li>
                             <li v-if="project?.registered">
                                 <UButton label="Registered"
-                                    class="mx-auto text-xl text-gray-700 font-semibold dark:text-gray-700" block
+                                    class="mx-auto text-xl font-semibold text-gray-700 dark:text-gray-700" block
                                     @click="registeredModal" v-if="isAdmin || isDept" />
                             </li>
                         </ul>
                         <UPopover overlay v-model:open="RegisterPopover"
                             :popper="{ strategy: 'absolute', placement: 'bottom', arrow: true }"
                             v-if="canMeRegister(project.canRegister, project.deadline) && !isMeRegistered(project)">
-                            <UButton type="submit" class="text-2xl my-3 font-semibold" variant="outline" block
+                            <UButton type="submit" class="my-3 text-2xl font-semibold" variant="outline" block
                                 label="Register This" />
 
                             <template #panel>
                                 <div class="p-4">
                                     <USelect color="gray" variant="outline" :options="project.tasks" />
-                                    <UButton type="submit" class="text-2xl my-3 font-semibold" variant="outline" block
+                                    <UButton type="submit" class="my-3 text-2xl font-semibold" variant="outline" block
                                         @click="register(project?._id as string)" label="Accept"
                                         tralling-icon="i-heroicons-check" />
                                 </div>

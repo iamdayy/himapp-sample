@@ -272,11 +272,11 @@ const colorbadge = (status: "active" | "inactive" | "free" | "deleted") => {
                 </div>
 
                 <!-- Header and Action buttons -->
-                <div class="flex justify-between items-center w-full px-4 py-3">
+                <div class="flex items-center justify-between w-full px-4 py-3">
                     <div class="flex items-center gap-1.5">
                         <span class="text-sm leading-5">Rows per page:</span>
 
-                        <USelect v-model="pageCount" :options="pageCountOptions" class="me-2 w-20" size="xs" />
+                        <USelect v-model="pageCount" :options="pageCountOptions" class="w-20 me-2" size="xs" />
                     </div>
 
                     <div class="flex gap-1.5 items-center">
@@ -338,14 +338,14 @@ const colorbadge = (status: "active" | "inactive" | "free" | "deleted") => {
 
                     <template #actions-data="{ row }">
                         <UDropdown :items="items(row)" :popper="{ arrow: true, strategy: 'absolute' }">
-                            <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
+                            <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal" />
                         </UDropdown>
                     </template>
                 </UTable>
             </div>
             <!-- Number of rows & Pagination -->
             <template #footer>
-                <div class="flex flex-wrap justify-between items-center">
+                <div class="flex flex-wrap items-center justify-between">
                     <div>
                         <span class="text-sm leading-5">
                             Showing

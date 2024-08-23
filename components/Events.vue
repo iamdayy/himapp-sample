@@ -96,13 +96,13 @@ const pickDetail = (id: string) => {
                             <Icon name="solar:calendar-outline"
                                 class="flex-shrink-0 w-4 h-4 text-blue-600 dark:text-blue-500" />
                             <span class="text-base font-normal leading-tight text-gray-500 dark:text-gray-400 ms-3">{{
-                                new Date(event.date).toLocaleDateString() }}</span>
+                                new Date(event.date).toLocaleDateString('id-Id', { dateStyle: 'full' }) }}</span>
                         </li>
                         <li class="flex items-center">
                             <Icon name="solar:clock-circle-outline"
                                 class="flex-shrink-0 w-4 h-4 text-blue-600 dark:text-blue-500" />
                             <span class="text-base font-normal leading-tight text-gray-500 dark:text-gray-400 ms-3">{{
-                                new Date(event?.date).toLocaleTimeString() }}</span>
+                                new Date(event?.date).toLocaleTimeString('id-Id', { timeStyle: 'full' }) }}</span>
                         </li>
                         <li class="flex">
                             <Icon name="solar:map-point-outline"
@@ -119,8 +119,7 @@ const pickDetail = (id: string) => {
                         <li class="flex">
                             <Icon name="solar:document-outline"
                                 class="flex-shrink-0 w-4 h-4 text-blue-600 dark:text-blue-500" />
-                            <span class="text-base font-normal leading-tight text-gray-500 dark:text-gray-400 ms-3">{{
-                                event?.description }}</span>
+                            <TiptapShow :content="event.description" />
                         </li>
                         <li v-if="event.committee">
                             <span class="flex">

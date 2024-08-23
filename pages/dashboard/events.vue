@@ -139,7 +139,7 @@ const register = async (id: string) => {
             </h2>
         </div>
         <UCard class="px-8 mt-6">
-            <UButton label="New" size="xl" class="text-2xl my-3 font-bold text-gray-700 dark:text-gray-700"
+            <UButton label="New" size="xl" class="my-3 text-2xl font-bold text-gray-700 dark:text-gray-700"
                 :ui="{ rounded: 'rounded-full' }" @click="AddModal" v-if="isAdmin || isDept" block />
             <div class="flex flex-col w-full gap-3 py-12 md:flex-row">
                 <ClientOnly>
@@ -187,14 +187,14 @@ const register = async (id: string) => {
                                     class="flex-shrink-0 w-4 h-4 text-blue-600 dark:text-blue-500" />
                                 <span
                                     class="text-base font-normal leading-tight text-gray-500 dark:text-gray-400 ms-3">{{
-                                        new Date(event.date).toLocaleDateString() }}</span>
+                                        new Date(event.date).toLocaleDateString('id-Id', { dateStyle: 'full' }) }}</span>
                             </li>
                             <li class="flex items-center">
                                 <Icon name="solar:clock-circle-outline"
                                     class="flex-shrink-0 w-4 h-4 text-blue-600 dark:text-blue-500" />
                                 <span
                                     class="text-base font-normal leading-tight text-gray-500 dark:text-gray-400 ms-3">{{
-                                        new Date(event?.date).toLocaleTimeString() }}</span>
+                                        new Date(event?.date).toLocaleTimeString('id-Id', { timeStyle: 'short' }) }}</span>
                             </li>
                             <li class="flex">
                                 <Icon name="solar:map-point-outline"
@@ -213,9 +213,7 @@ const register = async (id: string) => {
                             <li class="flex">
                                 <Icon name="solar:document-outline"
                                     class="flex-shrink-0 w-4 h-4 text-blue-600 dark:text-blue-500" />
-                                <span
-                                    class="text-base font-normal leading-tight text-gray-500 dark:text-gray-400 ms-3">{{
-                                        event?.description }}</span>
+                                <TiptapShow :content="event.description" />
                             </li>
                             <li v-if="event.committee">
                                 <span class="flex">
@@ -246,13 +244,13 @@ const register = async (id: string) => {
                             </li>
                             <li v-if="event.registered">
                                 <UButton label="Registered"
-                                    class="mx-auto text-xl text-gray-700 font-semibold dark:text-gray-700" block
+                                    class="mx-auto text-xl font-semibold text-gray-700 dark:text-gray-700" block
                                     @click="registeredModal" v-if="isAdmin || isDept" />
                             </li>
                         </ul>
                         <UButton type="submit"
                             v-if="canMeRegister(event.canRegister, event.date) && !isMeRegistered(event)"
-                            class="text-2xl my-3 font-semibold" variant="outline" block
+                            class="my-3 text-2xl font-semibold" variant="outline" block
                             @click="register(event?._id as string)" label="Register This" />
                     </div>
                 </div>

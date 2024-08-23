@@ -61,11 +61,11 @@ export default defineEventHandler(async (event) => {
       }
     }
     const projectsLength = await ProjectModel.countDocuments({
-      deadline: { $gte: new Date(Date.now()) },
+      // deadline: { $gte: new Date(Date.now()) },
       canSee: { $in: roles },
     });
     const projects = await ProjectModel.find({
-      deadline: { $gte: new Date(Date.now()) },
+      // deadline: { $gte: new Date(Date.now()) },
       canSee: { $in: roles },
     })
       .skip((page - 1) * perPage)

@@ -113,7 +113,12 @@ const links = computed(() => [
             label: 'Users',
             icon: 'i-heroicons-users',
             to: '/administrators/users'
-        }
+        },
+        {
+            label: 'Post',
+            icon: 'i-heroicons-clipboard-document-list',
+            to: '/dashboard/posts'
+        },
     ]
 ])
 const items = computed(() => isLoggedIn.value ? itemsIsLogged : itemsNotLogged);
@@ -155,7 +160,7 @@ onMounted(() => {
                                     <p>
                                         Signed in as
                                     </p>
-                                    <p class="truncate font-medium text-gray-900 dark:text-white">
+                                    <p class="font-medium text-gray-900 truncate dark:text-white">
                                         {{ item.label }}
                                     </p>
                                 </div>
@@ -164,7 +169,7 @@ onMounted(() => {
                             <template #item="{ item }">
                                 <NuxtLink :to="item.to" class="">
                                     <UIcon :name="item.icon" v-if="item.icon"
-                                        class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto me-2" />
+                                        class="flex-shrink-0 w-4 h-4 text-gray-400 dark:text-gray-500 ms-auto me-2" />
                                     <span class="truncate">{{ item.label }}</span>
                                 </NuxtLink>
                             </template>
@@ -181,9 +186,9 @@ onMounted(() => {
             </nav>
         </ClientOnly>
         <main>
-            <div class="px-3 py-6 pt-20 mx-auto sm:px-6 lg:px-8  dark:bg-indigo-900/40 bg-gray-200/40">
-                <div class="flex px-4 py-3 w-full space-x-6">
-                    <UCard class="max-w-md md:block hidden w-full"
+            <div class="px-3 py-6 pt-20 mx-auto sm:px-6 lg:px-8 dark:bg-indigo-900/40 bg-gray-200/40">
+                <div class="flex w-full px-4 py-3 space-x-6">
+                    <UCard class="hidden w-full max-w-md md:block"
                         :ui="{ divide: 'divide-y divide-gray-200/60 dark:divide-gray-800/60' }">
                         <template #header>
                             <NuxtLink to="/dashboard/profile">
@@ -192,7 +197,7 @@ onMounted(() => {
                                     <div>
                                         <h2 class="text-4xl font-extrabold text-gray-800 dark:text-white">{{
                                             user.username
-                                            }}
+                                        }}
                                         </h2>
                                         <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">{{
                                             user.profile.NIM }}
@@ -208,13 +213,13 @@ onMounted(() => {
                         </UVerticalNavigation>
                     </UCard>
                     <div class="w-full space-y-6">
-                        <div class="w-full flex gap-2">
+                        <div class="flex w-full gap-2">
                             <UCard class="w-full">
                                 <template #header>
                                     <h2 class="text-xl font-semibold dark:text-gray-200">Registered</h2>
                                 </template>
-                                <div class="flex w-full justify-between items-center mb-2">
-                                    <h2 class="text-3xl text-bold text-gray-700 dark:text-gray-400">{{ all }}</h2>
+                                <div class="flex items-center justify-between w-full mb-2">
+                                    <h2 class="text-3xl text-gray-700 text-bold dark:text-gray-400">{{ all }}</h2>
                                     <UIcon name="i-heroicons-globe-alt" class="text-6xl" />
                                 </div>
                                 <ClientOnly>
@@ -225,10 +230,10 @@ onMounted(() => {
                                 <template #header>
                                     <h2 class="text-xl font-semibold dark:text-gray-200">Events</h2>
                                 </template>
-                                <div class="flex w-full justify-between items-center mb-2">
-                                    <h2 class="text-3xl text-bold text-gray-700 dark:text-gray-400">{{
+                                <div class="flex items-center justify-between w-full mb-2">
+                                    <h2 class="text-3xl text-gray-700 text-bold dark:text-gray-400">{{
                                         eventsMe.length
-                                    }}</h2>
+                                        }}</h2>
                                     <UIcon name="i-heroicons-calendar" class="text-6xl" />
                                 </div>
                                 <ClientOnly>
@@ -239,10 +244,10 @@ onMounted(() => {
                                 <template #header>
                                     <h2 class="text-xl font-semibold dark:text-gray-200">Projects</h2>
                                 </template>
-                                <div class="flex w-full justify-between items-center mb-2">
-                                    <h2 class="text-3xl text-bold text-gray-700 dark:text-gray-400">{{
+                                <div class="flex items-center justify-between w-full mb-2">
+                                    <h2 class="text-3xl text-gray-700 text-bold dark:text-gray-400">{{
                                         projectsMe.length
-                                    }}</h2>
+                                        }}</h2>
                                     <UIcon name="i-heroicons-code-bracket" class="text-6xl" />
                                 </div>
                                 <ClientOnly>
@@ -253,7 +258,7 @@ onMounted(() => {
                         </div>
                         <UCard>
                             <template #header>
-                                <div class="flex w-full justify-between">
+                                <div class="flex justify-between w-full">
                                     <h2 class="text-xl font-semibold dark:text-gray-200">Events</h2>
                                     <NuxtLink to="/dashboard/events">
                                         see more...
@@ -264,12 +269,12 @@ onMounted(() => {
                                 :ui="{ item: 'w-full' }"
                                 :prev-button="{ color: 'gray', icon: 'i-heroicons-arrow-left-20-solid', }"
                                 :next-button="{ color: 'gray', icon: 'i-heroicons-arrow-right-20-solid', class: '-right-12' }"
-                                arrows class="rounded-lg overflow-hidden">
+                                arrows class="overflow-hidden rounded-lg">
                                 <div class="px-16">
                                     <span
                                         class="mt-4 text-sm text-gray-400 whitespace-nowrap dark:text-white">Title</span>
                                     <h3
-                                        class="ms-2 font-semibold self-center text-gray-500 text-md whitespace-nowrap dark:text-white/60">
+                                        class="self-center font-semibold text-gray-500 ms-2 text-md whitespace-nowrap dark:text-white/60">
                                         {{
                                             item.title
                                         }}
@@ -278,14 +283,14 @@ onMounted(() => {
                                     <span
                                         class="mt-4 text-sm text-gray-400 whitespace-nowrap dark:text-white">Date</span>
                                     <h3
-                                        class="ms-2 font-semibold self-center text-gray-500 text-md whitespace-nowrap dark:text-white/60">
+                                        class="self-center font-semibold text-gray-500 ms-2 text-md whitespace-nowrap dark:text-white/60">
                                         {{
                                             new Date(item.date).toLocaleDateString() }}
                                     </h3>
 
                                     <span class="mt-4 text-sm text-gray-400 whitespace-nowrap dark:text-white">At</span>
                                     <h3
-                                        class="ms-2 font-semibold self-center text-gray-500 text-md whitespace-nowrap dark:text-white/60">
+                                        class="self-center font-semibold text-gray-500 ms-2 text-md whitespace-nowrap dark:text-white/60">
                                         {{
                                             item.at
                                         }}
@@ -294,7 +299,7 @@ onMounted(() => {
                                     <span
                                         class="mt-4 text-sm text-gray-400 whitespace-nowrap dark:text-white">Accessbility</span>
                                     <h3
-                                        class="ms-2 font-semibold self-center text-gray-500 text-md whitespace-nowrap dark:text-white/60">
+                                        class="self-center font-semibold text-gray-500 ms-2 text-md whitespace-nowrap dark:text-white/60">
                                         {{
                                             item.canSee
                                         }}
@@ -304,7 +309,7 @@ onMounted(() => {
                         </UCard>
                         <UCard>
                             <template #header>
-                                <div class="flex w-full justify-between">
+                                <div class="flex justify-between w-full">
                                     <h2 class="text-xl font-semibold dark:text-gray-200">Projects</h2>
                                     <NuxtLink to="/dashboard/projects">
                                         see more...

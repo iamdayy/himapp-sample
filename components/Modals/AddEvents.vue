@@ -64,7 +64,7 @@ const getNameFromNIM = (NIM?: number) => {
     <UModal>
         <UCard>
             <template #header>
-                <div class="flex w-full justify-between">
+                <div class="flex justify-between w-full">
                     <h2 class="text-xl font-semibold dark:text-gray-200">New Event</h2>
                     <UButton icon="i-heroicons-x-mark" :padded="false" variant="link" color="gray"
                         @click="modal.close" />
@@ -81,13 +81,13 @@ const getNameFromNIM = (NIM?: number) => {
                         <div class="col-span-3">
                             <label for="date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date
                                 & Time</label>
-                            <div class="flex items-center gap-2 w-full justify-between">
+                            <div class="flex items-center justify-between w-full gap-2">
                                 <VDatePicker id="date" v-model="newEvent.date" mode="dateTime">
                                     <template #default="{ togglePopover }">
                                         <UButton icon="i-heroicons-calendar" @click="togglePopover" />
                                     </template>
                                 </VDatePicker>
-                                <span class="text-md font-semibold text-gray-900 dark:text-gray-300">{{ new
+                                <span class="font-semibold text-gray-900 text-md dark:text-gray-300">{{ new
                                     Date(newEvent.date).toLocaleDateString() }}</span>
                             </div>
                         </div>
@@ -113,7 +113,7 @@ const getNameFromNIM = (NIM?: number) => {
                         <div class="col-span-6">
                             <label for="description"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
-                            <UTextarea id="description" :rows="4" v-modal="newEvent.description" />
+                            <TipTapEditor id="description" v-model="newEvent.description" />
                         </div>
                         <div class="col-span-6">
                             <label for="committee"

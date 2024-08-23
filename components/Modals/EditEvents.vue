@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import type { PropType } from 'vue';
-import type { IEvent } from '~/types';
+import type { IEvent, IProfile } from '~/types';
 import type { IProfileResponse } from '~/types/IResponse';
 
 const { data: profile } = await useAsyncData(() => $api<IProfileResponse>("/api/profile"));
@@ -65,7 +65,7 @@ const getNameFromNIM = (NIM?: number) => {
     <UModal>
         <UCard>
             <template #header>
-                <div class="flex w-full justify-between">
+                <div class="flex justify-between w-full">
                     <h2 class="text-xl font-semibold dark:text-gray-200">Edit Event {{ Event.title }}</h2>
                     <UButton icon="i-heroicons-x-mark" :padded="false" variant="link" color="gray"
                         @click="modal.close" />
@@ -113,7 +113,7 @@ const getNameFromNIM = (NIM?: number) => {
                         <div class="col-span-6">
                             <label for="description"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
-                            <UTextarea id="description" rows="4" v-model="Event.description" />
+                            <TipTapEditor id="description" v-model="Event.description" />
                         </div>
                         <div class="col-span-6">
                             <label for="committee"
@@ -132,9 +132,9 @@ const getNameFromNIM = (NIM?: number) => {
                                             <div class="w-1/4">
                                                 <label :for="`${committee.job}-profile`"
                                                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIM</label>
-                                                <UInput :type="`${committee.job}-profile`"
-                                                    :name="`${committee.job}-profile`" :id="`${committee.job}-profile`"
-                                                    v-model="Event.committee![i].user" required />
+                                                <UInput type="number" :name="`${committee.job}-profile`"
+                                                    :id="`${committee.job}-profile`" v-model="Event.committee![i].user"
+                                                    :value="(Event.committee![i].user as IProfile).NIM" required />
                                             </div>
                                         </div>
                                         <UButton @click="deleteCommittee(i)" icon="i-heroicons-trash"

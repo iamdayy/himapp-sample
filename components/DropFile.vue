@@ -3,9 +3,10 @@
         <div class="flex items-center justify-center w-full max-w-xl p-4 mx-auto border-2 border-gray-400 border-dashed rounded-lg"
             :style="isDragging && 'border-color: green;'" @dragover="dragover" @dragleave="dragleave" @drop="drop">
             <input type="file" multiple name="file" id="fileInput" class="absolute w-px h-px overflow-hidden opacity-0"
-                @change="e => onChange((e.target as HTMLInputElement).files!)" accept=".xlsx .csv" />
+                @change="e => onChange((e.target as HTMLInputElement).files!)" :accept="accept" />
 
             <label for="fileInput" class="block text-lg cursor-pointer">
+                <slot />
                 <div v-if="isDragging">Release to drop files here.</div>
                 <div v-else>Drop files here or click here to upload.</div>
             </label>
@@ -23,6 +24,9 @@
 </template>
 
 <script setup lang="ts">
+defineProps({
+    accept: { type: String, default: '.xlsx .csv' }
+})
 const emit = defineEmits(["change"]);
 const isDragging = ref<boolean>(false);
 const files = ref<FileList>();

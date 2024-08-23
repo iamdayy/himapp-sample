@@ -4,7 +4,7 @@ useHead({
         return title + ' | Himatika'
     },
 })
-import type { ILink } from "~/types";
+import type { ILink, IUser } from "~/types";
 const { status, data: user, signOut } = useAuth();
 const isLoggedIn = computed(() => status.value == 'authenticated' ? true : false);
 
@@ -26,9 +26,9 @@ const navigation: ILink[] = [
     { name: 'Events', href: '#events', current: false },
     { name: 'Projects', href: '#projects', current: false },
 ] as ILink[]
-const itemsIsLogged = [
+const itemsIsLogged = (user: IUser) => [
     [{
-        label: user.value.username,
+        label: user.username,
         slot: 'account',
         disabled: true
     }],
@@ -68,7 +68,7 @@ const itemsNotLogged = [
         }
     ]
 ]
-const items = computed(() => isLoggedIn.value ? itemsIsLogged : itemsNotLogged);
+const items = computed(() => isLoggedIn.value ? itemsIsLogged(user.value) : itemsNotLogged);
 </script>
 <template>
     <div class="min-h-full">

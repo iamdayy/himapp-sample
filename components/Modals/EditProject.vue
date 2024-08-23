@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import type { IProject } from '~/types';
+import type { IProfile, IProject } from '~/types';
 import type { IProfileResponse } from '~/types/IResponse';
 
 const { data } = await useAsyncData(() => $api<IProfileResponse>("/api/profile"));
@@ -114,14 +114,14 @@ const deleteContributors = (i: number) => {
                             </VDatePicker>
                             <label class="block my-auto text-sm font-medium text-gray-900 dark:text-white"
                                 for="deadline">
-                                {{ project.deadline.toLocaleDateString() }}
+                                {{ new Date(project.deadline).toLocaleDateString() }}
                             </label>
                         </div>
                     </div>
                     <div class="col-span-6">
                         <label for="description"
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
-                        <UTextarea id="description" rows="6" v-model="project.description" />
+                        <TipTapEditor id="description" v-model="project.description" />
                     </div>
                     <div class="col-span-4">
                         <label for="contributors"
@@ -143,7 +143,8 @@ const deleteContributors = (i: number) => {
                                             <UInput :type="`${contributors.job}-profile`"
                                                 :name="`${contributors.job}-profile`"
                                                 :id="`${contributors.job}-profile`"
-                                                v-model="project.contributors![i].profile" required />
+                                                v-model="project.contributors![i].profile"
+                                                :value="(project.contributors![i].profile as IProfile).NIM" required />
                                         </div>
                                     </div>
                                     <UButton @click="deleteContributors(i)" icon="i-heroicons-trash"
@@ -176,7 +177,7 @@ const deleteContributors = (i: number) => {
                         <div class="mb-2">
                             <label for="select-tasks"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tasks</label>
-                            <div class="flex flex-wrap gap-2 items-center">
+                            <div class="flex flex-wrap items-center gap-2">
                                 <UBadge size="xs" variant="soft" v-for="task, i in project.tasks" :key="i">
                                     {{ task }}
                                     <UButton @click="deleteTask(i)" icon="i-heroicons-x-mark" size="xs"
@@ -194,7 +195,7 @@ const deleteContributors = (i: number) => {
                                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Task</label>
                                             <UInput type="text" name="Task" id="Task" placeholder="task..."
                                                 v-model="newTask" required />
-                                            <UButton type="submit" class="font-semibold my-2" variant="outline" block
+                                            <UButton type="submit" class="my-2 font-semibold" variant="outline" block
                                                 @click="addNewTask" label="Add" tralling-icon="i-heroicons-check" />
                                         </div>
                                     </template>

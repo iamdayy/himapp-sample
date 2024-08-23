@@ -1,6 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2024-04-03",
+  nitro: {
+    preset: "bun",
+  },
   runtimeConfig: {
     mongodb_uri: process.env.MONGODB_URI,
     mongodb_username: process.env.MONGODB_USERNAME,
@@ -20,12 +23,12 @@ export default defineNuxtConfig({
     "@nuxt/image",
     "@sidebase/nuxt-auth",
     "@samk-dev/nuxt-vcalendar",
-    "@nuxtjs/sanity",
     "nuxt-echarts",
     "nuxt-pdfmake",
+    "nuxt-tiptap-editor",
   ],
   ui: {
-    icons: ["heroicons", "uil", "ion"],
+    icons: ["heroicons", "uil", "ion", "ph"],
   },
   tailwindcss: {
     cssPath: "~/assets/css/tailwind.css",
@@ -97,8 +100,5 @@ export default defineNuxtConfig({
         },
       },
     },
-  },
-  sanity: {
-    projectId: process.env.SANITY_PROJECT_ID,
   },
 });

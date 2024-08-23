@@ -28,9 +28,7 @@ const randomWalk = computed(() => {
             </div>
         </div>
         <div class="img-wrapper">
-            <div class="nuxt-img-wrapper">
-                <NuxtImg :src='img' alt='' class="object-cover" />
-            </div>
+            <NuxtImg :src='img' alt='' class="object-cover aspect-square" width="224" height="224" />
         </div>
     </div>
 </template>
@@ -85,32 +83,6 @@ const randomWalk = computed(() => {
     opacity: 1;
 }
 
-/* h1,
-h2 {
-    margin: 0;
-    font-size: 38px;
-    letter-spacing: -.25px;
-    transform: translateX(-44px);
-    font-family: 'Sarala';
-    font-weight: 700;
-}
-
-h2 {
-    font-size: 21px;
-    transform: translateX(-34px);
-}
-
-p {
-    margin: 0;
-    font-weight: 300;
-    font-size: 16px;
-}
-
-span {
-    margin-left: 13px;
-    opacity: .55;
-} */
-
 img {
     transform-origin: top right;
     transition: transform 300ms cubic-bezier(0.390, 0.575, 0.565, 1.000);
@@ -118,16 +90,19 @@ img {
     transform: translateX(64%);
     max-width: 180px;
     pointer-events: none;
-    border-radius: 9999px;
+    border-radius: 9999px !important;
 }
 
 .img-wrapper {
     animation: float 4s v-bind('randomCubicBezier') infinite alternate;
     position: absolute;
+    transform-style: preserve-3d;
     top: 0;
     right: 0;
     pointer-events: none;
     backface-visibility: hidden;
+    width: 180px;
+    height: 180px;
 }
 
 @keyframes float {
@@ -143,82 +118,4 @@ img {
 .card:hover~.img-wrapper img {
     transform: scale(0.9) translateX(45%) translateY(195%);
 }
-
-/* ul {
-    margin-left: 21px;
-    padding: 0;
-    font-size: 16px;
-    font-weight: 300;
-    list-style: none;
-}
-
-li {
-    padding-bottom: 8px;
-    position: relative;
-}
-
-li:before {
-    content: 'x';
-    position: absolute;
-    left: -21px;
-    opacity: .55;
-}
-
-button {
-    position: absolute;
-    right: 21px;
-    bottom: 34px;
-    border: none;
-    box-shadow: none;
-    background: none;
-    color: inherit;
-    font-family: 'Exo 2';
-    font-weight: 300;
-    font-size: 15px;
-    letter-spacing: -.25px;
-    font-weight: 700;
-    padding: 13px 34px;
-    border-radius: 55px 55px 21px 55px;
-    background-image: linear-gradient(130deg, rgba(117, 51, 165, 1) 50%, rgba(51, 46, 57, .89) 100%);
-    background-size: 125% 100%;
-    background-position: right;
-    cursor: pointer;
-    box-shadow: 8px 5px 13px rgba(34, 34, 34, .08);
-    transform: scale(0) skewY(13deg);
-    transition: all 150ms cubic-bezier(0.390, 0.575, 0.565, 1.000);
-    transform-origin: right bottom;
-}
-
-.card:hover button {
-    transform: scale(1) skewY(0);
-}
-
-.card:not(:hover) button {
-    opacity: 0;
-}
-
-button:hover {
-    background-position: left;
-}
-
-.price {
-    position: absolute;
-    bottom: 34px;
-    left: 21px;
-    font-size: 34px;
-    opacity: .34;
-}
-
-@keyframes fadeIn {
-    0% {
-        opacity: 0.33;
-        transform: scale(.89);
-    }
-}
-
-@media only screen and (max-width: 600px) {
-    body {
-        transform: scale(.67);
-    }
-} */
 </style>

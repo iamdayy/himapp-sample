@@ -1,4 +1,4 @@
-import type { IProfile, IProject, IUser } from ".";
+import type { IPost, IProfile, IProject, IUser } from ".";
 
 interface IPaginateResponse {
   length: number;
@@ -10,7 +10,9 @@ export interface IProjectResponse extends IPaginateResponse {
 }
 
 export interface IProfileResponse extends IPaginateResponse {
-  length: number;
   filters: string[];
   profiles: IProfile[];
+}
+export interface IPostResponse extends IPaginateResponse {
+  posts: IPost[];
 }

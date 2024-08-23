@@ -39,3 +39,8 @@ export interface IReqEvent extends IEvent {}
 export interface IReqProjectQuery extends IReqQueryPaginate {
   id: string;
 }
+export interface IReqPostQuery extends IReqQueryPaginate {
+  sort: string;
+  order: string;
+  slug: string;
+}

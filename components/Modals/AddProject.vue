@@ -31,7 +31,7 @@ const getNameFromNIM = (NIM?: number) => {
 
 const addProject = async () => {
     try {
-        const added = await $fetch("/api/project", {
+        const added = await $api("/api/project", {
             method: "POST",
             body: project.value
         });
@@ -80,7 +80,7 @@ const deleteContributors = (i: number) => {
     <UModal>
         <UCard>
             <template #header>
-                <div class="flex w-full justify-between">
+                <div class="flex justify-between w-full">
                     <h2 class="text-xl font-semibold dark:text-gray-200">New Project</h2>
                     <UButton icon="i-heroicons-x-mark" :padded="false" variant="link" color="gray"
                         @click="modal.close" />
@@ -113,7 +113,7 @@ const deleteContributors = (i: number) => {
                     <div class="col-span-6">
                         <label for="description"
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
-                        <UTextarea id="description" rows="6" v-model="project.description" />
+                        <TipTapEditor id="description" v-model="project.description" />
                     </div>
                     <div class="col-span-4">
                         <label for="contributors"
@@ -168,7 +168,7 @@ const deleteContributors = (i: number) => {
                         <div class="mb-2">
                             <label for="select-tasks"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tasks</label>
-                            <div class="flex flex-wrap gap-2 items-center">
+                            <div class="flex flex-wrap items-center gap-2">
                                 <UBadge size="xs" variant="soft" v-for="task, i in project.tasks" :key="i">
                                     {{ task }}
                                     <UButton @click="deleteTask(i)" icon="i-heroicons-x-mark" size="xs"
@@ -186,7 +186,7 @@ const deleteContributors = (i: number) => {
                                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Task</label>
                                             <UInput type="text" name="Task" id="Task" placeholder="task..."
                                                 v-model="newTask" required />
-                                            <UButton type="submit" class="font-semibold my-2" variant="outline" block
+                                            <UButton type="submit" class="my-2 font-semibold" variant="outline" block
                                                 @click="addNewTask" label="Add" tralling-icon="i-heroicons-check" />
                                         </div>
                                     </template>

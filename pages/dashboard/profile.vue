@@ -1,6 +1,7 @@
 <script setup lang='ts'>
+import { ModalsCropImage } from "#components";
+import imageCompression from "browser-image-compression";
 import type { IAdministrator, IProfile } from '~/types';
-
 definePageMeta({
     layout: 'dashboard',
     middleware: 'auth'
@@ -16,24 +17,38 @@ const { data: user, refresh } = useAuth();
 const { data: administrators } = await useAsyncData(() => $fetch<IAdministrator[]>("/api/administrator"));
 
 const { all, allCanMeRegister } = useStats()
-
+const modal = useModal();
 const editMode = ref(false);
 const file = ref<File | null>(null);
 
 const onFileChange = async ($event: Event) => {
     const target = $event.target as HTMLInputElement;
+    const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+    }
     if (target && target.files) {
         file.value = target.files[0];
-        const body = new FormData()
-        body.append('avatar', target.files[0])
-        const uplaoded = await $api("/api/profile/avatar", {
-            method: "put",
-            query: {
-                NIM: user.value.profile.NIM
-            },
-            body
+        const body = new FormData();
+        const blob = URL.createObjectURL(file.value);
+        modal.open(ModalsCropImage, {
+            img: blob,
+            title: file.value.name,
+            async onCropped(file) {
+
+                const compressedFile = await imageCompression(file, options);
+                body.append('avatar', compressedFile);
+                await $api("/api/profile/avatar", {
+                    method: "put",
+                    query: {
+                        NIM: user.value.profile.NIM
+                    },
+                    body
+                });
+                refresh()
+            }
         });
-        refresh()
     }
 }
 
@@ -320,19 +335,19 @@ const getActivinessLetter = () => {
 const accessGetActivinessLetter = computed(() => ((all.value / allCanMeRegister.value) * 100) > 40);
 </script>
 <template>
-    <div class="items-center justify-center pb-24 px-6">
+    <div class="items-center justify-center px-6 pb-24">
         <UCard>
             <template #header>
-                <div class="flex w-full justify-between">
+                <div class="flex justify-between w-full">
                     <h2 class="text-4xl font-semibold dark:text-gray-200">My Profile</h2>
                     <UButton icon="i-heroicons-pencil-square" :padded="false" size="xl" variant="link" color="green"
                         @click="editMode = !editMode" />
                 </div>
             </template>
-            <div class="w-full flex gap-3 pt-12 flex-col-reverse md:flex-row">
-                <div class="md:w-1/3 w-full p-8 pt-12">
+            <div class="flex flex-col-reverse w-full gap-3 pt-12 md:flex-row">
+                <div class="w-full p-8 pt-12 md:w-1/3">
                     <h2
-                        class="text-4xl font-semibold leading-tight tracking-tight text-gray-800 dark:text-gray-200 mb-12">
+                        class="mb-12 text-4xl font-semibold leading-tight tracking-tight text-gray-800 dark:text-gray-200">
                         Details
                     </h2>
                     <dl class="max-w-md text-gray-900 dark:text-white">
@@ -388,9 +403,9 @@ const accessGetActivinessLetter = computed(() => ((all.value / allCanMeRegister.
                         </div>
                     </dl>
                 </div>
-                <div class="md:w-1/3 w-full p-8 pt-12">
+                <div class="w-full p-8 pt-12 md:w-1/3">
                     <h2
-                        class="text-4xl font-semibold leading-tight tracking-tight text-gray-800 dark:text-gray-200 mb-12">
+                        class="mb-12 text-4xl font-semibold leading-tight tracking-tight text-gray-800 dark:text-gray-200">
                         Organization
                     </h2>
                     <dl class="max-w-md text-gray-900 dark:text-white">
@@ -416,11 +431,11 @@ const accessGetActivinessLetter = computed(() => ((all.value / allCanMeRegister.
                         </div>
                     </dl>
                 </div>
-                <div class="md:w-1/3 w-full pt-12">
+                <div class="w-full pt-12 md:w-1/3">
                     <UCard class="mx-8">
-                        <div class="relative overflow-hidden rounded-full group w-56 h-56 -mt-32 mx-auto">
+                        <div class="relative w-56 h-56 mx-auto -mt-32 overflow-hidden rounded-full group">
                             <NuxtImg :src="user.profile.avatar || '/img/profile-blank.png'" width="224" height="224"
-                                class="max-w-56 absolute aspect-square object-cover mx-auto rounded-full" />
+                                class="absolute object-cover mx-auto rounded-full max-w-56 aspect-square" />
                             <div
                                 class="absolute top-0 left-0 flex items-center justify-center w-full h-0 gap-2 duration-500 bg-orange-400 rounded-full opacity-0 bg-opacity-95 group-hover:h-full group-hover:opacity-100">
                                 <label for="inputAvatar" class="cursor-pointer">
@@ -433,7 +448,7 @@ const accessGetActivinessLetter = computed(() => ((all.value / allCanMeRegister.
                                 </button>
                             </div>
                         </div>
-                        <div class="mx-auto text-center mt-8">
+                        <div class="mx-auto mt-8 text-center">
                             <h2
                                 class="text-4xl font-bold leading-tight tracking-tight text-gray-600 dark:text-gray-200">
                                 {{ user.username }}
@@ -443,20 +458,20 @@ const accessGetActivinessLetter = computed(() => ((all.value / allCanMeRegister.
                                     <dd class="text-lg font-semibold">{{ user.profile.email }}</dd>
                                 </div>
                                 <div class="flex flex-col py-3">
-                                    <dt class="text-gray-500 text-sm dark:text-gray-400">NIM</dt>
+                                    <dt class="text-sm text-gray-500 dark:text-gray-400">NIM</dt>
                                     <dd class="text-lg font-semibold">{{ user.profile.NIM }}
                                     </dd>
                                 </div>
                                 <div class="flex flex-col py-3">
-                                    <dt class="text-gray-500 text-sm dark:text-gray-400">Class</dt>
+                                    <dt class="text-sm text-gray-500 dark:text-gray-400">Class</dt>
                                     <dd class="text-lg font-semibold">{{ user.profile.class }}</dd>
                                 </div>
                                 <div class="flex flex-col py-3">
-                                    <dt class="text-gray-500 text-sm dark:text-gray-400">Semester</dt>
+                                    <dt class="text-sm text-gray-500 dark:text-gray-400">Semester</dt>
                                     <dd class="text-lg font-semibold">{{ user.profile.semester }}</dd>
                                 </div>
                                 <div class="flex flex-col py-3">
-                                    <dt class="text-gray-500 text-sm dark:text-gray-400">Entered Year</dt>
+                                    <dt class="text-sm text-gray-500 dark:text-gray-400">Entered Year</dt>
                                     <dd class="text-lg font-semibold">{{ user.profile.enteredYear }}</dd>
                                 </div>
                                 <div class="flex flex-col pt-3">
