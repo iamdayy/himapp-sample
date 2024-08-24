@@ -4,7 +4,7 @@ module.exports = {
       name: 'Himapp',
       port: '3000',
       exec_mode: 'cluster',
-      script: './.output/server/index.mjs'
+      script: 'node ./.output/server/index.mjs'
     }
   ]
 }

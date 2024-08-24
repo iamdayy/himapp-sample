@@ -8,7 +8,9 @@ definePageMeta({
 });
 useHead({
     title: 'Users'
-})
+});
+
+const { $api } = useNuxtApp();
 
 const { isAdmin } = useRole();
 const { isDept } = useDept();
@@ -321,7 +323,8 @@ const colorbadge = (status: "active" | "inactive" | "free" | "deleted") => {
                     </template>
 
                     <template #avatar-data="{ row }">
-                        <UAvatar :src="row.avatar || '/img/profile-blank.png'" />
+                        <NuxtImg :src="row.avatar || '/img/profile-blank.png'" width="24" height="24"
+                            class="object-cover rounded-full max-w-8 aspect-square" />
                     </template>
 
                     <template #position-data="{ row }">

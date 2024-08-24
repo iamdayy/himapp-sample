@@ -46,12 +46,8 @@ const onFileChange = async ($event: Event) => {
                         NIM: user.value.profile.NIM
                     },
                     body,
-                    onResponse({ response }) {
-                        if (response.status == 200) {
-                            refresh();
-                        }
-                    }
                 });
+                refresh();
             }
         });
     }
@@ -440,7 +436,7 @@ const accessGetActivinessLetter = computed(() => ((all.value / allCanMeRegister.
                     <UCard class="mx-8">
                         <div class="relative w-56 h-56 mx-auto -mt-32 overflow-hidden rounded-full group">
                             <NuxtImg :src="user.profile.avatar || '/img/profile-blank.png'" width="224" height="224"
-                                class="absolute object-cover mx-auto rounded-full max-w-56 aspect-square" />
+                                class="object-cover rounded-full max-w-56 aspect-square" />
                             <div
                                 class="absolute top-0 left-0 flex items-center justify-center w-full h-0 gap-2 duration-500 bg-orange-400 rounded-full opacity-0 bg-opacity-95 group-hover:h-full group-hover:opacity-100">
                                 <label for="inputAvatar" class="cursor-pointer">

@@ -86,15 +86,16 @@ const items = computed(() => isLoggedIn.value ? itemsIsLogged(user.value) : item
                             @change="changeMode" size="lg" class="mr-4" />
                         <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
                             :popper="{ placement: 'bottom-start' }">
-                            <UAvatar :icon="!isLoggedIn ? 'i-heroicons-arrow-right-end-on-rectangle' : undefined"
-                                :src="isLoggedIn ? user.profile.avatar : undefined" />
+                            <NuxtImg v-if="isLoggedIn" :src="user.profile.avatar || '/img/profile-blank.png'" width="24"
+                                height="24" class="object-cover rounded-full max-w-8 aspect-square" />
+                            <UAvatar v-else icon="i-heroicons-arrow-right-end-on-rectangle" />
 
                             <template #account="{ item }">
                                 <div class="text-left">
                                     <p>
                                         Signed in as
                                     </p>
-                                    <p class="truncate font-medium text-gray-900 dark:text-white">
+                                    <p class="font-medium text-gray-900 truncate dark:text-white">
                                         {{ item.label }}
                                     </p>
                                 </div>
@@ -103,7 +104,7 @@ const items = computed(() => isLoggedIn.value ? itemsIsLogged(user.value) : item
                             <template #item="{ item }">
                                 <NuxtLink :to="item.to" class="">
                                     <UIcon :name="item.icon" v-if="item.icon"
-                                        class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto me-2" />
+                                        class="flex-shrink-0 w-4 h-4 text-gray-400 dark:text-gray-500 ms-auto me-2" />
                                     <span class="truncate">{{ item.label }}</span>
                                 </NuxtLink>
                             </template>

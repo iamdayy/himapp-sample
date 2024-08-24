@@ -1,27 +1,27 @@
 export default defineNuxtPlugin((nuxtApp) => {
-  const { token } = useAuthState();
-  const config = useRuntimeConfig();
   const { refresh } = useAuth();
+  const config = useRuntimeConfig();
   const api = $fetch.create({
     baseURL: config.public.public_uri,
     onRequest({ request, options, error }) {
+      const token = useCookie("auth.token");
       if (token.value) {
         const headers = (options.headers ||= {});
         if (Array.isArray(headers)) {
-          headers.push(["Authorization", token.value]);
+          headers.push(["Authorization", `Bearer ${token.value}`]);
         } else if (headers instanceof Headers) {
-          headers.set("Authorization", token.value);
+          headers.set("Authorization", `Bearer ${token.value}`);
         } else {
-          headers.Authorization = token.value;
+          headers.Authorization = `Bearer ${token.value}`;
         }
       }
     },
-    async onResponseError({ request, response, options }) {
+    async onResponse({ request, response, options }) {
       if (response.status === 401) {
         if (response.status === 401) {
           try {
-            refresh();
-            options.headers = { Authorization: token.value! };
+            await refresh();
+            await api(request, options as any);
           } catch (error) {
             console.error("Token refresh failed:", error);
           }

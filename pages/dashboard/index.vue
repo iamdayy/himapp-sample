@@ -152,8 +152,9 @@ onMounted(() => {
                             @change="changeMode" size="lg" class="mr-4" />
                         <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
                             :popper="{ placement: 'bottom-start' }">
-                            <UAvatar :icon="!isLoggedIn ? 'i-heroicons-arrow-right-end-on-rectangle' : undefined"
-                                :src="isLoggedIn ? user.profile.avatar : undefined" />
+                            <NuxtImg v-if="isLoggedIn" :src="user.profile.avatar || '/img/profile-blank.png'" width="24"
+                                height="24" class="object-cover rounded-full max-w-8 aspect-square" />
+                            <UAvatar v-else icon="i-heroicons-arrow-right-end-on-rectangle" />
 
                             <template #account="{ item }">
                                 <div class="text-left">
