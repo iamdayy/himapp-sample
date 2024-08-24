@@ -8,7 +8,7 @@ useHead({
 })
 </script>
 <template>
-    <section class="relative min-h-screen px-6 pt-10 pb-8 isolate">
+    <section class="relative md:min-h-screen min-h-[80vh] px-6 pt-10 pb-8 isolate">
         <div class="absolute w-full transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
             <div class="text-center">
                 <h1
@@ -24,8 +24,9 @@ useHead({
                     ilmu
                     nya dalam bidang komputer.</p>
                 <div class="flex items-center justify-center mt-10 gap-x-6">
-                    <a href="#about" class="text-sm font-semibold leading-6 text-gray-900">Learn more <span
-                            aria-hidden="true">→</span></a>
+                    <a href="#about"
+                        class="text-sm font-semibold leading-6 text-gray-800 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300">Learn
+                        more <span aria-hidden="true">→</span></a>
                 </div>
             </div>
         </div>

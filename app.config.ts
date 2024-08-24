@@ -6,5 +6,12 @@ export default defineAppConfig({
       ring: "",
       shadow: "shadow-md",
     },
+    slideover: {
+      background: "bg-white/60 dark:bg-gray-900/50 backdrop-blur-sm",
+      divide: "",
+      ring: "",
+      shadow: "shadow-md",
+      width: "max-w-[45vw]",
+    },
   },
 });

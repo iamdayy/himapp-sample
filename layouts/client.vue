@@ -12,6 +12,7 @@ const colorMode = useColorMode();
 const router = useRouter();
 const route = useRoute();
 const isDarkMode = computed(() => colorMode.value == 'light' ? true : false);
+const isOpen = ref<boolean>(false)
 const changeMode = () => {
     if (colorMode.value == 'light') {
         colorMode.value = 'dark';
@@ -74,21 +75,42 @@ const items = computed(() => isLoggedIn.value ? itemsIsLogged(user.value) : item
     <div class="min-h-full">
         <ClientOnly>
             <nav
-                class="absolute z-10 w-full bg-white border-gray-200 md:bg-transparent bg-opacity-35 backdrop-blur-md md:border-none">
+                class="absolute z-10 w-full bg-white border-gray-200 md:bg-transparent bg-opacity-15 backdrop-blur-md md:border-none">
                 <div class="flex flex-wrap items-center justify-between p-4 mx-auto">
-                    <NuxtLink to="/" class="flex items-center space-x-3 rtl:space-x-reverse" v-if="route.path == '/'">
+                    <NuxtLink to="/" class="items-center hidden space-x-3 md:flex rtl:space-x-reverse"
+                        v-if="route.path == '/'">
                         <NuxtImg src="/img/logo.png" class="h-8" alt="Logo" />
                     </NuxtLink>
-                    <UButton icon="i-heroicons-chevron-left" size="xl" variant="link" color="gray" v-else
-                        @click="router.back()" />
+                    <UButton icon="i-heroicons-chevron-left" size="xl" variant="link" color="gray"
+                        class="hidden md:block" v-else @click="router.back()" />
+                    <UButton @click="isOpen = !isOpen" icon="i-heroicons-bars-3" class="block md:hidden" variant="link"
+                        square />
+                    <USlideover v-model="isOpen" :overlay="false" side="left">
+                        <div class="flex-1 p-4">
+                            <UButton color="gray" variant="ghost" size="sm" icon="i-heroicons-x-mark-20-solid"
+                                class="absolute z-10 flex sm:hidden end-5 top-5" square padded
+                                @click="isOpen = false" />
+                            <ul
+                                class="p-4 mt-12 font-medium bg-transparent rounded-lg md:space-x-8 rtl:space-x-reverse">
+                                <li v-for="nav, i in navigation" :key="i">
+                                    <a :href="nav.href"
+                                        class="block px-3 py-2 font-sans font-semibold text-gray-700 bg-transparent rounded md:p-0 dark:text-gray-200"
+                                        @click="isOpen = false">{{
+                                            nav.name }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </USlideover>
                     <div class="flex items-center space-x-3 md:order-2 md:space-x-0 rtl:space-x-reverse">
                         <UToggle on-icon="i-heroicons-sun" off-icon="i-heroicons-moon" :model-value="isDarkMode"
                             @change="changeMode" size="lg" class="mr-4" />
-                        <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
+                        <UDropdown :items="items"
+                            :ui="{ width: 'max-w-36', item: { disabled: 'cursor-text select-text' } }"
                             :popper="{ placement: 'bottom-start' }">
                             <NuxtImg v-if="isLoggedIn" :src="user.profile.avatar || '/img/profile-blank.png'" width="24"
                                 height="24" class="object-cover rounded-full max-w-8 aspect-square" />
-                            <UAvatar v-else icon="i-heroicons-arrow-right-end-on-rectangle" />
+                            <UButton v-else icon="i-heroicons-arrow-right-end-on-rectangle" variant="link"
+                                color="gray" />
 
                             <template #account="{ item }">
                                 <div class="text-left">
@@ -109,8 +131,8 @@ const items = computed(() => isLoggedIn.value ? itemsIsLogged(user.value) : item
                                 </NuxtLink>
                             </template>
                             <template #SignOut="{ item }">
-                                <UButton @click="signOut({ callbackUrl: '/login' })" :icon="item.icon" variant="link"
-                                    color="gray" :padded="false">
+                                <UButton @click="signOut()" :icon="item.icon" variant="link" color="gray"
+                                    :padded="false">
                                     <span class="truncate">{{ item.label }}</span>
                                 </UButton>
                             </template>
@@ -132,7 +154,7 @@ const items = computed(() => isLoggedIn.value ? itemsIsLogged(user.value) : item
         </ClientOnly>
 
         <main>
-            <div class="px-3 py-6 mx-auto sm:px-6 lg:px-8 dark:bg-indigo-900/40 bg-gray-200/40">
+            <div class="px-2 py-6 mx-auto md:px-8 dark:bg-indigo-900/40 bg-gray-200/40">
                 <slot />
                 <Footer />
             </div>

@@ -41,7 +41,7 @@ const randomWalk = computed(() => {
 }
 
 .card {
-    width: 320px;
+    width: 100%;
     height: 450px;
     position: relative;
     transform-style: preserve-3d;
@@ -52,7 +52,7 @@ const randomWalk = computed(() => {
 
 .card>div {
     position: absolute;
-    width: 320px;
+    width: 100%;
     height: 450px;
     padding: 34px 21px;
     transition: all 350ms cubic-bezier(0.390, 0.575, 0.565, 1.000);
@@ -87,7 +87,7 @@ img {
     transform-origin: top right;
     transition: transform 300ms cubic-bezier(0.390, 0.575, 0.565, 1.000);
     transition-delay: 100ms;
-    transform: translateX(64%);
+    transform: translateX(50%);
     max-width: 180px;
     pointer-events: none;
     border-radius: 9999px !important;
@@ -101,8 +101,8 @@ img {
     right: 0;
     pointer-events: none;
     backface-visibility: hidden;
-    width: 180px;
-    height: 180px;
+    width: 160px;
+    height: 160px;
 }
 
 @keyframes float {

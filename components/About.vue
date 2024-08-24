@@ -45,7 +45,7 @@ onMounted(async () => {
 <template>
     <UCard>
         <template #header>
-            <h2 class="text-4xl font-extrabold dark:text-white">About Us</h2>
+            <h2 class="text-2xl font-extrabold md:text-4xl dark:text-200">About Us</h2>
         </template>
         <div class="flex flex-col-reverse items-center gap-2 px-3 py-8 lg:flex-row">
             <div class="lg:w-1/2 dark:text-white md:px-2" data-aos="fade-right" data-aos-easing="ease-in-out"
@@ -76,7 +76,7 @@ onMounted(async () => {
                 <template #item="{ item }">
                     <UCard>
                         <template #header>
-                            <p class="mb-4 text-3xl font-bold text-center dark:text-gray-400">
+                            <p class="mb-4 text-2xl font-bold text-center md:text-3xl dark:text-gray-400">
                                 {{ item.label }}
                             </p>
                             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -107,10 +107,9 @@ onMounted(async () => {
                         </div>
                         <div v-if="item.key === 'ph'" class="w-full p-4 rounded-lg">
                             <h1 class="mb-4 text-xl font-bold text-center text-gray-400" v-if="administrator"><span>{{
-                                new
-                                    Date(administrator?.period.start!).getFullYear() }}</span> - <span>{{ new
+                                new Date(administrator?.period.start!).getFullYear() }}</span> - <span>{{ new
                                         Date(administrator?.period.end!).getFullYear() }}</span> </h1>
-                            <div class="grid max-w-4xl grid-cols-2 py-8 mx-auto justify-items-center"
+                            <div class="grid max-w-4xl grid-cols-1 py-8 mx-auto md:grid-cols-2 justify-items-center"
                                 v-if="administrator">
                                 <ProfileCard v-for="member, i in administrator.AdministratorMembers" class="mb-8"
                                     :profile="member.profile as IProfile" :subtitle="member.role" />
