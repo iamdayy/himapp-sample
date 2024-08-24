@@ -2,11 +2,12 @@ import type { IProject } from "~/types";
 import type { IProjectResponse } from "~/types/IResponse";
 
 export const useProjects = () => {
+  const { $api } = useNuxtApp();
   const page = ref<number>(1);
   const perPage = ref<number>(10);
   const { canMeRegister } = useCanMeRegister();
   const { data: user } = useAuth();
-  const { data, refresh: refreshProjects } = useAsyncData(() =>
+  const { data, refresh: refreshProjects } = useLazyAsyncData(() =>
     $api<IProjectResponse>("/api/project", {
       query: {
         page: page.value,

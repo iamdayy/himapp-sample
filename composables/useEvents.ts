@@ -1,8 +1,9 @@
 import type { IEvent } from "~/types";
 
 export const useEvents = () => {
+  const { $api } = useNuxtApp();
   const { canMeRegister } = useCanMeRegister();
-  const { data: events, refresh: refreshEvents } = useAsyncData(() =>
+  const { data: events, refresh: refreshEvents } = useLazyAsyncData(() =>
     $api<IEvent[]>("/api/event")
   );
   const { data: user } = useAuth();

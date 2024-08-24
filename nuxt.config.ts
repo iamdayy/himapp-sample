@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     mount: process.env.MOUNT,
     public: {
       appname: process.env.APPNAME,
+      api_uri: process.env.PUBLIC_URI_API,
       public_uri: process.env.PUBLIC_URI,
     },
   },

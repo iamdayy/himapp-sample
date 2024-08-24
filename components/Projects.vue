@@ -35,7 +35,7 @@ watch(perPage, () => {
                                         }}</time>
                                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{
                                         item.title
-                                    }}</h3>
+                                        }}</h3>
                                     <div v-if="item.description"
                                         class="w-full mb-4 text-base font-normal text-gray-500 line-clamp-2 dark:text-gray-400">
                                         <TiptapShow :content="item.description" />

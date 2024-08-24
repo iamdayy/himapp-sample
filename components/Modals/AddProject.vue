@@ -7,6 +7,7 @@ const toast = useToast();
 const modal = useModal();
 const emit = defineEmits(["triggerRefresh"]);
 
+const { $api } = useNuxtApp();
 const AddTaskPopover = ref<boolean>(false);
 const newTask = ref<string>('');
 const project = ref<IProject>({

@@ -16,7 +16,8 @@ const { data: user, refresh } = useAuth();
 
 const { data: administrators } = await useAsyncData(() => $fetch<IAdministrator[]>("/api/administrator"));
 
-const { all, allCanMeRegister } = useStats()
+const { all, allCanMeRegister } = useStats();
+const { $api } = useNuxtApp();
 const modal = useModal();
 const editMode = ref(false);
 const file = ref<File | null>(null);
@@ -44,9 +45,13 @@ const onFileChange = async ($event: Event) => {
                     query: {
                         NIM: user.value.profile.NIM
                     },
-                    body
+                    body,
+                    onResponse({ response }) {
+                        if (response.status == 200) {
+                            refresh();
+                        }
+                    }
                 });
-                refresh()
             }
         });
     }

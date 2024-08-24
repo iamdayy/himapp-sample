@@ -5,6 +5,7 @@ import type { IPost } from '~/types';
 import type { IProfileResponse } from '~/types/IResponse';
 
 const { data } = await useAsyncData(() => $fetch<IProfileResponse>("/api/profile"));
+const { $api } = useNuxtApp();
 const toast = useToast();
 const modal = useModal();
 const emit = defineEmits(["triggerRefresh"]);

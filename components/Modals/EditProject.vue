@@ -2,10 +2,11 @@
 import type { IProfile, IProject } from '~/types';
 import type { IProfileResponse } from '~/types/IResponse';
 
-const { data } = await useAsyncData(() => $api<IProfileResponse>("/api/profile"));
 const toast = useToast();
 const modal = useModal();
+const { $api } = useNuxtApp();
 
+const { data } = await useAsyncData(() => $api<IProfileResponse>("/api/profile"));
 const AddTaskPopover = ref<boolean>(false);
 const newTask = ref<string>('');
 

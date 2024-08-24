@@ -5,6 +5,8 @@ import type { IProfileResponse } from '~/types/IResponse';
 
 const { data: profile } = await useAsyncData(() => $api<IProfileResponse>("/api/profile"));
 
+const { $api } = useNuxtApp();
+
 const toast = useToast();
 
 const modal = useModal();

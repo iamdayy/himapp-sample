@@ -3,6 +3,7 @@ import type { IProfile } from '~/types';
 
 const toast = useToast();
 const modal = useModal();
+const { $api } = useNuxtApp();
 
 const emit = defineEmits(["triggerRefresh"]);
 const loading = ref<boolean>(false);
@@ -56,7 +57,7 @@ const addColleger = async () => {
     <UModal>
         <UCard>
             <template #header>
-                <div class="flex w-full justify-between">
+                <div class="flex justify-between w-full">
                     <h2 class="text-xl font-semibold dark:text-gray-200">New Member</h2>
                     <UButton icon="i-heroicons-x-mark" :padded="false" variant="link" color="gray"
                         @click="modal.close" />

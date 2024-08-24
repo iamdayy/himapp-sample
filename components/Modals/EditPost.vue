@@ -10,6 +10,7 @@ const props = defineProps({
 const toast = useToast();
 const modal = useModal();
 const emit = defineEmits(["triggerRefresh"]);
+const { $api } = useNuxtApp();
 
 const AddCategoryPopover = ref<boolean>(false);
 const categoryTitle = ref<string>('');

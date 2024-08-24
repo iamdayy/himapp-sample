@@ -3,9 +3,10 @@ import type { IEvent, IProfile } from '~/types';
 
 
 const colorMode = useColorMode();
+const { $api } = useNuxtApp();
 const isDarkMode = computed(() => colorMode.value == 'dark' ? true : false);
 
-const { data: events } = useAsyncData(() => $fetch<IEvent[]>("/api/event"));
+const { data: events } = useAsyncData(() => $api<IEvent[]>("/api/event"));
 const date = ref<Date>();
 const Event = ref<IEvent>();
 const event = computed<IEvent | undefined>({

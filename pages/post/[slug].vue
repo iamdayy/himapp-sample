@@ -1,12 +1,13 @@
 <script setup lang='ts'>
 import type { IPost, IProfile } from '~/types';
 
+const { $api } = useNuxtApp();
 definePageMeta({
     auth: false,
     layout: "client"
 });
 const route = useRoute();
-const { data: details } = useAsyncData<IPost>(() => $fetch('/api/post', {
+const { data: details } = useAsyncData<IPost>(() => $api('/api/post', {
     query: {
         slug: route.params.slug
     }

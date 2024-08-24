@@ -1,24 +1,27 @@
 <script setup lang='ts'>
 import type { IProfile } from '~/types';
 import type { IPostResponse } from '~/types/IResponse';
-
+const { $api } = useNuxtApp()
 // Pagination
 const sort = ref({ column: 'createdAt', direction: 'asc' as const });
 const page = ref(1);
 const pageCount = ref(10);
-const { data, refresh } = useLazyAsyncData<IPostResponse>(() => $api('/api/post', {
-    query: {
-        page: page.value,
-        perPage: pageCount.value,
-        sort: sort.value
-    }
-}), {
-    default: () => ({
-        posts: [],
-        length: 0
-    }),
-    watch: [page, pageCount, sort,]
-});
+const { data, refresh } = useLazyAsyncData(() =>
+    $api<IPostResponse>('/api/post', {
+        query: {
+            page: page.value,
+            perPage: pageCount.value,
+            sort: sort.value
+        },
+    })
+    , {
+        default: () => ({
+            posts: [],
+            length: 0
+        }),
+        watch: [page, pageCount, sort,]
+
+    })
 const pageTotal = computed(() => data.value.length) // This value should be dynamic coming from the API
 const pageFrom = computed(() => (page.value - 1) * pageCount.value + 1)
 const pageTo = computed(() => Math.min(page.value * pageCount.value, pageTotal.value))

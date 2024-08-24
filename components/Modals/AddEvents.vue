@@ -1,10 +1,10 @@
 <script setup lang='ts'>
 import type { IEvent } from '~/types';
 import type { IProfileResponse } from '~/types/IResponse';
-
+const { $api } = useNuxtApp();
 const toast = useToast();
 const modal = useModal();
-const { data: profile } = await useAsyncData(() => $api<IProfileResponse>("/api/profile"));
+const { data: profile } = useLazyAsyncData(() => $api<IProfileResponse>("/api/profile"));
 
 const emits = defineEmits(['trigger-refresh']);
 

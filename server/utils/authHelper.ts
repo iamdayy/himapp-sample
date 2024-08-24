@@ -18,7 +18,7 @@ export const ensureAuth = async (event: H3Event) => {
 
   if (typeof authHeaderValue === "undefined") {
     throw createError({
-      statusCode: 403,
+      statusCode: 401,
       statusMessage:
         "Need to pass valid Bearer-Authorization header to access this endpoint",
     });
@@ -30,7 +30,7 @@ export const ensureAuth = async (event: H3Event) => {
   } catch (error) {
     console.error("Login failed. Here's the raw error:", error);
     throw createError({
-      statusCode: 403,
+      statusCode: 401,
       statusMessage: "You must be logged in to use this endpoint",
     });
   }
@@ -40,7 +40,7 @@ export const refreshAuth = async (event: H3Event) => {
     const { refreshToken } = await readBody(event);
     if (typeof refreshToken === "undefined") {
       throw createError({
-        statusCode: 403,
+        statusCode: 401,
         statusMessage:
           "Need to pass valid Bearer-Authorization header to access this endpoint",
       });
@@ -53,7 +53,7 @@ export const refreshAuth = async (event: H3Event) => {
   } catch (error) {
     console.error("Login failed. Here's the raw error:", error);
     throw createError({
-      statusCode: 403,
+      statusCode: 401,
       statusMessage: "You must be logged in to use this endpoint",
     });
   }
@@ -62,7 +62,7 @@ export const killAuth = async (event: H3Event) => {
   const authHeaderValue = getRequestHeader(event, "Authorization");
   if (typeof authHeaderValue === "undefined") {
     throw createError({
-      statusCode: 403,
+      statusCode: 401,
       statusMessage:
         "Need to pass valid Bearer-Authorization header to access this endpoint",
     });
@@ -74,7 +74,7 @@ export const killAuth = async (event: H3Event) => {
   } catch (error) {
     console.error("Login failed. Here's the raw error:", error);
     throw createError({
-      statusCode: 403,
+      statusCode: 401,
       statusMessage: "You must be logged in to use this endpoint",
     });
   }

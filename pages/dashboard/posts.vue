@@ -9,14 +9,15 @@ definePageMeta({
 });
 useHead({
     title: 'Posts'
-})
+});
+const { $api } = useNuxtApp();
 const modal = useModal();
 const toast = useToast();
 // Pagination
 const sort = ref({ column: 'createdAt', direction: 'asc' as const });
 const page = ref(1);
 const pageCount = ref(10);
-const { data, refresh } = useLazyAsyncData<IPostResponse>(() => $api('/api/post', {
+const { data, refresh } = useLazyAsyncData(() => $api<IPostResponse>('/api/post', {
     query: {
         page: page.value,
         perPage: pageCount.value,
@@ -28,6 +29,7 @@ const { data, refresh } = useLazyAsyncData<IPostResponse>(() => $api('/api/post'
         length: 0
     }),
     watch: [page, pageCount, sort,]
+
 });
 const pageTotal = computed(() => data.value.length) // This value should be dynamic coming from the API
 const pageFrom = computed(() => (page.value - 1) * pageCount.value + 1)
