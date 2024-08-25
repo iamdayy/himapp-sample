@@ -14,7 +14,15 @@ export default defineAppConfig({
       divide: "",
       ring: "",
       shadow: "shadow-md",
-      width: "max-w-[45vw]",
+      width: "max-w-[45vw] md:max-w-[20vw]",
+    },
+    dropdown: {
+      background: "bg-white/90 dark:bg-gray-900/95 backdrop-blur-sm",
+      ring: "",
+      shadow: "shadow-md",
+    },
+    verticalNavigation: {
+      active: "",
     },
   },
 });

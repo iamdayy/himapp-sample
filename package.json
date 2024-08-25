@@ -18,6 +18,8 @@
     "@tiptap/extension-ordered-list": "^2.6.2",
     "@tiptap/extension-placeholder": "^2.5.9",
     "@tiptap/extension-text-style": "^2.6.2",
+    "@vueuse/core": "^11.0.3",
+    "@vueuse/nuxt": "^11.0.3",
     "bcrypt": "^5.1.1",
     "browser-image-compression": "^2.0.2",
     "exceljs": "^4.4.0",

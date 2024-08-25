@@ -1,8 +1,13 @@
 <script setup lang='ts'>
 import type { IReqAuth } from "~/types/IRequestPost";
-const { signIn, data: user } = useAuth()
+
+// Authentication composable
+const { signIn } = useAuth()
+
+// Toast notification composable
 const toast = useToast();
-const router = useRouter()
+
+// Form data reactive reference
 const Form = ref<IReqAuth>({
     username: "",
     password: "",
@@ -10,8 +15,7 @@ const Form = ref<IReqAuth>({
     NIM: 0,
 });
 
-
-
+// Page metadata
 definePageMeta({
     pageTransition: {
         name: "flip"
@@ -22,20 +26,29 @@ definePageMeta({
         navigateAuthenticatedTo: '/'
     }
 });
+
+/**
+ * Handles user login
+ * Attempts to sign in the user with provided credentials
+ * Redirects to dashboard on success, shows error toast on failure
+ */
 const login = async () => {
     try {
-        signIn({
+        await signIn({
             username: Form.value.username,
             password: Form.value.password
         }, { callbackUrl: '/dashboard' });
     } catch (error: any) {
-        toast.add({ title: "Failed to login, please chek username/password" })
+        toast.add({ title: "Failed to login, please check username/password" })
     }
 }
+
+// Set page head metadata
 useHead({
     title: "Login | Himatika"
 });
 </script>
+
 <template>
     <div
         class="shadow-xl card bg-gradient-to-bl from-indigo-50 via-white to-teal-100 dark:from-gray-800 dark:via-gray-800 dark:to-gray-900">
@@ -45,8 +58,9 @@ useHead({
                 <nuxtImg class="w-auto h-10 mx-auto" src="/img/logo.png" alt="Himatika" />
             </div>
 
-            <div class="mt-6 overflow-y-scroll sm:mx-auto sm:w-full sm:max-w-sm no-scrollbar max-h-96 px-2">
+            <div class="px-2 mt-6 overflow-y-scroll sm:mx-auto sm:w-full sm:max-w-sm no-scrollbar max-h-96">
                 <div class="space-y-6">
+                    <!-- Username input -->
                     <div>
                         <label for="username-login"
                             class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">Username</label>
@@ -56,6 +70,7 @@ useHead({
                         </div>
                     </div>
 
+                    <!-- Password input -->
                     <div>
                         <div class="flex items-center justify-between">
                             <label for="password-login"
@@ -71,6 +86,7 @@ useHead({
                         </div>
                     </div>
 
+                    <!-- Login button -->
                     <div>
                         <button @click="login"
                             class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Sign
@@ -81,9 +97,11 @@ useHead({
         </div>
     </div>
 </template>
+
 <style scoped>
 @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,800,900');
 
+/* Card styles */
 .card {
     width: 100%;
     height: 100%;
@@ -114,6 +132,7 @@ useHead({
     backface-visibility: hidden;
 }
 
+/* Heading styles */
 .card-wrap h4 {
     position: relative;
     width: 100%;
@@ -128,6 +147,7 @@ useHead({
     transform: translate3d(0, 0, 35px) perspective(100px);
 }
 
+/* Animated background for heading */
 .card-wrap h4:before {
     position: absolute;
     content: '';
@@ -143,7 +163,7 @@ useHead({
     animation: border-transform 6s linear infinite;
 }
 
-
+/* Animation for heading background */
 @keyframes border-transform {
 
     0%,
@@ -176,6 +196,7 @@ useHead({
     }
 }
 
+/* Additional heading styles */
 .card-wrap h2 {
     position: relative;
     width: 100%;

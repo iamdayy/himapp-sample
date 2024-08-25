@@ -1,8 +1,18 @@
 <script setup lang='ts'>
+import { useWindowSize } from '@vueuse/core';
+
+// Define the component's slots
 const slots = defineSlots();
-const props = defineProps({
-    img: String,
+
+// Define the component's props
+defineProps({
+    img: String, // URL or path to the image
 });
+
+/**
+ * Compute a random cubic-bezier timing function
+ * @returns {string} A cubic-bezier function with random parameters
+ */
 const randomCubicBezier = computed(() => {
     const R1 = ((Math.random() * 0.699) + 0.300).toFixed(3);
     const R2 = ((Math.random() * 0.199) + 0.100).toFixed(3);
@@ -10,39 +20,65 @@ const randomCubicBezier = computed(() => {
     const R4 = ((Math.random() * 0.100) + 0.300).toFixed(3);
     return `cubic-bezier(${R1}, ${R2}, ${R3},${R4})`
 });
+
+/**
+ * Compute a random translation for the floating animation
+ * @returns {string} A CSS transform function with random X and Y translations
+ */
 const randomWalk = computed(() => {
     const x = Math.floor(Math.random() * -25) + 'px';
     const y = Math.floor(Math.random() * -35) + 'px';
     return `translateY(${x}) translateX(${y})`
 });
 
+// Use VueUse's useWindowSize composable for responsive design
+const { width } = useWindowSize();
+
+// Compute if the screen is mobile
+const isMobile = computed(() => width.value < 768);
+
+// Compute responsive dimensions
+const wrapperDimensions = computed(() => ({
+    width: isMobile.value ? '220px' : '280px',
+    height: isMobile.value ? '380px' : '480px'
+}));
+
+const cardDimensions = computed(() => ({
+    height: isMobile.value ? '350px' : '450px'
+}));
+
+const imageDimensions = computed(() => ({
+    width: isMobile.value ? '120px' : '160px',
+    height: isMobile.value ? '120px' : '160px'
+}));
+
 </script>
 <template>
-    <div class="mx-16 wrapper">
-        <div class="card">
-            <div class="front">
+    <div class="mx-auto wrapper" :style="wrapperDimensions">
+        <div class="card" :style="{ height: cardDimensions.height }">
+            <div class="front" :style="{ height: cardDimensions.height }">
                 <slot name="front" />
             </div>
-            <div class="right">
+            <div class="right" :style="{ height: cardDimensions.height }">
                 <slot name="back" />
             </div>
         </div>
-        <div class="img-wrapper">
-            <NuxtImg :src='img' alt='' class="object-cover aspect-square" width="224" height="224" />
+        <div class="img-wrapper" :style="imageDimensions">
+            <NuxtImg :src='img' alt='' class="object-cover aspect-square" :width="imageDimensions.width"
+                :height="imageDimensions.height" />
         </div>
     </div>
 </template>
 <style scoped>
+/* Wrapper for the entire component */
 .wrapper {
-    width: 280px;
-    height: 480px;
     perspective: 800px;
     position: relative;
 }
 
+/* Main card container */
 .card {
     width: 100%;
-    height: 450px;
     position: relative;
     transform-style: preserve-3d;
     transform: translateZ(-140px);
@@ -50,20 +86,22 @@ const randomWalk = computed(() => {
     cursor: pointer;
 }
 
+/* Common styles for front and back of the card */
 .card>div {
     position: absolute;
     width: 100%;
-    height: 450px;
     padding: 34px 21px;
     transition: all 350ms cubic-bezier(0.390, 0.575, 0.565, 1.000);
 }
 
+/* Front face of the card */
 .front {
     background-image: linear-gradient(180deg, rgb(255 138 76) 0%, rgba(92, 91, 94, 0) 95%);
     transform: rotateY(0deg) translateZ(160px);
     border-radius: 34px 8px 0;
 }
 
+/* Back face of the card */
 .right {
     background-image: linear-gradient(0deg, rgb(255 138 76) 0%, rgba(92, 91, 94, 0) 95%);
     opacity: 0.08;
@@ -71,6 +109,7 @@ const randomWalk = computed(() => {
     border-radius: 0 0 3px 34px;
 }
 
+/* Card hover effects */
 .card:hover {
     transform: translateZ(-160px) rotateY(-90deg);
 }
@@ -83,16 +122,18 @@ const randomWalk = computed(() => {
     opacity: 1;
 }
 
+/* Image styles */
 img {
     transform-origin: top right;
     transition: transform 300ms cubic-bezier(0.390, 0.575, 0.565, 1.000);
     transition-delay: 100ms;
     transform: translateX(50%);
-    max-width: 180px;
+    max-width: 100%;
     pointer-events: none;
     border-radius: 9999px !important;
 }
 
+/* Image wrapper styles */
 .img-wrapper {
     animation: float 4s v-bind('randomCubicBezier') infinite alternate;
     position: absolute;
@@ -101,10 +142,9 @@ img {
     right: 0;
     pointer-events: none;
     backface-visibility: hidden;
-    width: 160px;
-    height: 160px;
 }
 
+/* Floating animation keyframes */
 @keyframes float {
     0% {
         transform: translateZ(20px);
@@ -115,7 +155,24 @@ img {
     }
 }
 
+/* Image hover effect */
 .card:hover~.img-wrapper img {
     transform: scale(0.9) translateX(45%) translateY(195%);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .card>div {
+        padding: 20px 15px;
+    }
+
+    .front,
+    .right {
+        border-radius: 20px 5px 0;
+    }
+
+    .card:hover~.img-wrapper img {
+        transform: scale(0.9) translateX(40%) translateY(150%);
+    }
 }
 </style>

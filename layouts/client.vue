@@ -1,32 +1,49 @@
 <script setup lang='ts'>
+// Set up the head with a dynamic title template
 useHead({
     titleTemplate(title) {
-        return title + ' | Himatika'
+        return title ? `${title} | Himatika` : 'Himatika'
     },
 })
-import type { ILink, IUser } from "~/types";
-const { status, data: user, signOut } = useAuth();
-const isLoggedIn = computed(() => status.value == 'authenticated' ? true : false);
 
+// Import necessary types
+import type { ILink, IUser } from "~/types";
+
+// Set up authentication
+const { status, data: user, signOut } = useAuth();
+const isLoggedIn = computed(() => status.value === 'authenticated');
+
+// Set up color mode
 const colorMode = useColorMode();
+const isDarkMode = computed(() => colorMode.value === 'dark');
+
+// Set up router
 const router = useRouter();
 const route = useRoute();
-const isDarkMode = computed(() => colorMode.value == 'light' ? true : false);
+
+// UI state
 const isOpen = ref<boolean>(false)
+
+/**
+ * Toggle between light and dark mode
+ */
 const changeMode = () => {
-    if (colorMode.value == 'light') {
-        colorMode.value = 'dark';
-    } else {
-        colorMode.value = 'light';
-    }
+    colorMode.value = colorMode.value === 'light' ? 'dark' : 'light';
 }
 
+// Navigation links
 const navigation: ILink[] = [
     { name: 'Home', href: '/', current: true },
     { name: 'About', href: '#about', current: false },
     { name: 'Events', href: '#events', current: false },
     { name: 'Projects', href: '#projects', current: false },
 ] as ILink[]
+
+/**
+ * Generate dropdown items for logged-in users
+ * @param user - The logged-in user
+ * @returns An array of dropdown item groups
+ */
 const itemsIsLogged = (user: IUser) => [
     [{
         label: user.username,
@@ -57,6 +74,8 @@ const itemsIsLogged = (user: IUser) => [
         icon: 'i-heroicons-arrow-right-start-on-rectangle'
     }]
 ]
+
+// Dropdown items for non-logged-in users
 const itemsNotLogged = [
     [
         {
@@ -69,6 +88,8 @@ const itemsNotLogged = [
         }
     ]
 ]
+
+// Computed property to determine which items to show based on login status
 const items = computed(() => isLoggedIn.value ? itemsIsLogged(user.value) : itemsNotLogged);
 </script>
 <template>
@@ -77,14 +98,19 @@ const items = computed(() => isLoggedIn.value ? itemsIsLogged(user.value) : item
             <nav
                 class="absolute z-10 w-full bg-white border-gray-200 md:bg-transparent bg-opacity-15 backdrop-blur-md md:border-none">
                 <div class="flex flex-wrap items-center justify-between p-4 mx-auto">
+                    <!-- Logo or back button -->
                     <NuxtLink to="/" class="items-center hidden space-x-3 md:flex rtl:space-x-reverse"
                         v-if="route.path == '/'">
                         <NuxtImg src="/img/logo.png" class="h-8" alt="Logo" />
                     </NuxtLink>
                     <UButton icon="i-heroicons-chevron-left" size="xl" variant="link" color="gray"
                         class="hidden md:block" v-else @click="router.back()" />
+
+                    <!-- Mobile menu button -->
                     <UButton @click="isOpen = !isOpen" icon="i-heroicons-bars-3" class="block md:hidden" variant="link"
                         square />
+
+                    <!-- Mobile slideover menu -->
                     <USlideover v-model="isOpen" :overlay="false" side="left">
                         <div class="flex-1 p-4">
                             <UButton icon="i-heroicons-chevron-left" size="xl" variant="link" color="gray"
@@ -104,6 +130,8 @@ const items = computed(() => isLoggedIn.value ? itemsIsLogged(user.value) : item
                             </ul>
                         </div>
                     </USlideover>
+
+                    <!-- User menu and theme toggle -->
                     <div class="flex items-center space-x-3 md:order-2 md:space-x-0 rtl:space-x-reverse">
                         <UToggle on-icon="i-heroicons-sun" off-icon="i-heroicons-moon" :model-value="isDarkMode"
                             @change="changeMode" size="lg" class="mr-4" />
@@ -141,6 +169,8 @@ const items = computed(() => isLoggedIn.value ? itemsIsLogged(user.value) : item
                             </template>
                         </UDropdown>
                     </div>
+
+                    <!-- Desktop navigation menu -->
                     <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
                         id="navbar-user">
                         <ul

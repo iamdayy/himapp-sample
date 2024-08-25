@@ -1,34 +1,68 @@
 <script setup lang='ts'>
-import type { ILink, IProfile, IProject } from "~/types";
+import type { IProfile, IProject } from "~/types";
+
+/**
+ * Set page metadata
+ */
 definePageMeta({
     layout: false,
     middleware: 'auth'
 });
+
+/**
+ * Set page title
+ */
 useHead({
-    title: 'Home | Himatika Dahsboard'
+    title: 'Home | Himatika Dashboard'
 })
+
+/**
+ * Get color mode
+ */
 const colorMode = useColorMode();
+
+/**
+ * Get user stats
+ */
 const { all, eventsMe, projectsMe, allCanMeRegister, eventsCanMeRegistered, ProjectsCanMeRegistered } = useStats()
+
+/**
+ * Get authentication data
+ */
 const { status, data: user, signOut } = useAuth();
+
+/**
+ * Get the next upcoming project
+ */
 const Project = computed<IProject | undefined>(() => {
     return projectsMe.value?.find((project) => new Date(project.deadline) > new Date(Date.now()))
 });
-const isLoggedIn = computed(() => status.value == 'authenticated' ? true : false);
-const isDarkMode = computed(() => colorMode.value == 'light' ? true : false);
+
+/**
+ * Check if user is logged in
+ */
+const isLoggedIn = computed(() => status.value === 'authenticated');
+
+/**
+ * Check if dark mode is enabled
+ */
+const isDarkMode = computed(() => colorMode.value === 'dark');
+
+/**
+ * Slide-over state
+ */
+const openSlideOver = ref<boolean>(false)
+
+/**
+ * Toggle between light and dark mode
+ */
 const changeMode = () => {
-    if (colorMode.value == 'light') {
-        colorMode.value = 'dark';
-    } else {
-        colorMode.value = 'light';
-    }
+    colorMode.value = colorMode.value === 'light' ? 'dark' : 'light';
 }
 
-const navigation: ILink[] = [
-    { name: 'Home', href: '/', current: true },
-    { name: 'About', href: '#about', current: false },
-    { name: 'Events', href: '#events', current: false },
-    { name: 'Projects', href: '#projects', current: false },
-] as ILink[]
+/**
+ * Dropdown items for logged-in users
+ */
 const itemsIsLogged = [
     [{
         label: user.value.username,
@@ -59,6 +93,10 @@ const itemsIsLogged = [
         icon: 'i-heroicons-arrow-right-start-on-rectangle'
     }]
 ]
+
+/**
+ * Dropdown items for non-logged-in users
+ */
 const itemsNotLogged = [
     [
         {
@@ -71,6 +109,10 @@ const itemsNotLogged = [
         }
     ]
 ]
+
+/**
+ * Sidebar navigation links
+ */
 const links = computed(() => [
     [
         {
@@ -100,6 +142,11 @@ const links = computed(() => [
     ],
     [
         {
+            label: 'Dashboard',
+            icon: 'i-heroicons-rectangle-group',
+            to: '/dashboard'
+        },
+        {
             label: 'Events',
             icon: 'i-heroicons-calendar',
             to: '/dashboard/events'
@@ -121,10 +168,20 @@ const links = computed(() => [
         },
     ]
 ])
+
+/**
+ * Dropdown items based on login status
+ */
 const items = computed(() => isLoggedIn.value ? itemsIsLogged : itemsNotLogged);
 
+/**
+ * Reference to the carousel component
+ */
 const carouselRef = ref()
 
+/**
+ * Set up carousel auto-rotation
+ */
 onMounted(() => {
     setInterval(() => {
         if (!carouselRef.value) return
@@ -135,18 +192,19 @@ onMounted(() => {
 
         carouselRef.value.next()
     }, 30000);
-
-})
+});
 </script>
 <template>
     <div class="">
         <ClientOnly>
             <nav
-                class="absolute z-10 w-full bg-white border-gray-200 md:bg-transparent bg-opacity-35 backdrop-blur-md md:border-none">
+                class="absolute z-10 w-full bg-white border-gray-200 md:bg-transparent bg-opacity-15 backdrop-blur-md md:border-none">
                 <div class="flex flex-wrap items-center justify-between p-4 mx-auto">
-                    <NuxtLink to="/" class="flex items-center space-x-3 rtl:space-x-reverse">
+                    <NuxtLink to="/" class="items-center hidden space-x-3 md:flex rtl:space-x-reverse">
                         <NuxtImg src="/img/logo.png" class="h-8" alt="Logo" />
                     </NuxtLink>
+                    <UButton variant="link" color="gray" :padded="false" icon="i-heroicons-bars-3" class="md:hidden"
+                        @click="openSlideOver = !openSlideOver" />
                     <div class="flex items-center space-x-3 md:order-2 md:space-x-0 rtl:space-x-reverse">
                         <UToggle on-icon="i-heroicons-sun" off-icon="i-heroicons-moon" :model-value="isDarkMode"
                             @change="changeMode" size="lg" class="mr-4" />
@@ -188,19 +246,19 @@ onMounted(() => {
         </ClientOnly>
         <main>
             <div class="px-3 py-6 pt-20 mx-auto sm:px-6 lg:px-8 dark:bg-indigo-900/40 bg-gray-200/40">
-                <div class="flex w-full px-4 py-3 space-x-6">
-                    <UCard class="hidden w-full max-w-md md:block"
+                <div class="flex flex-col w-full px-4 py-3 space-y-6 md:flex-row md:space-y-0 md:space-x-6">
+                    <UCard class="hidden w-full md:w-1/3 lg:w-1/4 md:block"
                         :ui="{ divide: 'divide-y divide-gray-200/60 dark:divide-gray-800/60' }">
                         <template #header>
                             <NuxtLink to="/dashboard/profile">
                                 <div class="flex w-full gap-2">
                                     <UAvatar :src="user.profile.avatar" size="3xl" />
                                     <div>
-                                        <h2 class="text-4xl font-extrabold text-gray-800 dark:text-white">{{
+                                        <h2 class="text-2xl font-extrabold text-gray-800 md:text-4xl dark:text-white">{{
                                             user.username
-                                        }}
+                                            }}
                                         </h2>
-                                        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">{{
+                                        <h2 class="text-lg font-semibold text-gray-800 md:text-xl dark:text-gray-200">{{
                                             user.profile.NIM }}
                                         </h2>
                                     </div>
@@ -209,13 +267,13 @@ onMounted(() => {
                         </template>
                         <UVerticalNavigation :links="links">
                             <template #default="{ link }">
-                                <h2 class="text-xl font-semibold">{{ link.label }}</h2>
+                                <h2 class="text-lg font-semibold md:text-xl">{{ link.label }}</h2>
                             </template>
                         </UVerticalNavigation>
                     </UCard>
-                    <div class="w-full space-y-6">
-                        <div class="flex w-full gap-2">
-                            <UCard class="w-full">
+                    <div class="w-full space-y-6 md:w-2/3 lg:w-3/4">
+                        <div class="flex flex-col w-full gap-2 sm:flex-row">
+                            <UCard class="w-full sm:w-1/3">
                                 <template #header>
                                     <h2 class="text-xl font-semibold dark:text-gray-200">Registered</h2>
                                 </template>
@@ -227,28 +285,28 @@ onMounted(() => {
                                     <UMeter :value="all" :max="allCanMeRegister" indicator />
                                 </ClientOnly>
                             </UCard>
-                            <UCard class="w-full">
+                            <UCard class="w-full sm:w-1/3">
                                 <template #header>
                                     <h2 class="text-xl font-semibold dark:text-gray-200">Events</h2>
                                 </template>
                                 <div class="flex items-center justify-between w-full mb-2">
                                     <h2 class="text-3xl text-gray-700 text-bold dark:text-gray-400">{{
                                         eventsMe.length
-                                        }}</h2>
+                                    }}</h2>
                                     <UIcon name="i-heroicons-calendar" class="text-6xl" />
                                 </div>
                                 <ClientOnly>
                                     <UMeter :value="eventsMe.length" :max="eventsCanMeRegistered?.length" indicator />
                                 </ClientOnly>
                             </UCard>
-                            <UCard class="w-full">
+                            <UCard class="w-full sm:w-1/3">
                                 <template #header>
                                     <h2 class="text-xl font-semibold dark:text-gray-200">Projects</h2>
                                 </template>
                                 <div class="flex items-center justify-between w-full mb-2">
                                     <h2 class="text-3xl text-gray-700 text-bold dark:text-gray-400">{{
                                         projectsMe.length
-                                        }}</h2>
+                                    }}</h2>
                                     <UIcon name="i-heroicons-code-bracket" class="text-6xl" />
                                 </div>
                                 <ClientOnly>
@@ -268,10 +326,10 @@ onMounted(() => {
                             </template>
                             <UCarousel ref="carouselRef" :items="eventsMe" v-slot="{ item, index }"
                                 :ui="{ item: 'w-full' }"
-                                :prev-button="{ color: 'gray', icon: 'i-heroicons-arrow-left-20-solid', }"
-                                :next-button="{ color: 'gray', icon: 'i-heroicons-arrow-right-20-solid', class: '-right-12' }"
+                                :prev-button="{ color: 'gray', icon: 'i-heroicons-arrow-left-20-solid', class: 'left-0' }"
+                                :next-button="{ color: 'gray', icon: 'i-heroicons-arrow-right-20-solid', class: 'right-0' }"
                                 arrows class="overflow-hidden rounded-lg">
-                                <div class="px-16">
+                                <div class="px-8">
                                     <span
                                         class="mt-4 text-sm text-gray-400 whitespace-nowrap dark:text-white">Title</span>
                                     <h3
@@ -317,7 +375,7 @@ onMounted(() => {
                                     </NuxtLink>
                                 </div>
                             </template>
-                            <div v-if="Project" class="px-8 my-4">
+                            <div v-if="Project" class="px-4 my-4 sm:px-8">
                                 <span class="mt-4 text-sm text-gray-400 whitespace-nowrap dark:text-white">Name</span>
                                 <h3 class="self-center text-gray-500 text-md whitespace-nowrap dark:text-white">{{
                                     Project?.title }}</h3>
@@ -355,6 +413,34 @@ onMounted(() => {
                 </div>
                 <Footer />
             </div>
+            <USlideover v-model="openSlideOver" :overlay="false" side="left">
+                <div class="flex-1 p-4">
+                    <NuxtLink to="/" class="text-2xl font-semibold">Himatika</NuxtLink>
+                    <UButton color="gray" variant="ghost" size="sm" icon="i-heroicons-x-mark-20-solid"
+                        class="absolute z-10 flex sm:hidden end-5 top-5" square padded @click="openSlideOver = false" />
+                    <div class="mt-8">
+                        <NuxtLink to="/dashboard/profile">
+                            <div class="flex w-full gap-2">
+                                <UAvatar :src="user.profile.avatar" size="lg" />
+                                <div>
+                                    <h2 class="text-xl font-extrabold text-gray-800 dark:text-white">{{
+                                        user.username
+                                        }}
+                                    </h2>
+                                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">{{
+                                        user.profile.NIM }}
+                                    </h2>
+                                </div>
+                            </div>
+                        </NuxtLink>
+                        <UVerticalNavigation :links="links">
+                            <template #default="{ link }">
+                                <h2 class="text-base font-semibold truncate">{{ link.label }}</h2>
+                            </template>
+                        </UVerticalNavigation>
+                    </div>
+                </div>
+            </USlideover>
         </main>
     </div>
 </template>

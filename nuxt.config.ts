@@ -1,6 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2024-04-03",
+  app: {
+    pageTransition: {
+      name: "flip",
+    },
+  },
   runtimeConfig: {
     mongodb_uri: process.env.MONGODB_URI,
     mongodb_username: process.env.MONGODB_USERNAME,
@@ -24,6 +29,7 @@ export default defineNuxtConfig({
     "nuxt-echarts",
     "nuxt-pdfmake",
     "nuxt-tiptap-editor",
+    "@vueuse/nuxt",
   ],
   ui: {
     icons: ["heroicons", "uil", "ion", "ph"],
