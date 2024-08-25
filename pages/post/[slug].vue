@@ -19,7 +19,7 @@ watch(details, () => {
 })
 </script>
 <template>
-    <div class="p-5 mx-auto text-gray-100 sm:p-10 md:p-16 dark:text-gray-800">
+    <div class="p-2 py-16 text-gray-100 md:mx-auto md:p-5 dark:text-gray-800">
         <UCard v-if="details">
             <template #header>
                 <h1 rel="noopener noreferrer" href="#"
@@ -45,11 +45,11 @@ watch(details, () => {
                             v-for="category, i in details?.categories" :key="i">{{ category.title }}</span>
                     </div>
                     <div class="space-y-2">
-                        <h4 class="text-lg font-semibold">Related posts</h4>
+                        <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Related posts</h4>
                         <ul class="ml-4 space-y-1 list-disc">
                             <li v-for="relate, i in details?.related" :key="i">
                                 <NuxtLink rel="noopener noreferrer" :to="`/post/${relate.slug}`"
-                                    class="hover:underline">
+                                    class="text-gray-800 hover:underline hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-200">
                                     {{ relate.title }}
                                 </NuxtLink>
                             </li>

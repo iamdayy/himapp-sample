@@ -30,17 +30,17 @@ const pageCountOptions = computed(() => [10, 20, 50, 100, 200, data.value.length
 <template>
     <UCard>
         <template #header>
-            <h2 class="text-4xl font-extrabold dark:text-white">Posts</h2>
+            <h2 class="text-2xl font-extrabold md:text-4xl dark:text-white">Posts</h2>
         </template>
-        <div class="flex flex-row gap-3">
+        <div class="flex flex-col gap-3 md:flex-row">
             <NuxtLink v-for="post, i in data.posts" :to="`/post/${post.slug}`">
                 <UCard class="max-w-lg min-h-32">
                     <template #header>
-                        <NuxtImg :src="post.mainImage" class="mx-auto rounded-lg w" />
+                        <NuxtImg :src="post.mainImage" class="mx-auto rounded-lg" />
                     </template>
                     <div class="space-y-2">
-                        <h2 class="text-2xl font-semibold line-clamp-1">{{ post.title }}</h2>
-                        <div class="text-sm font-normal line-clamp-2 max-h-20 indent-6">
+                        <h2 class="text-xl font-semibold md:text-2xl line-clamp-1">{{ post.title }}</h2>
+                        <div class="hidden text-sm font-normal line-clamp-2 max-h-20 indent-6 md:block">
                             <TiptapShow :content="post.body" />
                         </div>
                     </div>
@@ -70,7 +70,7 @@ const pageCountOptions = computed(() => [10, 20, 50, 100, 200, data.value.length
             </NuxtLink>
         </div>
         <template #footer>
-            <div class="flex flex-wrap items-center justify-between">
+            <div class="flex flex-wrap items-center justify-between gap-1.5">
                 <div class="flex items-center gap-1.5">
                     <span class="text-sm leading-5">Rows per page:</span>
                     <USelect v-model="pageCount" :options="pageCountOptions" class="w-20 me-2" size="xs" />
@@ -95,5 +95,3 @@ const pageCountOptions = computed(() => [10, 20, 50, 100, 200, data.value.length
     </UCard>
 </template>
 <style scoped></style>
-import type { IProfile } from '~/types';
-import type { IPostResponse } from '~/types/IResponse';

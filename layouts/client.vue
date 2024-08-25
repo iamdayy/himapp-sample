@@ -87,6 +87,9 @@ const items = computed(() => isLoggedIn.value ? itemsIsLogged(user.value) : item
                         square />
                     <USlideover v-model="isOpen" :overlay="false" side="left">
                         <div class="flex-1 p-4">
+                            <UButton icon="i-heroicons-chevron-left" size="xl" variant="link" color="gray"
+                                class="block md:hidden" v-if="route.path != '/'"
+                                @click="() => { router.back(); isOpen = false }" />
                             <UButton color="gray" variant="ghost" size="sm" icon="i-heroicons-x-mark-20-solid"
                                 class="absolute z-10 flex sm:hidden end-5 top-5" square padded
                                 @click="isOpen = false" />
@@ -154,7 +157,7 @@ const items = computed(() => isLoggedIn.value ? itemsIsLogged(user.value) : item
         </ClientOnly>
 
         <main>
-            <div class="px-2 py-6 mx-auto md:px-8 dark:bg-indigo-900/40 bg-gray-200/40">
+            <div class="px-2 py-6 mx-auto md:pt-16 md:px-8 dark:bg-indigo-900/40 bg-gray-200/40">
                 <slot />
                 <Footer />
             </div>

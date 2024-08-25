@@ -1,5 +1,4 @@
 <script setup lang='ts'>
-import type { IProfile } from '~/types';
 
 const { page, perPage, projects, totalProjects, refreshProjects } = useProjects();
 perPage.value = 10;
@@ -9,7 +8,18 @@ watch(page, () => {
 })
 watch(perPage, () => {
     refreshProjects();
-})
+});
+const contributorHeaders = [
+    {
+        key: 'name',
+        label: 'Name'
+    },
+    {
+        key: 'job',
+        label: 'Job'
+    }
+
+]
 </script>
 <template>
     <UCard>
@@ -21,7 +31,7 @@ watch(perPage, () => {
                 <UAccordion :items="projects" :ui="{ wrapper: 'flex flex-col w-full' }">
                     <template #default="{ item, index, open }">
                         <li class="w-full mb-10 ms-4">
-                            <UButton color="gray" variant="ghost" class="w-full"
+                            <UButton color="gray" variant="link" class="w-full"
                                 :ui="{ rounded: 'rounded-md', padding: { sm: 'p-3' } }">
                                 <template #leading>
                                     <div
@@ -31,26 +41,26 @@ watch(perPage, () => {
                                 <div class="w-full text-start">
                                     <time
                                         class="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">{{
-                                            item.date
+                                            new Date(item.deadline).toLocaleDateString('id-Id', { dateStyle: 'long' })
                                         }}</time>
                                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{
                                         item.title
-                                        }}</h3>
+                                    }}</h3>
                                     <div v-if="item.description"
-                                        class="w-full mb-4 text-base font-normal text-gray-500 line-clamp-2 dark:text-gray-400">
+                                        class="hidden w-full mb-4 text-base font-normal text-gray-500 md:block line-clamp-2 max-h-16 dark:text-gray-400">
                                         <TiptapShow :content="item.description" />
                                     </div>
                                 </div>
                                 <template #trailing>
-                                    <UIcon name="i-heroicons-chevron-right-20-solid"
+                                    <UIcon name="i-heroicons-chevron-up-20-solid"
                                         class="w-5 h-5 transition-transform duration-200 transform ms-auto"
-                                        :class="[open && 'rotate-90']" />
+                                        :class="[open && 'rotate-180']" />
                                 </template>
                             </UButton>
                         </li>
                     </template>
                     <template #item="{ item }">
-                        <ul role="list" class="px-4 space-y-5 my-7 ms-16">
+                        <ul role="list" class="px-4 space-y-5 my-7 ms-8">
                             <li class="flex items-center">
                                 <Icon name="solar:calendar-outline"
                                     class="flex-shrink-0 w-4 h-4 text-blue-600 dark:text-blue-500" />
@@ -77,10 +87,7 @@ watch(perPage, () => {
                                 <Icon name="solar:pen-new-square-outline"
                                     class="flex-shrink-0 w-4 h-4 text-blue-600 dark:text-blue-500" />
                                 <div class="flex flex-wrap gap-2 ms-3">
-                                    <span v-for="task, i in item.tasks" :key="i" id="badge-dismiss-default"
-                                        class="inline-flex items-center px-2 py-1 text-sm font-medium text-blue-800 bg-blue-100 rounded me-2 dark:bg-blue-900 dark:text-blue-300">
-                                        {{ task }}
-                                    </span>
+                                    <UBadge v-for="task, i in item.tasks" :key="i">{{ task }}</UBadge>
                                 </div>
                             </li>
                             <li class="flex">
@@ -97,22 +104,11 @@ watch(perPage, () => {
                                         Contributors</span>
                                 </span>
                                 <div class="relative my-3 mt-6 overflow-auto sm:rounded-lg ms-8 max-h-48 no-scrollbar">
-                                    <table
-                                        class="w-full text-sm text-left text-gray-500 bg-gray-100 rtl:text-right dark:text-gray-400">
-                                        <tbody>
-                                            <tr v-for="event, i in item.contributors">
-                                                <td class="px-6 py-4 border-gray-200 border-e">
-                                                    {{ (event.profile as IProfile).fullName }}
-                                                </td>
-                                                <td class="px-6 py-4 border-gray-200 border-e">
-                                                    as
-                                                </td>
-                                                <td class="px-6 py-4">
-                                                    {{ event.job }}
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                    <UTable :rows="item.contributors" :columns="contributorHeaders">
+                                        <template #name-data="{ row }">
+                                            {{ row.profile.fullName }}
+                                        </template>
+                                    </UTable>
                                 </div>
                             </li>
                         </ul>
