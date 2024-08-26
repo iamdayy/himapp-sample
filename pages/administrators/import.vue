@@ -2,57 +2,86 @@
 import { ModalsEditProfile } from '#components';
 import type { IProfile } from '~/types';
 
+// Define page metadata
 definePageMeta({
     layout: 'dashboard',
     middleware: 'auth'
 });
+
+// Set page title
 useHead({
     title: "Import"
 })
 
-// Columns
-const columns = [{
-    key: 'id',
-    label: '#',
-},
-{
-    label: "NIM",
-    key: "NIM"
-},
-{
-    key: 'fullName',
-    label: 'Full Name',
-},
-{
-    key: 'birth',
-    label: 'Birth Date & Place',
-},
-{
-    label: "Email",
-    key: "email"
-},
-{
-    label: "Class",
-    key: "class",
-},
-{
-    label: "Semester",
-    key: "semester",
-},
-{
-    key: 'actions',
-    label: 'Actions',
-}]
+// Responsive design
+const { width } = useWindowSize();
+const isMobile = computed(() => width.value < 640);
+const isTablet = computed(() => width.value >= 640 && width.value < 1024);
 
+// Responsive UI sizes based on screen width
+const responsiveUISizes = computed(() => ({
+    input: isMobile.value ? 'sm' : 'md',
+    button: isMobile.value ? 'sm' : isTablet.value ? 'md' : 'lg',
+    select: isMobile.value ? 'sm' : 'md',
+    card: isMobile.value ? 'p-4' : 'p-6',
+    table: {
+        th: isMobile.value ? 'px-2 py-1' : 'px-4 py-2',
+        td: isMobile.value ? 'px-2 py-1' : 'px-4 py-2'
+    }
+}));
+
+// Define table columns
+const columns = computed(() => [
+    {
+        key: 'id',
+        label: '#',
+    },
+    {
+        label: "NIM",
+        key: "NIM"
+    },
+    {
+        key: 'fullName',
+        label: 'Full Name',
+    },
+    // Additional columns for non-mobile view
+    ...(!isMobile.value ? [
+        {
+            key: 'birth',
+            label: 'Birth Date & Place',
+        },
+        {
+            label: "Email",
+            key: "email"
+        },
+        {
+            label: "Class",
+            key: "class",
+        },
+        {
+            label: "Semester",
+            key: "semester",
+        }
+    ] : []),
+    {
+        key: 'actions',
+        label: 'Actions',
+    }
+]);
+
+// Initialize toast and modal
 const toast = useToast();
-
 const modal = useModal();
 
+// Reactive variables
 const selectedCollegers = ref<IProfile[]>([]);
 const loading = ref<boolean>(false);
-
 const DataFromCSV = ref<IProfile[]>([]);
 
+/**
+ * Handle file upload and parse CSV data
+ * @param {File} file - The uploaded CSV file
+ */
 const onChangeXlsx = async (file: File) => {
     loading.value = true;
     try {
@@ -70,6 +99,9 @@ const onChangeXlsx = async (file: File) => {
     }
 }
 
+/**
+ * Add selected collegers to the database
+ */
 const addCollegers = async () => {
     loading.value = true;
     try {
@@ -84,6 +116,10 @@ const addCollegers = async () => {
         toast.add({ title: "Failed to add new Collegers" });
     }
 }
+
+/**
+ * Download template for CSV import
+ */
 const downloadTemplate = async () => {
     const profile: IProfile = {
         fullName: "",
@@ -134,6 +170,10 @@ const downloadTemplate = async () => {
     link.click();
 }
 
+/**
+ * Open edit modal for a specific member
+ * @param {IProfile} Member - The member to edit
+ */
 const editModal = (Member: IProfile) => {
     modal.open(ModalsEditProfile, {
         Member,
@@ -147,6 +187,11 @@ const editModal = (Member: IProfile) => {
     })
 }
 
+/**
+ * Generate dropdown items for each row
+ * @param {any} row - The row data
+ * @returns {Array} Array of dropdown items
+ */
 const items = (row: any) => [
     [{
         label: 'Edit',
@@ -160,27 +205,30 @@ const items = (row: any) => [
 ]
 </script>
 <template>
-    <!-- Add From CSV -->
-    <!--  -->
-    <!--  -->
-    <div class="items-center justify-center mb-24 ">
-        <div class="mx-auto text-center">
-            <h2 class="text-4xl font-extrabold leading-tight tracking-tight text-gray-600 dark:text-white">
+    <div class="items-center justify-center mb-24">
+        <div class="mx-auto my-4 text-center">
+            <h2 class="text-2xl font-extrabold leading-tight tracking-tight text-gray-600 md:text-4xl dark:text-white">
                 Users
             </h2>
         </div>
-        <UCard :ui="{ base: 'min-h-full' }">
-            <div class="py-12">
+        <UCard :ui="{ base: 'min-h-full', body: responsiveUISizes.card }">
+            <div class="px-2 py-6 md:py-12 md:px-8">
                 <DropFile @change="onChangeXlsx" />
                 <div class="w-full p-2 mx-auto my-3 text-center">
-                    <UButton variant="link" @click="downloadTemplate">
+                    <UButton variant="link" @click="downloadTemplate" :size="responsiveUISizes.button">
                         Download Template
                     </UButton>
                 </div>
                 <!-- Table -->
                 <UTable v-model="selectedCollegers" :rows="DataFromCSV" :columns="columns" :loading="loading"
-                    sort-asc-icon="i-heroicons-arrow-up" sort-desc-icon="i-heroicons-arrow-down" sort-mode="manual"
-                    :ui="{ base: 'w-full', default: { checkbox: { color: 'gray' } } }">
+                    sort-asc-icon="i-heroicons-arrow-up" sort-desc-icon="i-heroicons-arrow-down" sort-mode="manual" :ui="{
+                        base: 'w-full overflow-x-auto',
+                        default: {
+                            checkbox: { color: 'gray' },
+                            th: { padding: responsiveUISizes.table.th },
+                            td: { padding: responsiveUISizes.table.td }
+                        }
+                    }">
                     <template #id-data="{ index }">
                         <span>{{ index + 1 }}</span>
                     </template>
@@ -192,12 +240,14 @@ const items = (row: any) => [
 
                     <template #actions-data="{ row }">
                         <UDropdown :items="items(row)" :popper="{ arrow: true, strategy: 'absolute' }">
-                            <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
+                            <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid"
+                                :size="responsiveUISizes.button" />
                         </UDropdown>
                     </template>
                 </UTable>
                 <div class="w-full p-2">
-                    <UButton @click="addCollegers" size="xl" :loading="loading" :disabled="DataFromCSV.length <= 0"
+                    <UButton @click="addCollegers" :size="responsiveUISizes.button" :loading="loading"
+                        :disabled="DataFromCSV.length <= 0"
                         :label="`Add Checked Collegers (${selectedCollegers.length})`" block />
                 </div>
             </div>

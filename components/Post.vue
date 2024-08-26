@@ -40,9 +40,6 @@ const pageCountOptions = computed(() => [10, 20, 50, 100, 200, data.value.length
                     </template>
                     <div class="space-y-2">
                         <h2 class="text-xl font-semibold md:text-2xl line-clamp-1">{{ post.title }}</h2>
-                        <div class="hidden text-sm font-normal line-clamp-2 max-h-20 indent-6 md:block">
-                            <TiptapShow :content="post.body" />
-                        </div>
                     </div>
                     <template #footer>
                         <UCard class="min-w-full min-h-12" :ui="{ body: { padding: 'p-1 sm:p-1 px-3 sm:px-3' } }">

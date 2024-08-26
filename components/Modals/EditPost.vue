@@ -3,25 +3,41 @@ import { ModalsCropImage } from '#components';
 import imageCompression from 'browser-image-compression';
 import type { IPost } from '~/types';
 
+/**
+ * Props definition
+ */
 const props = defineProps({
     data: { type: Object as PropType<IPost>, required: true }
 })
 
+/**
+ * Composables
+ */
 const toast = useToast();
 const modal = useModal();
-const emit = defineEmits(["triggerRefresh"]);
 const { $api } = useNuxtApp();
 
+/**
+ * Emits
+ */
+const emit = defineEmits(["triggerRefresh"]);
+
+/**
+ * Reactive references
+ */
 const AddCategoryPopover = ref<boolean>(false);
 const categoryTitle = ref<string>('');
 const categoryDescription = ref<string>('');
-
 const openModal = ref<Boolean>(false)
 const file = ref<File>()
 const fileToCropped = ref<{ blob: string, name: string }>({
     blob: "",
     name: ""
 });
+
+/**
+ * Post data structure
+ */
 const post = ref<IPost>({
     title: props.data.title,
     mainImage: props.data.mainImage,
@@ -29,6 +45,9 @@ const post = ref<IPost>({
     body: props.data.body
 });
 
+/**
+ * Edit post
+ */
 const editPost = async () => {
     try {
         const body = new FormData();
@@ -50,11 +69,15 @@ const editPost = async () => {
         toast.add({ title: added.statusMessage! });
         modal.close();
         emit("triggerRefresh");
-
     } catch (error) {
-        toast.add({ title: "Failed to add new Posts" });
+        toast.add({ title: "Failed to edit Post" });
     }
 };
+
+/**
+ * Handle cropped image
+ * @param {File} f - Cropped image file
+ */
 const onCropped = async (f: File) => {
     const options = {
         maxSizeMB: 0.2,
@@ -65,14 +88,22 @@ const onCropped = async (f: File) => {
     file.value = compressedFile;
     const blob = URL.createObjectURL(compressedFile);
     fileToCropped.value.blob = blob;
-
 }
+
+/**
+ * Handle image change
+ * @param {File} f - Selected image file
+ */
 const onChangeImage = (f: File) => {
     const blob = URL.createObjectURL(f);
     fileToCropped.value.name = f.name;
     fileToCropped.value.blob = blob;
     openModal.value = true;
 }
+
+/**
+ * Add new category
+ */
 const addNewCategory = () => {
     if (categoryTitle.value != "" && categoryDescription.value != '') {
         const value = {
@@ -86,29 +117,59 @@ const addNewCategory = () => {
     }
 }
 
+/**
+ * Delete category
+ * @param {number} i - Index of category to delete
+ */
 const deleteCategory = (i: number) => {
     post.value.categories?.splice(i, 1);
 }
+
+/**
+ * Responsive design
+ */
+const { width } = useWindowSize()
+const isMobile = computed(() => width.value < 640)
+const isTablet = computed(() => width.value >= 640 && width.value < 1024)
+
+/**
+ * Responsive classes
+ */
+const responsiveClasses = computed(() => ({
+    container: isMobile.value ? 'p-4' : 'p-6',
+    grid: isMobile.value ? 'grid-cols-1 space-y-4' : 'grid-cols-6 space-y-8',
+    fullSpan: isMobile.value ? 'col-span-1' : 'col-span-6',
+    halfSpan: isMobile.value ? 'col-span-1' : 'col-span-3',
+    title: isMobile.value ? 'text-lg' : 'text-xl',
+    button: isMobile.value ? 'text-sm' : 'text-base',
+}))
+
+/**
+ * Compute UI size
+ */
+const uiSize = computed(() => isMobile.value ? 'sm' : isTablet.value ? 'md' : 'lg')
 </script>
 <template>
     <UModal>
-        <UCard>
+        <UCard :ui="{ background: 'bg-gray-200 dark:bg-gray-800' }">
             <template #header>
                 <div class="flex justify-between w-full">
-                    <h2 class="text-xl font-semibold dark:text-gray-200">Edit Post</h2>
+                    <h2 :class="['font-semibold dark:text-gray-200', responsiveClasses.title]">Edit Post</h2>
                     <UButton icon="i-heroicons-x-mark" :padded="false" variant="link" color="gray"
                         @click="modal.close" />
                 </div>
             </template>
-            <div class="space-y-6 text-start">
-                <div class="grid grid-cols-6 gap-6">
-                    <div class="col-span-6 sm:col-span-3">
+            <div :class="['space-y-6 text-start', responsiveClasses.container]">
+                <div :class="responsiveClasses.grid">
+                    <!-- Title input -->
+                    <div :class="responsiveClasses.halfSpan">
                         <label for="Title"
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title</label>
                         <UInput type="text" name="Title" id="Title" placeholder="Post 1" v-model="post.title"
-                            required />
+                            :size="uiSize" required />
                     </div>
-                    <div class="col-span-6 sm:col-span-3">
+                    <!-- Categories input -->
+                    <div :class="responsiveClasses.halfSpan">
                         <label for="select-categorys"
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Categories</label>
                         <div class="flex flex-wrap items-center gap-2">
@@ -121,24 +182,27 @@ const deleteCategory = (i: number) => {
 
                             <UPopover overlay v-model:open="AddCategoryPopover"
                                 :popper="{ placement: 'bottom', strategy: 'absolute', arrow: true }">
-                                <UButton icon="i-heroicons-pencil-square" variant="outline" size="xs" />
+                                <UButton icon="i-heroicons-pencil-square" variant="outline" :size="uiSize" />
 
                                 <template #panel>
                                     <div class="px-3 py-2 space-y-3 min-w-48">
                                         <label for="Category"
                                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category</label>
                                         <UInput type="text" name="Category-title" id="Category-title"
-                                            placeholder="Title" v-model="categoryTitle" required />
+                                            placeholder="Title" v-model="categoryTitle" :size="uiSize" required />
                                         <UInput type="text" name="Category-description" id="Category-description"
-                                            placeholder="Description" v-model="categoryDescription" required />
+                                            placeholder="Description" v-model="categoryDescription" :size="uiSize"
+                                            required />
                                         <UButton type="submit" class="my-2 font-semibold" variant="outline" block
-                                            @click="addNewCategory" label="Add" tralling-icon="i-heroicons-check" />
+                                            @click="addNewCategory" label="Add" tralling-icon="i-heroicons-check"
+                                            :size="uiSize" />
                                     </div>
                                 </template>
                             </UPopover>
                         </div>
                     </div>
-                    <div class="col-span-6 min-h-36">
+                    <!-- Image upload -->
+                    <div :class="[responsiveClasses.fullSpan, 'min-h-36']">
                         <label for="Title"
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Image</label>
                         <DropFile @change="onChangeImage" accept="image/*">
@@ -150,13 +214,16 @@ const deleteCategory = (i: number) => {
                             aspectRatio: 16 / 9,
                         }" :title="fileToCropped.name" @cropped="onCropped" />
                     </div>
-                    <div class="col-span-6">
+                    <!-- Description input -->
+                    <div :class="responsiveClasses.fullSpan">
                         <label for="description"
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
                         <TipTapEditor id="description" v-model="post.body" />
                     </div>
                 </div>
-                <UButton @click.prevent="editPost" label="Save" icon="i-heroicons-clipboard" block trailing />
+                <!-- Submit button -->
+                <UButton @click.prevent="editPost" label="Save" icon="i-heroicons-clipboard" block trailing
+                    :size="uiSize" />
             </div>
         </UCard>
     </UModal>

@@ -109,7 +109,7 @@ const responsiveClasses = computed(() => ({
 
 <template>
     <UModal :fullscreen="isMobile">
-        <UCard>
+        <UCard :ui="{ background: 'bg-gray-200 dark:bg-gray-800' }">
             <template #header>
                 <div class="flex justify-between w-full">
                     <h2 :class="[responsiveClasses.label, 'font-semibold dark:text-gray-200']">New Event</h2>

@@ -20,7 +20,7 @@
                     @click="editor?.chain().focus().toggleHeading({ level: level as 1 | 2 | 3 | 4 | 5 }).run()" />
                 <UButton icon="i-ph-paragraph" color="orange" @click="editor?.chain().focus().setParagraph().run()" />
                 <UButton icon="i-ph-image" color="orange" @click="openInput" />
-                <input class="hidden" id="fileInput" type="file" @input="handleImage" accept="image/*" />
+                <input class="hidden" id="tiptapFileInput" type="file" @input="handleImage" accept="image/*" />
             </UButtonGroup>
             <!-- Undo/Redo buttons -->
             <UButtonGroup :size="responsiveUISizes.button as any" orientation="horizontal" v-if="editor"
@@ -53,7 +53,11 @@
         <TiptapEditorContent :editor="editor" />
     </div>
     <!-- Modal for image cropping -->
-    <ModalsCropImage v-model="openModal" :img="file.blob" :title="file.name" @cropped="onCropped" />
+    <ModalsCropImage v-model="openCropModal" :img="file.blob" :title="file.name" :stencil="{
+        movable: true,
+        resizable: true,
+        aspectRatio: false,
+    }" @cropped="openImageCropped" />
 </template>
 
 <script setup lang="ts">
@@ -68,7 +72,7 @@ import { useWindowSize } from '@vueuse/core';
 import imageCompression from 'browser-image-compression';
 
 // Reactive references for UI state
-const openModal = ref(false);
+const openCropModal = ref(false);
 const file = ref<{ blob: string, name: string }>({
     blob: "",
     name: ""
@@ -86,7 +90,7 @@ const emit = defineEmits(['update:modelValue']);
  * Opens the file input dialog
  */
 const openInput = () => {
-    const input = document.getElementById('fileInput') as HTMLInputElement;
+    const input = document.getElementById('tiptapFileInput') as HTMLInputElement;
     input?.click();
 }
 
@@ -108,7 +112,7 @@ const encodeImageFileAsURL = async (target: HTMLInputElement) => {
         const blob = URL.createObjectURL(f);
         file.value.blob = blob;
         file.value.name = f.name;
-        openModal.value = true;
+        openCropModal.value = true;
     }
 }
 
@@ -116,7 +120,7 @@ const encodeImageFileAsURL = async (target: HTMLInputElement) => {
  * Handles the cropped image
  * @param {File} file - The cropped image file
  */
-const onCropped = async (file: File) => {
+const openImageCropped = async (file: File) => {
     const options = {
         maxSizeMB: 0.2,
         maxWidthOrHeight: 1920,
@@ -155,7 +159,10 @@ const editor = useEditor({
             placeholder: 'Write your post content here',
         }),
         TiptapImage.configure({
-            allowBase64: true
+            allowBase64: true,
+            HTMLAttributes: {
+                class: 'mx-auto'
+            }
         }),
         Color.configure({ types: [TextStyle.name, ListItem.name] }),
         Link.configure({

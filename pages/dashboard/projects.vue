@@ -115,7 +115,7 @@ const register = async (id: string) => {
  */
 const registeredModal = () => {
     Modal.open(ModalsRegisteredUsers, {
-        registered: Project.value?.registered,
+        registered: Project.value?.registered!,
         onChangeCheckItem(val) {
             selectedRegistered.value = val
         }

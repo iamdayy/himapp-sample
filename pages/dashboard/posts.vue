@@ -3,20 +3,35 @@ import { ModalsAddPost, ModalsConfirmation, ModalsEditPost } from '#components';
 import type { IPost, IProfile } from '~/types';
 import type { IPostResponse } from '~/types/IResponse';
 
+/**
+ * Page metadata configuration
+ */
 definePageMeta({
     layout: 'dashboard',
     middleware: 'auth'
 });
+
+/**
+ * Set page title
+ */
 useHead({
     title: 'Posts'
 });
+
 const { $api } = useNuxtApp();
 const modal = useModal();
 const toast = useToast();
-// Pagination
+
+/**
+ * Pagination and sorting state
+ */
 const sort = ref({ column: 'createdAt', direction: 'asc' as const });
 const page = ref(1);
 const pageCount = ref(10);
+
+/**
+ * Fetch posts data
+ */
 const { data, refresh } = useLazyAsyncData(() => $api<IPostResponse>('/api/post', {
     query: {
         page: page.value,
@@ -28,20 +43,25 @@ const { data, refresh } = useLazyAsyncData(() => $api<IPostResponse>('/api/post'
         posts: [],
         length: 0
     }),
-    watch: [page, pageCount, sort,]
-
+    watch: [page, pageCount, sort]
 });
-const pageTotal = computed(() => data.value.length) // This value should be dynamic coming from the API
+
+/**
+ * Computed properties for pagination
+ */
+const pageTotal = computed(() => data.value.length)
 const pageFrom = computed(() => (page.value - 1) * pageCount.value + 1)
 const pageTo = computed(() => Math.min(page.value * pageCount.value, pageTotal.value))
 const pageCountOptions = computed(() => [10, 20, 50, 100, 200, data.value.length]);
 
+/**
+ * Publish a post
+ * @param {string} slug - The slug of the post to publish
+ */
 const publishPost = async (slug: string) => {
     try {
         const published = await $api('/api/post/publish', {
-            query: {
-                slug
-            }
+            query: { slug }
         });
         toast.add({ title: published.statusMessage! });
         refresh();
@@ -50,6 +70,9 @@ const publishPost = async (slug: string) => {
     }
 }
 
+/**
+ * Open modal to add a new post
+ */
 const AddModal = () => {
     modal.open(ModalsAddPost, {
         fullscreen: true,
@@ -58,6 +81,11 @@ const AddModal = () => {
         }
     })
 }
+
+/**
+ * Open modal to edit an existing post
+ * @param {IPost} post - The post to edit
+ */
 const EditModal = (post: IPost) => {
     modal.open(ModalsEditPost, {
         fullscreen: true,
@@ -67,22 +95,24 @@ const EditModal = (post: IPost) => {
         data: post
     })
 }
+
+/**
+ * Open confirmation modal to delete a post
+ * @param {string} slug - The slug of the post to delete
+ */
 const DeleteModal = (slug: string) => {
     modal.open(ModalsConfirmation, {
         async onConfirm() {
             try {
                 const deleted = await $api('/api/post', {
                     method: 'DELETE',
-                    query: {
-                        slug
-                    }
+                    query: { slug }
                 });
                 toast.add({ title: deleted.statusMessage! });
                 refresh();
                 modal.close();
             } catch (error) {
                 toast.add({ title: 'Failed To delete Post' });
-
             }
         },
         title: 'Post delete Confirmation',
@@ -90,6 +120,31 @@ const DeleteModal = (slug: string) => {
     })
 }
 
+/**
+ * Open confirmation modal to publish a post
+ * @param {string} slug - The slug of the post to publish
+ */
+const PublishModal = (slug: string) => {
+    modal.open(ModalsConfirmation, {
+        async onConfirm() {
+            try {
+                await publishPost(slug);
+                modal.close();
+            } catch (error) {
+                toast.add({ title: 'Failed to publish Post' });
+            }
+        },
+        title: 'Post Publish Confirmation',
+        body: 'Are you sure you want to publish this post?'
+    })
+}
+
+
+/**
+ * Generate dropdown items for each post
+ * @param {IPost} post - The post to generate items for
+ * @returns {Array} Array of dropdown items
+ */
 const items = (post: IPost) => [[
     {
         label: 'Delete',
@@ -104,26 +159,45 @@ const items = (post: IPost) => [[
     {
         label: 'Publish',
         icon: 'i-ion-arrow-up-right-box-outline',
-        click: () => publishPost(post.slug!)
+        click: () => PublishModal(post.slug!)
     }
 ]]
+
+/**
+ * Responsive design
+ */
+const { width } = useWindowSize()
+const isMobile = computed(() => width.value < 640)
+const isTablet = computed(() => width.value >= 640 && width.value < 1024)
+
+/**
+ * Computed property for responsive class names
+ */
+const responsiveClasses = computed(() => ({
+    container: isMobile.value ? 'px-2' : 'px-6',
+    title: isMobile.value ? 'text-2xl' : 'text-4xl',
+    card: isMobile.value ? 'w-full' : isTablet.value ? 'w-1/2' : 'w-1/3',
+    button: isMobile.value ? 'text-sm' : 'text-base',
+    pagination: isMobile.value ? 'flex-col items-start' : 'flex-row items-center',
+}))
 </script>
 <template>
-    <div class="items-center justify-center pb-24">
+    <div :class="['items-center justify-center pb-24', responsiveClasses.container]">
         <div class="mx-auto mb-3 text-center">
-            <h2 class="text-4xl font-extrabold leading-tight tracking-tight text-gray-600 dark:text-white">
+            <h2
+                :class="['font-extrabold leading-tight tracking-tight text-gray-600 dark:text-white', responsiveClasses.title]">
                 Project
             </h2>
         </div>
-        <UCard class="mx-6">
+        <UCard>
             <template #header>
-                <UButton label="Add Post" @click="AddModal" />
-                <div class="flex flex-wrap items-center justify-between">
-                    <div class="flex items-center gap-1.5">
+                <UButton :class="responsiveClasses.button" label="Add Post" @click="AddModal" />
+                <div :class="['flex flex-wrap justify-between', responsiveClasses.pagination]">
+                    <div class="flex items-center gap-1.5 mb-2 sm:mb-0">
                         <span class="text-sm leading-5">Rows per page:</span>
                         <USelect v-model="pageCount" :options="pageCountOptions" class="w-20 me-2" size="xs" />
                     </div>
-                    <div>
+                    <div class="mb-2 sm:mb-0">
                         <span class="text-sm leading-5">
                             Showing
                             <span class="font-medium">{{ pageFrom }}</span>
@@ -140,16 +214,15 @@ const items = (post: IPost) => [[
                     </div>
                 </div>
             </template>
-            <div class="flex flex-row gap-3">
-                <UCard class="max-w-lg min-h-32" v-for="post, i in data.posts">
+            <div class="flex flex-wrap gap-3">
+                <UCard :class="['min-h-32', responsiveClasses.card]" v-for="post, i in data.posts" :key="i">
                     <template #header>
-                        <NuxtImg :src="post.mainImage" class="mx-auto rounded-lg w" />
+                        <NuxtImg :src="post.mainImage" class="w-full mx-auto rounded-lg" />
                     </template>
                     <div class="space-y-2">
-                        <h2 class="text-2xl font-semibold line-clamp-1">{{ post.title }}</h2>
-                        <div class="text-sm font-normal line-clamp-2 max-h-20 indent-6">
-                            <TiptapShow :content="post.body" />
-                        </div>
+                        <NuxtLink :to="`/post/${post.slug}`" class="text-xl font-semibold sm:text-4xl line-clamp-1">{{
+                            post.title
+                        }}</NuxtLink>
                     </div>
                     <template #footer>
                         <UCard class="min-w-full min-h-12" :ui="{ body: { padding: 'p-1 sm:p-1 px-3 sm:px-3' } }">
@@ -173,13 +246,11 @@ const items = (post: IPost) => [[
                                 <UDropdown :items="items(post)" :popper="{ arrow: true, strategy: 'absolute' }">
                                     <UButton icon="i-ion-ellipsis-vertical" variant="link" color="gray" />
                                 </UDropdown>
-
                             </div>
                         </UCard>
                     </template>
                 </UCard>
             </div>
-
         </UCard>
     </div>
 </template>

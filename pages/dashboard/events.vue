@@ -147,7 +147,7 @@ const EditModal = () =>
  */
 const registeredModal = () => {
     Modal.open(ModalsRegisteredUsers, {
-        registered: event.value?.registered,
+        registered: event.value?.registered!,
         onChangeCheckItem(val) {
             selectedRegistered.value = val
         }
