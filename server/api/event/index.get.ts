@@ -1,42 +1,62 @@
 import { EventModel } from "~/server/models/EventModel";
 import { ProfileModel } from "~/server/models/ProfileModel";
 
-const getNimFromID = async (id: string) => {
+/**
+ * Retrieves the NIM (Student Identification Number) associated with a given user ID.
+ * @param {string} id - The user ID.
+ * @returns {Promise<number>} The NIM associated with the user ID.
+ * @throws {H3Error} If the profile is not found or NIM is missing.
+ */
+const getNimFromID = async (id: string): Promise<number> => {
   const profile = await ProfileModel.findById(id);
 
   if (!profile?.NIM) {
     throw createError({
       statusCode: 404,
-      statusMessage: "Someone is error",
+      statusMessage: "Profile not found or NIM is missing",
     });
   }
 
   return profile.NIM;
 };
 
+/**
+ * Handles GET requests for event data.
+ * @param {H3Event} event - The H3 event object.
+ * @returns {Promise<Event | Event[]>} The event data or an array of events.
+ * @throws {H3Error} If an error occurs during the process.
+ */
 export default defineEventHandler(async (event) => {
   try {
     const { id } = getQuery(event);
     if (id) {
-      const event = await EventModel.findById(id, {}, { autopopulate: false });
-      if (!event) {
+      // Fetch a single event by ID
+      const eventData = await EventModel.findById(
+        id,
+        {},
+        { autopopulate: false }
+      );
+      if (!eventData) {
         throw createError({
           statusCode: 404,
           statusMessage: "Event not found",
         });
       }
+      // Map committee members to their NIMs
       const committee = await Promise.all(
-        event?.committee?.map(async (coommitee) => ({
-          user: await getNimFromID(coommitee.user as string),
-          job: coommitee.job,
+        eventData?.committee?.map(async (committee) => ({
+          user: await getNimFromID(committee.user as string),
+          job: committee.job,
         }))!
       );
 
       return {
-        ...event.toJSON(),
+        ...eventData.toJSON(),
         committee,
       };
     }
+
+    // Fetch multiple events based on user roles
     const roles: string[] = ["All", "External"];
     const auth = checkAuth(event);
     if (auth) {
@@ -58,14 +78,16 @@ export default defineEventHandler(async (event) => {
     if (!events) {
       throw createError({
         statusCode: 400,
-        message: "Owhhh data not saved yet",
+        message: "No events found",
       });
     }
     return events;
   } catch (error: any) {
     throw createError({
-      statusCode: 500,
-      message: "Owhhh system error",
+      statusCode: error.statusCode || 500,
+      message:
+        error.message ||
+        "An unexpected error occurred while fetching event data",
     });
   }
 });

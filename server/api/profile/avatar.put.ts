@@ -1,52 +1,16 @@
-import formidable from "formidable";
 import fs from "fs";
 import { readFiles } from "h3-formidable";
-import { IncomingMessage } from "http";
 import path from "path";
 import { ProfileModel } from "~/server/models/ProfileModel";
+
 const config = useRuntimeConfig();
 
-const getAvatar = (req: IncomingMessage): Promise<string> => {
-  const BASE_AVATAR_FOLDER = "img/avatars";
-  let imageUrl = "";
-  let oldPath = "";
-  let newPath = "";
-
-  const form = formidable({ multiples: false });
-  return new Promise((resolve, reject) => {
-    form.parse(req, (err, fields, files) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      if (!files.avatar) {
-        reject({
-          status: "error",
-          statusMessage: "Please upload a photo with name photo in the form",
-        });
-        return;
-      }
-      if (files.avatar[0].mimetype?.startsWith("image/")) {
-        let imageName =
-          Date.now() +
-          Math.round(Math.random() * 100000) +
-          files.avatar[0].originalFilename!;
-        oldPath = files.avatar[0].filepath;
-        newPath = `${path.join(config.mount, BASE_AVATAR_FOLDER, imageName)}`;
-        imageUrl = `/${BASE_AVATAR_FOLDER}/${imageName}`;
-        fs.copyFileSync(oldPath, newPath);
-        resolve(imageUrl);
-        return;
-      } else {
-        reject({
-          statusMessage: "Please upload nothing but images.",
-        });
-        return;
-      }
-    });
-  });
-};
-
+/**
+ * Handles PUT requests for updating a user's avatar.
+ * @param {H3Event} event - The H3 event object.
+ * @returns {Promise<Object>} An object containing the status code, message, and updated avatar URL.
+ * @throws {H3Error} If the user is not authorized, the profile is not found, or if a system error occurs.
+ */
 export default defineEventHandler(async (event) => {
   try {
     const { files } = await readFiles(event);
@@ -57,13 +21,17 @@ export default defineEventHandler(async (event) => {
     let oldPath = "";
     let newPath = "";
 
+    // Ensure the user is authenticated and authorized
     const user = await ensureAuth(event);
     if (user.profile.NIM != NIM) {
       throw createError({
         statusCode: 403,
-        statusMessage: "Who are you ? it's not your profile!!!",
+        statusMessage:
+          "Unauthorized: You can only update your own profile avatar",
       });
     }
+
+    // Find the user's profile
     const profile = await ProfileModel.findOne({ NIM });
     if (!profile) {
       throw createError({
@@ -71,37 +39,46 @@ export default defineEventHandler(async (event) => {
         message: "Profile not found",
       });
     }
+
+    // Remove old avatar if it exists
     if (profile.avatar) {
-      const exist = fs.existsSync(`${path.join(config.mount, profile.avatar)}`);
-      if (exist) {
-        fs.rmSync(`${path.join(config.mount, profile.avatar)}`);
+      const oldAvatarPath = path.join(config.mount, profile.avatar);
+      if (fs.existsSync(oldAvatarPath)) {
+        fs.rmSync(oldAvatarPath);
       }
     }
+
+    // Process and save the new avatar
     if (avatarFile.mimetype?.startsWith("image/")) {
-      let imageName =
-        Date.now() +
-        Math.round(Math.random() * 100000) +
-        avatarFile.originalFilename!;
+      const imageName = `${Date.now()}_${Math.round(
+        Math.random() * 100000
+      )}_${avatarFile.originalFilename!}`;
       oldPath = avatarFile.filepath;
-      newPath = `${path.join(config.mount, BASE_AVATAR_FOLDER, imageName)}`;
+      newPath = path.join(config.mount, BASE_AVATAR_FOLDER, imageName);
       fs.copyFileSync(oldPath, newPath);
       imageUrl = `/${BASE_AVATAR_FOLDER}/${imageName}`;
     } else {
       throw createError({
-        statusMessage: "Please upload nothing but images.",
+        statusCode: 400,
+        statusMessage: "Invalid file type: Please upload an image file",
       });
     }
+
+    // Update the profile with the new avatar URL
     profile.avatar = imageUrl;
     await profile.save();
+
     return {
       statusCode: 200,
-      statusMessage: `Avatar ${profile.NIM} updated`,
+      statusMessage: `Avatar for user ${profile.NIM} updated successfully`,
       avatar: profile.avatar,
     };
   } catch (error: any) {
     return createError({
-      statusCode: error.statusCode,
-      message: error.message,
+      statusCode: error.statusCode || 500,
+      message:
+        error.message ||
+        "An unexpected error occurred while updating the avatar",
     });
   }
 });

@@ -8,41 +8,41 @@ type ISortable = {
   [key: string]: SortOrder;
 };
 
+/**
+ * Handles GET requests for retrieving user profiles.
+ * @param {H3Event} event - The H3 event object.
+ * @returns {Promise<Object>} An object containing profiles, total count, and filters.
+ * @throws {H3Error} If the user is not authorized or if a system error occurs.
+ */
 export default defineEventHandler(async (event) => {
   try {
     let { NIM, perPage, page, order, sort, search, filter, filterBy, deleted } =
       getQuery<IReqProfileQuery>(event);
+
+    // If NIM is provided without pagination, return a single profile
     if (NIM && !perPage && !page) {
       const profile = await ProfileModel.findOne({ NIM });
       return profile;
     }
 
-    let query = {};
-    let sortOpt = {};
+    let query: any = {};
+    let sortOpt: ISortable = {};
+
+    // Apply filters based on query parameters
     if (deleted == "false") {
-      query = {
-        ...query,
-        status: { $nin: "deleted" },
-      };
+      query.status = { $nin: "deleted" };
     }
     if (order && sort) {
-      sortOpt = { [sort]: order };
+      sortOpt[sort] = order as SortOrder;
     }
     if (filter && filterBy) {
-      query = {
-        ...query,
-        [filterBy]: filter,
-      };
+      query[filterBy] = filter;
     }
     if (search) {
-      query = {
-        ...query,
-        $text: {
-          $search: search,
-        },
-      };
+      query.$text = { $search: search };
     }
 
+    // Ensure user is authenticated and authorized
     const user = await ensureAuth(event);
     if (!user) {
       throw createError({
@@ -57,20 +57,25 @@ export default defineEventHandler(async (event) => {
         statusMessage: "You must be admin / departement to access this",
       });
     }
+
+    // Count total documents matching the query
     const length = await ProfileModel.countDocuments(query);
+
+    // Get unique filter values if filterBy is provided
     let filters = null;
     if (filterBy) {
       const profiles = await ProfileModel.find();
       filters = [
-        ...new Set(profiles.map((v) => (filterBy ? v[filterBy] : null))),
+        ...new Set(profiles.map((v) => v[filterBy as keyof IProfile])),
       ];
     }
 
+    // Fetch profiles with populated fields
     const profiles = await ProfileModel.find(query)
       .populate({
         path: "events",
         select: "title date at description -_id",
-        transform: (doc: IEvent, id) => ({
+        transform: (doc: IEvent) => ({
           title: doc.title,
           date: doc.date,
           at: doc.at,
@@ -110,8 +115,9 @@ export default defineEventHandler(async (event) => {
         "NIM avatar fullName email class semester enteredYear createdAt status"
       )
       .sort(sortOpt)
-      .skip((page - 1) * perPage)
-      .limit(perPage);
+      .skip((Number(page) - 1) * Number(perPage))
+      .limit(Number(perPage));
+
     return {
       profiles,
       length,
@@ -119,8 +125,9 @@ export default defineEventHandler(async (event) => {
     };
   } catch (error: any) {
     return createError({
-      statusCode: error.statusCode,
-      message: error.message,
+      statusCode: error.statusCode || 500,
+      message:
+        error.message || "An unexpected error occurred while fetching profiles",
     });
   }
 });

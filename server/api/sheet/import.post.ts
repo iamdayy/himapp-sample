@@ -1,11 +1,21 @@
 import ExcelJS from "exceljs";
 import { readFiles } from "h3-formidable";
+
+/**
+ * Represents a row of data from the Excel sheet.
+ */
 interface DataRow {
   [key: string]: string | number | boolean | object | null;
 }
 
+/**
+ * Handles POST requests for importing Excel data.
+ * @param {H3Event} event - The H3 event object.
+ * @returns {Promise<DataRow[]|Error>} An array of imported data rows or an error.
+ */
 export default defineEventHandler(async (event) => {
   try {
+    // Read the uploaded file
     const { files } = await readFiles(event);
     const file = files.file![0].filepath;
     if (!file) {
@@ -15,6 +25,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    // Read the Excel workbook
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile(file);
     const worksheet = workbook.getWorksheet("Data");
@@ -22,38 +33,38 @@ export default defineEventHandler(async (event) => {
     const jsonData: DataRow[] = [];
     const headers: string[] = [];
 
-    // Mendapatkan header kolom
+    // Extract column headers
     worksheet?.getRow(1).eachCell((cell) => {
       headers.push(cell.value as string);
     });
 
-    // Mendapatkan data baris
+    // Process each row of data
     worksheet?.eachRow({ includeEmpty: false }, (row, rowNumber) => {
       if (rowNumber > 1) {
-        // Mulai dari baris kedua (baris pertama adalah header)
+        // Skip the header row
         const rowData: any = {};
         row.eachCell((cell, colNumber) => {
-          const header = headers[colNumber - 1]; // Mendapatkan header yang sesuai dengan kolom
-          const nestedKeys = header.split("."); // Memisahkan header yang mungkin bersarang
+          const header = headers[colNumber - 1];
+          const nestedKeys = header.split(".");
           let currentObject = rowData;
 
-          // Menangani header bersarang
+          // Handle nested headers
           for (let i = 0; i < nestedKeys.length - 1; i++) {
             const key = nestedKeys[i];
             if (!currentObject[key]) {
-              currentObject[key] = {}; // Membuat objek kosong jika belum ada
+              currentObject[key] = {};
             }
-            currentObject = currentObject[key]; // Masuk ke objek yang lebih dalam
+            currentObject = currentObject[key];
           }
 
-          // Mengisi nilai pada objek terakhir
+          // Set the value for the deepest nested key
           currentObject[nestedKeys[nestedKeys.length - 1]] = cell.value;
         });
-        jsonData.push(rowData as DataRow); // Mengkonversi rowData menjadi DataMahasiswa
+        jsonData.push(rowData as DataRow);
       }
     });
 
-    return jsonData; // Kirim JSON sebagai respons
+    return jsonData;
   } catch (error) {
     return error;
   }

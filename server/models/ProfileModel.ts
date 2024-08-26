@@ -3,6 +3,10 @@ import { IAddressSchema, IProfileSchema } from "~/types/ISchemas";
 import { EventModel } from "./EventModel";
 import { ProjectModel } from "./ProjectModel";
 import { UserModel } from "./UserModel";
+
+/**
+ * Schema for representing an address.
+ */
 const AddressSchema = new Schema<IAddressSchema>({
   fullAddress: String,
   village: String,
@@ -13,6 +17,9 @@ const AddressSchema = new Schema<IAddressSchema>({
   zip: Number,
 });
 
+/**
+ * Schema for representing a user profile.
+ */
 const profileSchema = new Schema<IProfileSchema>(
   {
     NIM: {
@@ -85,9 +92,16 @@ const profileSchema = new Schema<IProfileSchema>(
   }
 );
 
+/**
+ * Virtual field to get the year when the profile was created.
+ */
 profileSchema.virtual("enteredYear").get(function (this: IProfileSchema) {
   return new Date(this.createdAt).getFullYear();
 });
+
+/**
+ * Virtual field to get the projects associated with the profile.
+ */
 profileSchema.virtual("projects", {
   ref: "Project",
   localField: "_id",
@@ -96,6 +110,10 @@ profileSchema.virtual("projects", {
     deadline: { $gte: new Date() },
   },
 });
+
+/**
+ * Virtual field to get the events associated with the profile.
+ */
 profileSchema.virtual("events", {
   ref: "Event",
   localField: "_id",
@@ -104,6 +122,10 @@ profileSchema.virtual("events", {
     date: { $gte: new Date() },
   },
 });
+
+/**
+ * Virtual field to check if the profile is an administrator.
+ */
 profileSchema.virtual("isAdministrator", {
   ref: "Administrator",
   localField: "_id",
@@ -113,6 +135,10 @@ profileSchema.virtual("isAdministrator", {
     "period.end": { $gte: new Date() },
   },
 });
+
+/**
+ * Virtual field to check if the profile belongs to a department.
+ */
 profileSchema.virtual("isDepartement", {
   ref: "Departement",
   localField: "_id",
@@ -123,8 +149,13 @@ profileSchema.virtual("isDepartement", {
   },
 });
 
+// Create a text index for searching profiles
 profileSchema.index({ NIM: "text", fullName: "text", email: "text" });
 
+/**
+ * Post-save middleware to handle profile deletion.
+ * Removes the profile from associated projects, events, and deletes the user.
+ */
 profileSchema.post("save", async function (next) {
   const profile = this;
   const profileId = this._id;
@@ -161,6 +192,9 @@ profileSchema.post("save", async function (next) {
   }
 });
 
+/**
+ * Mongoose model for the Profile collection.
+ */
 export const ProfileModel = mongoose.model<IProfileSchema>(
   "Profile",
   profileSchema

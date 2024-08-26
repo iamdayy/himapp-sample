@@ -14,37 +14,84 @@ import type {
   ISession,
   IUser,
 } from ".";
-export interface IUserSchema extends IUser, Document {
+
+/**
+ * Extends the IUser interface with Document and adds a password field.
+ */
+export interface IUserSchema extends Omit<IUser, "id">, Document {
   password: string;
 }
+
+/**
+ * Extends the ISession interface with Document and adds timestamp fields.
+ */
 export interface ISessionSchema extends ISession, Document {
   createdAt: Date;
   updatedAt: Date;
 }
-export interface IProfileSchema extends IProfile, Document {
+
+/**
+ * Extends the IProfile interface with Document and adds timestamp fields.
+ */
+export interface IProfileSchema extends Omit<IProfile, "id">, Document {
   createdAt: Date;
   updatedAt: Date;
 }
+
+/**
+ * Extends the IDepartement interface with Document.
+ */
 export interface IDepartementSchema extends IDepartement, Document {}
+
+/**
+ * Extends the IAdministratorMember interface with Document.
+ */
 export interface IAdministratorMemberSchema
   extends IAdministratorMember,
     Document {}
+
+/**
+ * Extends the IAdministrator interface with Document.
+ */
 export interface IAdministratorSchema extends IAdministrator, Document {}
+
+/**
+ * Extends the IAddress interface with Document.
+ */
 export interface IAddressSchema extends IAddress, Document {}
 
+/**
+ * Extends the IRegistered interface with Document.
+ */
 export interface IRegisteredSchema extends IRegistered, Document {}
 
+/**
+ * Extends the ICommittee interface with Document.
+ */
 export interface ICommitteeSchema extends ICommittee, Document {}
-export interface IEventSchema extends IEvent, Document {
+
+/**
+ * Extends the IEvent interface with Document and adds timestamp fields.
+ */
+export interface IEventSchema extends Omit<IEvent, "_id">, Document {
   createdAt: Date;
   updatedAt: Date;
 }
 
+/**
+ * Extends the IContributor interface with Document.
+ */
 export interface IContributorSchema extends IContributor, Document {}
-export interface IProjectSchema extends IProject, Document {
+
+/**
+ * Extends the IProject interface with Document and adds timestamp fields.
+ */
+export interface IProjectSchema extends Omit<IProject, "_id">, Document {
   createdAt: Date;
   updatedAt: Date;
 }
 
-// Interface untuk Post
+/**
+ * Extends the IPost interface with Document.
+ */
 export interface IPostSchema extends IPost, Document {}

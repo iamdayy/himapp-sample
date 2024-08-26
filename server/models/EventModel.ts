@@ -5,6 +5,10 @@ import {
   IEventSchema,
   IRegisteredSchema,
 } from "~/types/ISchemas";
+
+/**
+ * Schema for representing a committee member.
+ */
 const CommitteeSchema = new Schema<ICommitteeSchema>({
   job: {
     type: String,
@@ -23,6 +27,9 @@ const CommitteeSchema = new Schema<ICommitteeSchema>({
   },
 });
 
+/**
+ * Schema for representing a registered participant.
+ */
 const registeredSchema = new Schema<IRegisteredSchema>({
   profile: {
     type: Types.ObjectId,
@@ -39,6 +46,10 @@ const registeredSchema = new Schema<IRegisteredSchema>({
     type: String,
   },
 });
+
+/**
+ * Schema for representing an event.
+ */
 const eventSchema = new Schema<IEventSchema>(
   {
     title: {
@@ -75,5 +86,11 @@ const eventSchema = new Schema<IEventSchema>(
     timestamps: true,
   }
 );
+
+// Enable auto-population for referenced documents
 eventSchema.plugin(mongooseAutoPopulate);
+
+/**
+ * Mongoose model for the Event collection.
+ */
 export const EventModel = mongoose.model<IEventSchema>("Event", eventSchema);

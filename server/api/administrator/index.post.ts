@@ -1,6 +1,13 @@
 import { AdministratorModel } from "~/server/models/AdministratorModel";
 import { ProfileModel } from "~/server/models/ProfileModel";
 import { IAdministrator, IAdministratorMember } from "~/types";
+
+/**
+ * Handles POST requests to create a new administrator period.
+ * @param {H3Event} event - The H3 event object.
+ * @returns {Promise<Object>} A response object with status code and message.
+ * @throws {H3Error} If an error occurs during the process.
+ */
 export default defineEventHandler(async (event) => {
   try {
     const user = await ensureAuth(event);
@@ -45,6 +52,12 @@ export default defineEventHandler(async (event) => {
   }
 });
 
+/**
+ * Retrieves the profile ID associated with a given NIM (Student Identification Number).
+ * @param {number} NIM - The Student Identification Number.
+ * @returns {Promise<unknown>} The profile ID associated with the NIM.
+ * @throws {H3Error} If an error occurs during the database query.
+ */
 const getIdByNim = async (NIM: number): Promise<unknown> => {
   try {
     const profile = await ProfileModel.findOne({ NIM });
@@ -57,6 +70,12 @@ const getIdByNim = async (NIM: number): Promise<unknown> => {
   }
 };
 
+/**
+ * Checks if an administrator period already exists for the given date range.
+ * @param {Date} start - The start date of the period.
+ * @param {Date} end - The end date of the period.
+ * @throws {H3Error} If an administrator period already exists within the given date range.
+ */
 const checkExistAdministrator = async (start: Date, end: Date) => {
   try {
     const administrator = await AdministratorModel.findOne({

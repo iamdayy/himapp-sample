@@ -4,7 +4,12 @@ interface DataRow {
   [key: string]: string | number | boolean | object | null;
 }
 
-// Fungsi untuk meratakan objek JSON bersarang
+/**
+ * Flattens a nested JSON object into a single-level object.
+ * @param {Record<string, any>} obj - The object to flatten.
+ * @param {string} prefix - The prefix to use for nested keys (default: "").
+ * @returns {Record<string, any>} A flattened object.
+ */
 function flattenObject(
   obj: Record<string, any>,
   prefix = ""
@@ -23,6 +28,11 @@ function flattenObject(
   return result;
 }
 
+/**
+ * Handles POST requests for exporting data to Excel.
+ * @param {H3Event} event - The H3 event object.
+ * @returns {Promise<Blob|Object>} A Blob containing the Excel file or an error object.
+ */
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event);
@@ -31,7 +41,7 @@ export default defineEventHandler(async (event) => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet(body.title);
 
-    // Mendapatkan semua header yang mungkin dari data
+    // Get all possible headers from the data
     const allHeaders = new Set<string>();
     complexData.forEach((item) => {
       Object.keys(flattenObject(item)).forEach((header) =>
@@ -39,10 +49,10 @@ export default defineEventHandler(async (event) => {
       );
     });
 
-    // Menambahkan header kolom
+    // Add column headers
     worksheet.addRow(Array.from(allHeaders));
 
-    // Menambahkan data baris
+    // Add data rows
     complexData.forEach((item) => {
       const flattenedItem = flattenObject(item);
       const rowValues = Array.from(allHeaders).map(
@@ -51,8 +61,11 @@ export default defineEventHandler(async (event) => {
       worksheet.addRow(rowValues);
     });
 
+    // Generate Excel file buffer
     const buffer = await workbook.xlsx.writeBuffer();
-    var blob = new Blob([buffer], {
+
+    // Create a Blob from the buffer
+    const blob = new Blob([buffer], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
 
@@ -60,6 +73,6 @@ export default defineEventHandler(async (event) => {
   } catch (error) {
     console.error("Error exporting to Excel:", error);
     setResponseStatus(event, 500); // Internal Server Error
-    return { error: "Terjadi kesalahan saat mengekspor data." };
+    return { error: "An error occurred while exporting data." };
   }
 });
