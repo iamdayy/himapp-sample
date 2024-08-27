@@ -251,8 +251,9 @@ onMounted(() => {
                         :ui="{ divide: 'divide-y divide-gray-200/60 dark:divide-gray-800/60' }">
                         <template #header>
                             <NuxtLink to="/dashboard/profile">
-                                <div class="flex w-full gap-2">
-                                    <UAvatar :src="user.profile.avatar" size="3xl" />
+                                <div class="flex items-center w-full gap-6">
+                                    <NuxtImg :src="user.profile.avatar || '/img/profile-blank.png'" width="180"
+                                        height="180" class="object-cover rounded-full max-w-36 aspect-square" />
                                     <div>
                                         <h2 class="text-2xl font-extrabold text-gray-800 md:text-4xl dark:text-white">{{
                                             user.username

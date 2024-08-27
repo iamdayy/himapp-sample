@@ -323,21 +323,18 @@ const visiblePages = computed(() => isMobile.value ? 3 : 5)
                             </li>
 
                             <li class="flex justify-between gap-2 mt-4">
-                                <UPopover overlay v-model:open="RegisterPopover"
-                                    :popper="{ strategy: 'absolute', placement: 'bottom', arrow: true }">
+                                <UPopover overlay :popper="{ strategy: 'absolute', placement: 'bottom', arrow: true }">
                                     <UButton class="flex-1" color="blue" variant="solid"
                                         :size="responsiveUISizes.button" icon="i-heroicons-user-plus"
-                                        :disabled="!canMeRegister(project.canRegister, project.deadline) || isMeRegistered(project)"
-                                        @click="RegisterPopover = !RegisterPopover">
+                                        :disabled="!canMeRegister(project.canRegister, project.deadline) || isMeRegistered(project)">
                                         Register
                                     </UButton>
                                     <template #panel>
-                                        <div class="flex flex-col p-4">
-                                            <USelect color="gray" variant="outline" :options="project.tasks" />
-                                            <UButton type="submit" class="my-3 text-xl font-semibold md:text-2xl"
-                                                variant="outline" block @click="register(project?._id as string)"
-                                                label="Accept" tralling-icon="i-heroicons-check"
-                                                :size="responsiveUISizes.button" />
+                                        <div class="flex flex-col gap-2 p-4 md:gap-4 md:p-6">
+                                            <USelect color=" gray" variant="outline" :options="project.tasks" />
+                                            <UButton type="submit" variant="outline" block
+                                                @click="register(project?._id as string)" label="Accept"
+                                                tralling-icon="i-heroicons-check" :size="responsiveUISizes.button" />
                                         </div>
                                     </template>
                                 </UPopover>
