@@ -55,7 +55,7 @@ export interface IProfile {
   address: IAddress;
   status?: "active" | "inactive" | "free" | "deleted";
   enteredYear?: number;
-  events?: IEvent[];
+  agendas?: IAgenda[];
   projects?: IProject[];
   isAdministrator?: {
     role: string;
@@ -91,6 +91,29 @@ export interface IPeriod {
   end: Date;
 }
 
+/**
+ * Represents an organizer with daily management and department details.
+ */
+
+export interface IDailyManagement {
+  position: string;
+  profile: Types.ObjectId | IProfile | number;
+}
+
+export interface IDepartment {
+  name: string;
+  coordinator: Types.ObjectId | IProfile | number;
+  members: Types.ObjectId[] | IProfile[] | number[];
+}
+
+export interface IOrganizer {
+  _id?: string;
+  dailyManagement: IDailyManagement[];
+  department: IDepartment[];
+  period: IPeriod;
+}
+
+// TODO: DELETE THIS
 /**
  * Represents a department affiliation for a user.
  */
@@ -141,9 +164,9 @@ export interface IRegistered {
 }
 
 /**
- * Represents an event with details, committee, and registration information.
+ * Represents an agenda with details, committee, and registration information.
  */
-export interface IEvent {
+export interface IAgenda {
   _id?: number | string;
   title: string;
   date: Date;

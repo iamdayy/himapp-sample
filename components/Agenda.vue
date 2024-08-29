@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { useWindowSize } from '@vueuse/core';
-import type { IEvent } from '~/types';
+import type { IAgenda } from '~/types';
 
 /**
  * Access the color mode of the application
@@ -18,9 +18,9 @@ const { $api } = useNuxtApp();
 const isDarkMode = computed(() => colorMode.value === 'dark');
 
 /**
- * Fetch events data from the API
+ * Fetch agendas data from the API
  */
-const { data: events } = useAsyncData(() => $api<IEvent[]>("/api/event"));
+const { data: agendas } = useAsyncData(() => $api<IAgenda[]>("/api/agenda"));
 
 /**
  * Reactive reference for the selected date
@@ -28,59 +28,59 @@ const { data: events } = useAsyncData(() => $api<IEvent[]>("/api/event"));
 const date = ref<Date>();
 
 /**
- * Reactive reference for the selected event
+ * Reactive reference for the selected agenda
  */
-const Event = ref<IEvent>();
+const Agenda = ref<IAgenda>();
 
 /**
- * Computed property to get and set the current event
+ * Computed property to get and set the current agenda
  */
-const event = computed<IEvent | undefined>({
+const agenda = computed<IAgenda | undefined>({
     get() {
-        if (Event.value) {
-            return Event.value;
+        if (Agenda.value) {
+            return Agenda.value;
         }
-        if (events.value) {
+        if (agendas.value) {
             const parseDate = (date: string) => new Date(date.replace(/(\d{2})\/(\d{2})\/(\d{4})/g, '$2/$1/$3'));
             const diff = (date: any, now: Date) => (parseDate(date).getTime() - now.getTime());
-            const evs = events.value?.sort(({ date: date1 }, { date: date2 }) => {
+            const agds = agendas.value?.sort(({ date: date1 }, { date: date2 }) => {
                 const diff1 = diff(date1, new Date());
                 const diff2 = diff(date2, new Date());
                 if (diff1 < 0) return 1;
                 if (diff2 < 0) return -1;
                 return diff1 - diff2;
             });
-            return evs![0];
+            return agds![0];
         }
         return undefined;
     },
     set(newVal) {
-        Event.value = newVal;
+        Agenda.value = newVal;
     }
 });
 
 /**
- * Computed property to generate calendar attributes for events
+ * Computed property to generate calendar attributes for agendas
  */
 const attributes = computed(() => [
-    ...<[]>events.value?.map(event => ({
+    ...<[]>agendas.value?.map(agenda => ({
         dot: 'green',
         content: 'green',
-        dates: event.date,
+        dates: agenda.date,
         popover: {
-            label: event.title
+            label: agenda.title
         }
     }))
 ]);
 
 /**
- * Function to select an event by its ID
- * @param {string} id - The ID of the event to select
+ * Function to select an agenda by its ID
+ * @param {string} id - The ID of the agenda to select
  */
 const pickDetail = (id: string) => {
-    if (events.value) {
-        const index = events.value.findIndex((event) => event.title === id);
-        event.value = events.value[index];
+    if (agendas.value) {
+        const index = agendas.value.findIndex((agenda) => agenda.title === id);
+        agenda.value = agendas.value[index];
     }
 };
 
@@ -129,29 +129,29 @@ const responsiveClasses = computed(() => ({
 <template>
     <UCard>
         <template #header>
-            <h2 :class="['font-extrabold dark:text-white', responsiveClasses.cardHeader]">Events</h2>
+            <h2 :class="['font-extrabold dark:text-white', responsiveClasses.cardHeader]">Agendas</h2>
         </template>
         <div class="flex flex-col w-full gap-3 md:flex-row">
             <clientOnly>
                 <div :class="['mx-auto shadow-lg', responsiveClasses.calendarWrapper]">
-                    <VCalendar v-if="events" expanded :attributes="attributes" class="shadow-lg" :is-dark="isDarkMode"
+                    <VCalendar v-if="agendas" expanded :attributes="attributes" class="shadow-lg" :is-dark="isDarkMode"
                         @dayclick="day => date = day.date">
                         <template #footer>
                             <div class="px-2 pb-3">
                                 <div class="mx-auto">
                                     <div class="pt-2 border-t border-gray-800 dark:border-gray-700">
-                                        <div v-for="event, i in events?.filter((event: IEvent) => new Date(event.date).toDateString() == new Date(date!).toDateString())"
+                                        <div v-for="agenda, i in agendas?.filter((agenda: IAgenda) => new Date(agenda.date).toDateString() == new Date(date!).toDateString())"
                                             :key="i"
                                             class="flex flex-col gap-2 px-4 py-2 cursor-pointer md:flex-row md:items-center hover:bg-gray-200 rounded-3xl"
-                                            @click="pickDetail(event.title)">
+                                            @click="pickDetail(agenda.title)">
                                             <p
                                                 class="text-xs font-normal text-gray-500 md:text-sm dark:text-gray-400 shrink-0">
-                                                {{ `${new Date(event.date).getHours()}:${new
-                                                    Date(event.date).getMinutes()}` }}
+                                                {{ `${new Date(agenda.date).getHours()}:${new
+                                                    Date(agenda.date).getMinutes()}` }}
                                             </p>
                                             <h3
                                                 class="text-base font-semibold text-gray-600 md:text-lg dark:text-white">
-                                                {{ event.title }}
+                                                {{ agenda.title }}
                                             </h3>
                                         </div>
                                     </div>
@@ -162,13 +162,13 @@ const responsiveClasses = computed(() => ({
                 </div>
             </clientOnly>
             <div :class="['px-4 py-4 border-gray-400', responsiveClasses.eventDetailsWrapper]">
-                <h5 v-if="!event"
+                <h5 v-if="!agenda"
                     class="my-12 mb-4 text-2xl font-semibold text-center text-yellow-300 dark:text-yellow-200">
                     No Agenda Selected
                 </h5>
                 <div v-else>
                     <h5 :class="['mb-4 font-medium text-gray-500 dark:text-gray-400', responsiveClasses.eventTitle]">
-                        {{ event?.title }}
+                        {{ agenda?.title }}
                     </h5>
                     <ul role="list" class="my-5 space-y-3">
                         <li v-for="(item, index) in ['date', 'time', 'location', 'visibility', 'description']"
@@ -179,23 +179,23 @@ const responsiveClasses = computed(() => ({
                             <span
                                 :class="['font-normal leading-tight text-gray-500 dark:text-gray-400 ms-2', responsiveClasses.listItem]">
                                 <template v-if="item === 'date'">
-                                    {{ new Date(event.date).toLocaleDateString('id-Id', { dateStyle: 'full' }) }}
+                                    {{ new Date(agenda.date).toLocaleDateString('id-Id', { dateStyle: 'full' }) }}
                                 </template>
                                 <template v-else-if="item === 'time'">
-                                    {{ new Date(event.date).toLocaleTimeString('id-Id', { timeStyle: 'full' }) }}
+                                    {{ new Date(agenda.date).toLocaleTimeString('id-Id', { timeStyle: 'full' }) }}
                                 </template>
                                 <template v-else-if="item === 'location'">
-                                    {{ event?.at }}
+                                    {{ agenda.at }}
                                 </template>
                                 <template v-else-if="item === 'visibility'">
-                                    {{ event?.canSee }}
+                                    {{ agenda?.canSee }}
                                 </template>
                                 <template v-else-if="item === 'description'">
-                                    <TiptapShow :content="event.description" />
+                                    <TiptapShow :content="agenda.description" />
                                 </template>
                             </span>
                         </li>
-                        <li v-if="event.committee">
+                        <li v-if="agenda.committee">
                             <span class="flex items-center">
                                 <Icon name="solar:users-group-two-rounded-outline"
                                     :class="['flex-shrink-0 text-blue-600 dark:text-blue-500', responsiveClasses.icon]" />
@@ -205,7 +205,7 @@ const responsiveClasses = computed(() => ({
                                 </span>
                             </span>
                             <div class="relative my-2 mt-4 overflow-auto sm:rounded-lg ms-6 max-h-36 md:max-h-48">
-                                <UTable :rows="event.committee" :columns="committeeHeaders"
+                                <UTable :rows="agenda.committee" :columns="committeeHeaders"
                                     :ui="{ td: { base: responsiveClasses.listItem } }">
                                     <template #name-data="{ row }">
                                         {{ row.user.fullName }}

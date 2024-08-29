@@ -60,9 +60,9 @@ const itemsIsLogged = (user: IUser) => [
         icon: 'i-heroicons-rectangle-group',
         to: '/dashboard'
     }, {
-        label: 'Events',
+        label: 'Agendas',
         icon: 'i-heroicons-calendar',
-        to: '/dashboard/events'
+        to: '/dashboard/agendas'
     }, {
         label: 'Projects',
         icon: 'i-heroicons-code-bracket',

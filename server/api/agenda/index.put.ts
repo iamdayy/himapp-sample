@@ -1,4 +1,4 @@
-import { EventModel } from "~/server/models/EventModel";
+import { AgendaModel } from "~/server/models/AgendaModel";
 
 /**
  * Handles PUT requests for updating an existing event.
@@ -18,36 +18,36 @@ export default defineEventHandler(async (ev) => {
       });
     }
 
-    // Get the event ID from the query parameters
+    // Get the agenda ID from the query parameters
     const { id } = getQuery(ev);
 
     // Read and validate the request body
     const body = await readBody(ev);
 
-    // Find the event by ID
-    const event = await EventModel.findById(id);
-    if (!event) {
+    // Find the agenda by ID
+    const agenda = await AgendaModel.findById(id);
+    if (!agenda) {
       throw createError({
         statusCode: 404,
-        statusMessage: "The event is not found",
+        statusMessage: "The agenda is not found",
       });
     }
 
-    // Update event properties
-    event.title = body.title;
-    event.at = body.at;
-    event.date = body.date;
-    event.canSee = body.canSee;
-    event.description = body.description;
-    event.canRegister = body.canRegister;
+    // Update agenda properties
+    agenda.title = body.title;
+    agenda.at = body.at;
+    agenda.date = body.date;
+    agenda.canSee = body.canSee;
+    agenda.description = body.description;
+    agenda.canRegister = body.canRegister;
 
-    // Save the updated event
-    await event.save();
+    // Save the updated agenda
+    await agenda.save();
 
     // Return success response
     return {
       statusCode: 200,
-      statusMessage: `Event ${event.title} updated`,
+      statusMessage: `Agenda ${agenda.title} updated`,
     };
   } catch (error: any) {
     // Handle any errors that occur during the process
@@ -55,7 +55,7 @@ export default defineEventHandler(async (ev) => {
       statusCode: error.statusCode || 500,
       message:
         error.message ||
-        "An unexpected error occurred while updating the event",
+        "An unexpected error occurred while updating the agenda",
     });
   }
 });

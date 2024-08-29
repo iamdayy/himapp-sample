@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { EventModel } from "~/server/models/EventModel";
+import { AgendaModel } from "~/server/models/AgendaModel";
 import { ProfileModel } from "~/server/models/ProfileModel";
 
 /**
@@ -11,12 +11,12 @@ import { ProfileModel } from "~/server/models/ProfileModel";
 export default defineEventHandler(async (ev) => {
   const { NIM, id } = await readBody(ev);
   try {
-    // Find the event by ID
-    const event = await EventModel.findById(id);
-    if (!event) {
+    // Find the agenda by ID
+    const agenda = await AgendaModel.findById(id);
+    if (!agenda) {
       throw createError({
         statusCode: 404,
-        statusMessage: "Event not found",
+        statusMessage: "Agenda not found",
       });
     }
 
@@ -29,24 +29,24 @@ export default defineEventHandler(async (ev) => {
       });
     }
 
-    // Add the user to the event's registered list
-    event.registered?.push({
+    // Add the user to the agenda's registered list
+    agenda.registered?.push({
       profile: me._id as Types.ObjectId,
     });
 
-    // Save the updated event
-    const saved = await event.save();
+    // Save the updated agenda
+    const saved = await agenda.save();
     if (!saved) {
       throw createError({
         statusCode: 400,
-        statusMessage: "Failed to save event registration",
+        statusMessage: "Failed to save agenda registration",
       });
     }
 
     // Return success response
     return {
       status: true,
-      statusMessage: `Successfully registered for event: ${event.title}`,
+      statusMessage: `Successfully registered for agenda: ${agenda.title}`,
     };
   } catch (error: any) {
     // Handle any errors that occur during the process
@@ -54,7 +54,7 @@ export default defineEventHandler(async (ev) => {
       statusCode: error.statusCode || 500,
       statusMessage:
         error.message ||
-        "An unexpected error occurred during event registration",
+        "An unexpected error occurred during agenda registration",
     });
   }
 });

@@ -1,8 +1,8 @@
 import mongoose, { Schema, Types } from "mongoose";
 import mongooseAutoPopulate from "mongoose-autopopulate";
 import {
+  IAgendaSchema,
   ICommitteeSchema,
-  IEventSchema,
   IRegisteredSchema,
 } from "~/types/ISchemas";
 
@@ -50,7 +50,7 @@ const registeredSchema = new Schema<IRegisteredSchema>({
 /**
  * Schema for representing an event.
  */
-const eventSchema = new Schema<IEventSchema>(
+const agendaSchema = new Schema<IAgendaSchema>(
   {
     title: {
       type: String,
@@ -88,9 +88,12 @@ const eventSchema = new Schema<IEventSchema>(
 );
 
 // Enable auto-population for referenced documents
-eventSchema.plugin(mongooseAutoPopulate);
+agendaSchema.plugin(mongooseAutoPopulate);
 
 /**
  * Mongoose model for the Event collection.
  */
-export const EventModel = mongoose.model<IEventSchema>("Event", eventSchema);
+export const AgendaModel = mongoose.model<IAgendaSchema>(
+  "Agenda",
+  agendaSchema
+);

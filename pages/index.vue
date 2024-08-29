@@ -47,7 +47,7 @@ useHead({
 
     <!-- Events Section -->
     <section class="py-8 sm:py-12" id="events" data-aos="fade-right">
-        <Events />
+        <Agenda />
     </section>
 
     <!-- Projects Section -->

@@ -1,6 +1,6 @@
-import { EventModel } from "~/server/models/EventModel";
+import { AgendaModel } from "~/server/models/AgendaModel";
 import { ProfileModel } from "~/server/models/ProfileModel";
-import { IReqEvent } from "~/types/IRequestPost";
+import { IReqAgenda } from "~/types/IRequestPost";
 
 /**
  * Handles POST requests for creating a new event.
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Read and validate the request body
-    const body = await readBody<IReqEvent>(event);
+    const body = await readBody<IReqAgenda>(event);
 
     // Process committee members
     const committees = body.committee?.map(async (committee) => {
@@ -45,22 +45,22 @@ export default defineEventHandler(async (event) => {
       }
     });
 
-    // Create a new event
-    const newEvent = new EventModel({
+    // Create a new agenda
+    const newAgenda = new AgendaModel({
       ...body,
       committee: await Promise.all(committees!),
     });
 
-    // Save the new event
-    const savedEvent = await newEvent.save();
-    if (!savedEvent) {
+    // Save the new agenda
+    const savedAgenda = await newAgenda.save();
+    if (!savedAgenda) {
       throw createError({
         statusCode: 400,
-        message: "Failed to save the event",
+        message: "Failed to save the agenda",
       });
     }
 
-    return savedEvent;
+    return savedAgenda;
   } catch (error: any) {
     return createError({
       statusCode: error.statusCode || 500,

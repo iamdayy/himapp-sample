@@ -48,9 +48,9 @@ const itemsIsLogged = [
         icon: 'i-heroicons-rectangle-group',
         to: '/dashboard'
     }, {
-        label: 'Events',
+        label: 'Agendas',
         icon: 'i-heroicons-calendar',
-        to: '/dashboard/events'
+        to: '/dashboard/agendas'
     }, {
         label: 'Projects',
         icon: 'i-heroicons-code-bracket',
@@ -135,9 +135,9 @@ const links = [
             to: '/dashboard'
         },
         {
-            label: 'Events',
+            label: 'Agendas',
             icon: 'i-heroicons-calendar',
-            to: '/dashboard/events'
+            to: '/dashboard/agendas'
         },
         {
             label: 'Projects',
@@ -148,6 +148,11 @@ const links = [
             label: 'Users',
             icon: 'i-heroicons-users',
             to: '/administrators/users'
+        },
+        {
+            label: 'Organizers',
+            icon: 'i-heroicons-user-group',
+            to: '/administrators/organizers'
         },
         {
             label: 'Post',

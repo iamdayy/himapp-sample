@@ -1,5 +1,5 @@
 import type { SortOrder } from "mongoose";
-import type { IEvent, IProfile } from ".";
+import type { IAgenda, IProfile } from ".";
 
 /**
  * Interface for pagination query parameters.
@@ -71,7 +71,7 @@ export interface IReqProfile extends IProfile {}
 /**
  * Interface for event request, extending IEvent.
  */
-export interface IReqEvent extends IEvent {}
+export interface IReqAgenda extends IAgenda {}
 
 /**
  * Interface for project query parameters, extending pagination.

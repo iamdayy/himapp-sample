@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import type { PropType } from 'vue';
-import type { IEvent, IProfile } from '~/types';
+import type { IAgenda, IProfile } from '~/types';
 import type { IProfileResponse } from '~/types/IResponse';
 
 // Fetch user profile data
@@ -12,8 +12,8 @@ const modal = useModal();
 
 // Define props
 const props = defineProps({
-    event: {
-        type: Object as PropType<IEvent>,
+    agenda: {
+        type: Object as PropType<IAgenda>,
         required: true
     },
 });
@@ -21,39 +21,39 @@ const props = defineProps({
 // Define emits
 const emits = defineEmits(['trigger-refresh']);
 
-// Create a reactive reference to the event
-const Event = ref<IEvent>(props.event);
+// Create a reactive reference to the agenda
+const Agenda = ref<IAgenda>(props.agenda);
 
 /**
- * Add a new committee member to the event
+ * Add a new committee member to the agenda
  */
 const addCommittee = () => {
-    if (!Event.value.committee) {
-        Event.value.committee = [{ job: "", user: "" }];
+    if (!Agenda.value.committee) {
+        Agenda.value.committee = [{ job: "", user: "" }];
     } else {
-        Event.value.committee.push({ job: "", user: "" });
+        Agenda.value.committee.push({ job: "", user: "" });
     }
 };
 
 /**
- * Remove a committee member from the event
+ * Remove a committee member from the agenda
  * @param {number} i - Index of the committee member to remove
  */
 const deleteCommittee = (i: number) => {
-    Event.value.committee?.splice(i, 1);
+    Agenda.value.committee?.splice(i, 1);
 };
 
 /**
- * Save the edited event
+ * Save the edited agenda
  */
-const addEvent = async () => {
+const addAgenda = async () => {
     try {
-        await $api("/api/event", {
+        await $api("/api/agenda", {
             method: "put",
-            body: Event.value,
-            query: { id: Event.value._id }
+            body: Agenda.value,
+            query: { id: Agenda.value._id }
         });
-        toast.add({ title: `Successfully edited event for ${new Date(Event.value.date).toLocaleDateString()}` });
+        toast.add({ title: `Successfully edited event for ${new Date(Agenda.value.date).toLocaleDateString()}` });
         emits('trigger-refresh');
         modal.close();
     } catch (error: any) {
@@ -89,7 +89,7 @@ const responsiveUISizes = computed(() => ({
         <UCard :ui="{ background: 'bg-gray-200 dark:bg-gray-800' }">
             <template #header>
                 <div class="flex justify-between w-full">
-                    <h2 class="text-xl font-semibold dark:text-gray-200">Edit Event {{ Event.title }}</h2>
+                    <h2 class="text-xl font-semibold dark:text-gray-200">Edit Event {{ Agenda.title }}</h2>
                     <UButton icon="i-heroicons-x-mark" :padded="false" variant="link" color="gray"
                         @click="modal.close" />
                 </div>
@@ -100,13 +100,13 @@ const responsiveUISizes = computed(() => ({
                         <div class="col-span-full">
                             <label for="title"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title</label>
-                            <UInput type="text" name="title" id="title" v-model="Event.title" required
+                            <UInput type="text" name="title" id="title" v-model="Agenda.title" required
                                 :size="responsiveUISizes.input" />
                         </div>
                         <div class="col-span-full md:col-span-3">
                             <label for="date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date
                                 & Time</label>
-                            <VDatePicker id="date" v-model="Event.date" mode="dateTime">
+                            <VDatePicker id="date" v-model="Agenda.date" mode="dateTime">
                                 <template #default="{ togglePopover }">
                                     <UButton :size="responsiveUISizes.button" @click="togglePopover">
                                         Select date
@@ -117,14 +117,14 @@ const responsiveUISizes = computed(() => ({
                         <div class="col-span-full md:col-span-3">
                             <label for="at"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">At</label>
-                            <UInput type="text" name="at" id="at" v-model="Event.at" required
+                            <UInput type="text" name="at" id="at" v-model="Agenda.at" required
                                 :size="responsiveUISizes.input" />
                         </div>
                         <div class="col-span-full md:col-span-3">
                             <label for="canSee" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Can
                                 See</label>
                             <USelect id="canSee" :options="['Admin', 'Departement', 'Internal', 'All', 'External']"
-                                v-model="Event.canSee" required :size="responsiveUISizes.input" />
+                                v-model="Agenda.canSee" required :size="responsiveUISizes.input" />
                         </div>
                         <div class="col-span-full md:col-span-3">
                             <label for="canRegister"
@@ -132,32 +132,32 @@ const responsiveUISizes = computed(() => ({
                                 Register</label>
                             <USelect id="canRegister"
                                 :options="['Admin', 'Departement', 'Internal', 'All', 'External', 'No']"
-                                v-model="Event.canRegister" required :size="responsiveUISizes.input" />
+                                v-model="Agenda.canRegister" required :size="responsiveUISizes.input" />
                         </div>
                         <div class="col-span-full">
                             <label for="description"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
-                            <TipTapEditor id="description" v-model="Event.description" />
+                            <TipTapEditor id="description" v-model="Agenda.description" />
                         </div>
                         <div class="col-span-full">
                             <label for="committee"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contributors</label>
                             <div id="committee" class="ms-2">
-                                <div v-for="(committee, i) in Event.committee" :key="i" class="mb-4">
+                                <div v-for="(committee, i) in Agenda.committee" :key="i" class="mb-4">
                                     <div class="flex flex-col gap-2 md:flex-row md:items-center">
                                         <div class="w-full md:w-3/4">
                                             <label :for="`${committee.job}-job`"
                                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Job</label>
                                             <UInput :type="`${committee.job}-job`" :name="`${committee.job}-job`"
-                                                :id="`${committee.job}-job`" v-model="Event.committee![i].job" required
+                                                :id="`${committee.job}-job`" v-model="Agenda.committee![i].job" required
                                                 :size="responsiveUISizes.input" />
                                         </div>
                                         <div class="w-full md:w-1/4">
                                             <label :for="`${committee.job}-profile`"
                                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIM</label>
                                             <UInput type="number" :name="`${committee.job}-profile`"
-                                                :id="`${committee.job}-profile`" v-model="Event.committee![i].user"
-                                                :value="(Event.committee![i].user as IProfile).NIM" required
+                                                :id="`${committee.job}-profile`" v-model="Agenda.committee![i].user"
+                                                :value="(Agenda.committee![i].user as IProfile).NIM" required
                                                 :size="responsiveUISizes.input" />
                                         </div>
                                         <UButton @click="deleteCommittee(i)" icon="i-heroicons-trash"
@@ -166,14 +166,14 @@ const responsiveUISizes = computed(() => ({
                                     </div>
                                     <label :for="`${committee.job}-profile`"
                                         class="block text-sm font-medium text-gray-900 dark:text-white">{{
-                                            getNameFromNIM(Event.committee![i].user as number) }}</label>
+                                            getNameFromNIM(Agenda.committee![i].user as number) }}</label>
                                 </div>
                                 <UButton @click="addCommittee" label="Add Committee" icon="i-heroicons-plus" block
                                     trailing :size="responsiveUISizes.button" />
                             </div>
                         </div>
                     </div>
-                    <UButton type="submit" @click.prevent="addEvent" label="Save" icon="i-heroicons-clipboard" block
+                    <UButton type="submit" @click.prevent="addAgenda" label="Save" icon="i-heroicons-clipboard" block
                         trailing :size="responsiveUISizes.button" />
                 </div>
             </div>

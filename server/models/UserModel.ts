@@ -4,8 +4,8 @@ import mongooseAutoPopulate from "mongoose-autopopulate";
 import { IAdministrator, IProfile, IUser } from "~/types";
 import { IUserSchema } from "~/types/ISchemas";
 import { AdministratorModel } from "./AdministratorModel";
+import { AgendaModel } from "./AgendaModel";
 import { DepartementModel } from "./DepartementModel";
-import { EventModel } from "./EventModel";
 import { ProfileModel } from "./ProfileModel";
 import { ProjectModel } from "./ProjectModel";
 
@@ -61,8 +61,8 @@ const userSchema = new Schema<IUserSchema, IUserModel, IUserMethods>({
           model: ProjectModel,
         },
         {
-          path: "events",
-          model: EventModel,
+          path: "agendas",
+          model: AgendaModel,
         },
         {
           path: "isAdministrator",

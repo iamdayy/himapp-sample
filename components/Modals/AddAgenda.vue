@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import type { IEvent } from '~/types';
+import type { IAgenda } from '~/types';
 import type { IProfileResponse } from '~/types/IResponse';
 
 // Access Nuxt app instance and utilities
@@ -14,7 +14,7 @@ const { data: profile } = useLazyAsyncData(() => $api<IProfileResponse>("/api/pr
 const emits = defineEmits(['trigger-refresh']);
 
 // Initialize new event object with default values
-const newEvent = ref<IEvent>({
+const newAgenda = ref<IAgenda>({
     title: "",
     date: new Date(),
     at: "",
@@ -33,15 +33,15 @@ const newEvent = ref<IEvent>({
  * Add a new committee member to the event
  */
 const addCommittee = () => {
-    if (!newEvent.value.committee) {
-        newEvent.value.committee = [
+    if (!newAgenda.value.committee) {
+        newAgenda.value.committee = [
             {
                 job: "",
                 user: ""
             }
         ]
     } else {
-        newEvent.value.committee?.push({
+        newAgenda.value.committee?.push({
             job: "",
             user: ""
         });
@@ -53,22 +53,22 @@ const addCommittee = () => {
  * @param {number} i - Index of the committee member to remove
  */
 const deleteCommittee = (i: number) => {
-    newEvent.value.committee?.splice(i, 1);
+    newAgenda.value.committee?.splice(i, 1);
 }
 
 /**
  * Add a new event to the database
  */
-const addEvent = async () => {
+const addAgenda = async () => {
     try {
-        const added = await $api("/api/event", {
+        const added = await $api("/api/agenda", {
             method: "post",
-            body: newEvent.value,
+            body: newAgenda.value,
         });
-        toast.add({ title: "Success add new event at " + new Date(newEvent.value.date).toLocaleDateString() });
+        toast.add({ title: "Success add new agenda at " + new Date(newAgenda.value.date).toLocaleDateString() });
         emits('trigger-refresh');
     } catch (error: any) {
-        toast.add({ title: "Failed to add new Event" });
+        toast.add({ title: "Failed to add new Agenda" });
     }
 }
 
@@ -109,10 +109,11 @@ const responsiveClasses = computed(() => ({
 
 <template>
     <UModal :fullscreen="isMobile">
+
         <UCard :ui="{ background: 'bg-gray-200 dark:bg-gray-800' }">
             <template #header>
                 <div class="flex justify-between w-full">
-                    <h2 :class="[responsiveClasses.label, 'font-semibold dark:text-gray-200']">New Event</h2>
+                    <h2 :class="[responsiveClasses.label, 'font-semibold dark:text-gray-200']">New Agenda</h2>
                     <UButton icon="i-heroicons-x-mark" :size="responsiveUISizes.button" :padded="false" variant="link"
                         color="gray" @click="modal.close" />
                 </div>
@@ -123,7 +124,7 @@ const responsiveClasses = computed(() => ({
                         <div class="col-span-full">
                             <label for="title"
                                 :class="[responsiveClasses.label, 'block mb-2 font-medium text-gray-900 dark:text-white']">Title</label>
-                            <UInput type="text" name="title" id="title" v-model="newEvent.title"
+                            <UInput type="text" name="title" id="title" v-model="newAgenda.title"
                                 :size="responsiveUISizes.input" required />
                         </div>
                         <div :class="[isMobile ? 'col-span-full' : 'col-span-3']">
@@ -131,7 +132,7 @@ const responsiveClasses = computed(() => ({
                                 :class="[responsiveClasses.label, 'block mb-2 font-medium text-gray-900 dark:text-white']">Date
                                 & Time</label>
                             <div class="flex items-center justify-between w-full gap-2">
-                                <VDatePicker id="date" v-model="newEvent.date" mode="dateTime">
+                                <VDatePicker id="date" v-model="newAgenda.date" mode="dateTime">
                                     <template #default="{ togglePopover }">
                                         <UButton icon="i-heroicons-calendar" :size="responsiveUISizes.button"
                                             @click="togglePopover" />
@@ -139,14 +140,14 @@ const responsiveClasses = computed(() => ({
                                 </VDatePicker>
                                 <span
                                     :class="[responsiveClasses.input, 'font-semibold text-gray-900 dark:text-gray-300']">
-                                    {{ new Date(newEvent.date).toLocaleDateString() }}
+                                    {{ new Date(newAgenda.date).toLocaleDateString() }}
                                 </span>
                             </div>
                         </div>
                         <div :class="[isMobile ? 'col-span-full' : 'col-span-3']">
                             <label for="at"
                                 :class="[responsiveClasses.label, 'block mb-2 font-medium text-gray-900 dark:text-white']">At</label>
-                            <UInput type="text" name="at" id="at" v-model="newEvent.at" :size="responsiveUISizes.input"
+                            <UInput type="text" name="at" id="at" v-model="newAgenda.at" :size="responsiveUISizes.input"
                                 required />
                         </div>
                         <div :class="[isMobile ? 'col-span-full' : 'col-span-3']">
@@ -154,7 +155,7 @@ const responsiveClasses = computed(() => ({
                                 :class="[responsiveClasses.label, 'block mb-2 font-medium text-gray-900 dark:text-white']">Can
                                 See</label>
                             <USelect id="canSee" :options="['Admin', 'Departement', 'Internal', 'All', 'External']"
-                                v-model="newEvent.canSee" :size="responsiveUISizes.input" />
+                                v-model="newAgenda.canSee" :size="responsiveUISizes.input" />
                         </div>
                         <div :class="[isMobile ? 'col-span-full' : 'col-span-3']">
                             <label for="canRegister"
@@ -162,25 +163,25 @@ const responsiveClasses = computed(() => ({
                                 Register</label>
                             <USelect id="canRegister"
                                 :options="['Admin', 'Departement', 'Internal', 'All', 'External', 'No']"
-                                v-model="newEvent.canRegister" :size="responsiveUISizes.input" />
+                                v-model="newAgenda.canRegister" :size="responsiveUISizes.input" />
                         </div>
                         <div class="col-span-full">
                             <label for="description"
                                 :class="[responsiveClasses.label, 'block mb-2 font-medium text-gray-900 dark:text-white']">Description</label>
-                            <TipTapEditor id="description" v-model="newEvent.description" />
+                            <TipTapEditor id="description" v-model="newAgenda.description" />
                         </div>
                         <div class="col-span-full">
                             <label for="committee"
                                 :class="[responsiveClasses.label, 'block mb-2 font-medium text-gray-900 dark:text-white']">Contributors</label>
                             <div id="committee" class="ms-2">
-                                <div v-for="committee, i in newEvent.committee" :key="i" class="mb-2">
+                                <div v-for="committee, i in newAgenda.committee" :key="i" class="mb-2">
                                     <div class="flex flex-col items-end gap-2 sm:flex-row">
                                         <div class="flex flex-col items-center w-full gap-2 sm:flex-row">
                                             <div class="w-full sm:w-3/4">
                                                 <label :for="`${committee.job}-job`"
                                                     :class="[responsiveClasses.label, 'block mb-2 font-medium text-gray-900 dark:text-white']">Job</label>
                                                 <UInput :type="`${committee.job}-job`" :name="`${committee.job}-job`"
-                                                    :id="`${committee.job}-job`" v-model="newEvent.committee![i].job"
+                                                    :id="`${committee.job}-job`" v-model="newAgenda.committee![i].job"
                                                     :size="responsiveUISizes.input" required />
                                             </div>
                                             <div class="w-full sm:w-1/4">
@@ -188,7 +189,7 @@ const responsiveClasses = computed(() => ({
                                                     :class="[responsiveClasses.label, 'block mb-2 font-medium text-gray-900 dark:text-white']">NIM</label>
                                                 <UInput :type="`${committee.job}-profile`"
                                                     :name="`${committee.job}-profile`" :id="`${committee.job}-profile`"
-                                                    v-model="newEvent.committee![i].user"
+                                                    v-model="newAgenda.committee![i].user"
                                                     :size="responsiveUISizes.input" required />
                                             </div>
                                         </div>
@@ -198,7 +199,7 @@ const responsiveClasses = computed(() => ({
                                     </div>
                                     <label :for="`${committee.job}-profile`"
                                         :class="[responsiveClasses.label, 'block font-medium text-gray-900 dark:text-white']">
-                                        {{ getNameFromNIM(newEvent.committee![i].user as number) }}
+                                        {{ getNameFromNIM(newAgenda.committee![i].user as number) }}
                                     </label>
                                 </div>
                                 <UButton @click="addCommittee" label="Add Committee" icon="i-heroicons-plus" block
@@ -206,7 +207,7 @@ const responsiveClasses = computed(() => ({
                             </div>
                         </div>
                     </div>
-                    <UButton type="submit" @click.prevent="addEvent" label="Save" icon="i-heroicons-clipboard" block
+                    <UButton type="submit" @click.prevent="addAgenda" label="Save" icon="i-heroicons-clipboard" block
                         :size="responsiveUISizes.button" trailing />
                 </div>
             </div>

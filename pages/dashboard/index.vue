@@ -24,7 +24,7 @@ const colorMode = useColorMode();
 /**
  * Get user stats
  */
-const { all, eventsMe, projectsMe, allCanMeRegister, eventsCanMeRegistered, ProjectsCanMeRegistered } = useStats()
+const { all, agendasMe, projectsMe, allCanMeRegister, agendasCanMeRegistered, ProjectsCanMeRegistered } = useStats()
 
 /**
  * Get authentication data
@@ -147,9 +147,9 @@ const links = computed(() => [
             to: '/dashboard'
         },
         {
-            label: 'Events',
+            label: 'Agendas',
             icon: 'i-heroicons-calendar',
-            to: '/dashboard/events'
+            to: '/dashboard/agendas'
         },
         {
             label: 'Projects',
@@ -160,6 +160,11 @@ const links = computed(() => [
             label: 'Users',
             icon: 'i-heroicons-users',
             to: '/administrators/users'
+        },
+        {
+            label: 'Organizers',
+            icon: 'i-heroicons-user-group',
+            to: '/administrators/organizers'
         },
         {
             label: 'Post',
@@ -288,16 +293,16 @@ onMounted(() => {
                             </UCard>
                             <UCard class="w-full sm:w-1/3">
                                 <template #header>
-                                    <h2 class="text-xl font-semibold dark:text-gray-200">Events</h2>
+                                    <h2 class="text-xl font-semibold dark:text-gray-200">Agendas</h2>
                                 </template>
                                 <div class="flex items-center justify-between w-full mb-2">
                                     <h2 class="text-3xl text-gray-700 text-bold dark:text-gray-400">{{
-                                        eventsMe.length
+                                        agendasMe.length
                                     }}</h2>
                                     <UIcon name="i-heroicons-calendar" class="text-6xl" />
                                 </div>
                                 <ClientOnly>
-                                    <UMeter :value="eventsMe.length" :max="eventsCanMeRegistered?.length" indicator />
+                                    <UMeter :value="agendasMe.length" :max="agendasCanMeRegistered?.length" indicator />
                                 </ClientOnly>
                             </UCard>
                             <UCard class="w-full sm:w-1/3">
@@ -325,7 +330,7 @@ onMounted(() => {
                                     </NuxtLink>
                                 </div>
                             </template>
-                            <UCarousel ref="carouselRef" :items="eventsMe" v-slot="{ item, index }"
+                            <UCarousel ref="carouselRef" :items="agendasMe" v-slot="{ item, index }"
                                 :ui="{ item: 'w-full' }"
                                 :prev-button="{ color: 'gray', icon: 'i-heroicons-arrow-left-20-solid', class: 'left-0' }"
                                 :next-button="{ color: 'gray', icon: 'i-heroicons-arrow-right-20-solid', class: 'right-0' }"

@@ -3,10 +3,13 @@ import type {
   IAddress,
   IAdministrator,
   IAdministratorMember,
+  IAgenda,
   ICommittee,
   IContributor,
+  IDailyManagement,
   IDepartement,
-  IEvent,
+  IDepartment,
+  IOrganizer,
   IPost,
   IProfile,
   IProject,
@@ -37,6 +40,16 @@ export interface IProfileSchema extends Omit<IProfile, "id">, Document {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface IOrganizerSchema extends Omit<IOrganizer, "id">, Document {}
+
+export interface IDailyManagementSchema
+  extends Omit<IDailyManagement, "id">,
+    Document {}
+
+export interface IDepartmentSchema extends Omit<IDepartment, "id">, Document {}
+
+// TODO: DELETE THIS
 
 /**
  * Extends the IDepartement interface with Document.
@@ -73,7 +86,7 @@ export interface ICommitteeSchema extends ICommittee, Document {}
 /**
  * Extends the IEvent interface with Document and adds timestamp fields.
  */
-export interface IEventSchema extends Omit<IEvent, "_id">, Document {
+export interface IAgendaSchema extends Omit<IAgenda, "_id">, Document {
   createdAt: Date;
   updatedAt: Date;
 }

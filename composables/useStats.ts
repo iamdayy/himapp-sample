@@ -3,11 +3,11 @@ export const useStats = () => {
     var with2Decimals = num.toString().match(/^-?\d+(?:\.\d{0,2})?/)![0];
     return parseFloat(with2Decimals);
   }
-  const { eventsCanMeRegistered, eventsMe } = useEvents();
+  const { agendasCanMeRegistered, agendasMe } = useAgendas();
   const { ProjectsCanMeRegistered, projectsMe } = useProjects();
   const EventPercentage = computed<number>(() => {
     return calc(
-      (eventsMe.value.length! / eventsCanMeRegistered.value?.length!) * 100
+      (agendasMe.value.length! / agendasCanMeRegistered.value?.length!) * 100
     );
   });
   const ProjectPercentage = computed<number>(() => {
@@ -16,11 +16,11 @@ export const useStats = () => {
     );
   });
   const all = computed<number>(() => {
-    return eventsMe.value.length! + projectsMe.value.length!;
+    return agendasMe.value.length! + projectsMe.value.length!;
   });
   const allCanMeRegister = computed<number>(() => {
     return (
-      eventsCanMeRegistered.value?.length! +
+      agendasCanMeRegistered.value?.length! +
       ProjectsCanMeRegistered.value?.length!
     );
   });
@@ -28,11 +28,11 @@ export const useStats = () => {
     return calc((all.value / allCanMeRegister.value) * 100);
   });
   return {
-    eventsMe,
+    agendasMe,
     projectsMe,
     allCanMeRegister,
     all,
-    eventsCanMeRegistered,
+    agendasCanMeRegistered,
     ProjectsCanMeRegistered,
   };
 };

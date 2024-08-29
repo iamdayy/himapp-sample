@@ -1,4 +1,4 @@
-import { EventModel } from "~/server/models/EventModel";
+import { AgendaModel } from "~/server/models/AgendaModel";
 import { ProfileModel } from "~/server/models/ProfileModel";
 
 /**
@@ -21,7 +21,7 @@ const getNimFromID = async (id: string): Promise<number> => {
 };
 
 /**
- * Handles GET requests for event data.
+ * Handles GET requests for agenda data.
  * @param {H3Event} event - The H3 event object.
  * @returns {Promise<Event | Event[]>} The event data or an array of events.
  * @throws {H3Error} If an error occurs during the process.
@@ -30,8 +30,8 @@ export default defineEventHandler(async (event) => {
   try {
     const { id } = getQuery(event);
     if (id) {
-      // Fetch a single event by ID
-      const eventData = await EventModel.findById(
+      // Fetch a single agenda by ID
+      const eventData = await AgendaModel.findById(
         id,
         {},
         { autopopulate: false }
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
       if (!eventData) {
         throw createError({
           statusCode: 404,
-          statusMessage: "Event not found",
+          statusMessage: "Agenda not found",
         });
       }
       // Map committee members to their NIMs
@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
       };
     }
 
-    // Fetch multiple events based on user roles
+    // Fetch multiple agendas based on user roles
     const roles: string[] = ["All", "External"];
     const auth = checkAuth(event);
     if (auth) {
@@ -74,11 +74,11 @@ export default defineEventHandler(async (event) => {
         roles.push("Departement");
       }
     }
-    const events = await EventModel.find({ canSee: { $in: roles } });
+    const events = await AgendaModel.find({ canSee: { $in: roles } });
     if (!events) {
       throw createError({
         statusCode: 400,
-        message: "No events found",
+        message: "No agendas found",
       });
     }
     return events;
@@ -87,7 +87,7 @@ export default defineEventHandler(async (event) => {
       statusCode: error.statusCode || 500,
       message:
         error.message ||
-        "An unexpected error occurred while fetching event data",
+        "An unexpected error occurred while fetching agenda data",
     });
   }
 });

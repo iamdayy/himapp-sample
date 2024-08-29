@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import { IAddressSchema, IProfileSchema } from "~/types/ISchemas";
-import { EventModel } from "./EventModel";
+import { AgendaModel } from "./AgendaModel";
 import { ProjectModel } from "./ProjectModel";
 import { UserModel } from "./UserModel";
 
@@ -112,10 +112,10 @@ profileSchema.virtual("projects", {
 });
 
 /**
- * Virtual field to get the events associated with the profile.
+ * Virtual field to get the agendas associated with the profile.
  */
-profileSchema.virtual("events", {
-  ref: "Event",
+profileSchema.virtual("agendas", {
+  ref: "Agenda",
   localField: "_id",
   foreignField: "registered.profile",
   match: {
@@ -174,7 +174,7 @@ profileSchema.post("save", async function (next) {
         },
       }
     );
-    await EventModel.updateMany(
+    await AgendaModel.updateMany(
       {
         $or: [
           { "committee.user": profileId },
