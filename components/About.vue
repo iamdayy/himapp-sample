@@ -109,7 +109,7 @@ const responsiveClasses = computed(() => ({
             </div>
             <div class="overflow-hidden shadow-md lg:w-1/2 rounded-tr-2xl rounded-bl-3xl" data-aos="fade-left"
                 data-aos-easing="ease-in-out" data-aos-duration="800" data-aos-anchor=".about">
-                <NuxtImg src="/img/fobar.jpg" loading="lazy"
+                <NuxtImg src="/img/fobar.png" loading="lazy"
                     class="transition duration-500 ease-out cursor-pointer hover:scale-125" />
             </div>
         </div>

@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 import { ModalsCropImage } from "#components";
 import imageCompression from "browser-image-compression";
+import type { IProfile } from "~/types";
 
 // Define page metadata
 definePageMeta({
@@ -70,6 +71,7 @@ const onFileChange = async ($event: Event) => {
  * Generate and download the activeness letter
  */
 const getActivinessLetter = () => {
+    const organizer = organizers?.find((org) => new Date(org.period.start).getFullYear() <= new Date(Date.now()).getFullYear() && new Date(org.period.end).getFullYear() >= new Date(Date.now()).getFullYear() + 1);
 
     const pdfMake = usePDFMake();
     pdfMake.fonts = {
@@ -81,7 +83,270 @@ const getActivinessLetter = () => {
         }
     }
     pdfMake.createPdf({
-        // ... (PDF content definition remains the same)
+        content: [
+            {
+                alignment: "center",
+                columns: [
+                    {
+                        image: "himaLogo",
+                        width: 60
+                    },
+                    {
+                        width: '*',
+                        stack: [
+                            {
+                                text: 'HIMPUNAN MAHASISWA INFORMATIKA',
+                                color: 'green',
+                                fontSize: 14,
+                                bold: true
+                            },
+                            {
+                                text: 'INSTITUT TEKNOLOGI DAN SAINS NAHDLATUL ULAMA PEKALONGAN',
+                                color: 'green',
+                                bold: true,
+                            },
+                            {
+                                text: 'Sekretariat : Gedung ITS NU Jl. Karangdowo No. 9 Kedungwuni Pekalongan 51173',
+                                italics: true,
+                                fontSize: 11
+                            },
+                            {
+                                text: 'email : him.tekom123@gmail.com',
+                                italics: true,
+                                fontSize: 11
+                            },
+                        ]
+                    },
+                    {
+                        image: "itsnuLogo",
+                        width: 60
+                    },
+                ]
+            },
+            { canvas: [{ type: 'line', lineColor: 'black', x1: 0, y1: 5, x2: 595 - 2 * 20, y2: 5, lineWidth: 1 }] },
+            { canvas: [{ type: 'line', lineColor: 'black', x1: 0, y1: 3, x2: 595 - 2 * 20, y2: 3, lineWidth: 2 }] },
+            {
+                alignment: 'center',
+                margin: [0, 30, 0, 10],
+                stack: [
+                    {
+                        bold: true,
+                        fontSize: 14,
+                        text: 'Surat Keterangan Aktif'
+                    },
+                    {
+                        text: 'Himpunan Mahasiswa Informatika',
+                        fontSize: 14,
+                        bold: true,
+                        lineHeight: 1.2,
+                        decoration: 'underline'
+                    },
+                    {
+                        text: `019/II.3.AI/BO1.01/02.A-1/S.Ket/IV/${new Date(Date.now()).getFullYear()}`,
+                    }
+                ]
+            },
+            {
+                margin: [40, 10],
+                stack: [
+                    {
+                        text: 'Yang bertanda tangan di bawah ini : ',
+                        margin: [0, 10],
+                    },
+                    {
+                        margin: [0, 2],
+                        columns: [
+                            {
+                                text: 'Nama',
+                                width: 90
+                            },
+                            {
+                                text: ':',
+                                width: 5
+                            },
+                            {
+                                text: (organizer?.dailyManagement.find((dm) => dm.position.includes('Ketua') || dm.position.includes('Chairman'))?.profile as IProfile).fullName
+                            },
+                        ],
+                    },
+                    {
+                        margin: [0, 2],
+                        columns: [
+                            {
+                                text: 'NIM',
+                                width: 90
+                            },
+                            {
+                                text: ':',
+                                width: 5
+                            },
+                            {
+                                text: (organizer?.dailyManagement.find((dm) => dm.position.includes('Ketua') || dm.position.includes('Chairman'))?.profile as IProfile).NIM
+                            },
+                        ],
+                    },
+                    {
+                        margin: [0, 2],
+                        columns: [
+                            {
+                                text: 'Jabatan',
+                                width: 90
+                            },
+                            {
+                                text: ':',
+                                width: 5
+                            },
+                            {
+                                text: 'Ketua Umum'
+                            },
+                        ],
+                    },
+                    {
+                        margin: [0, 10],
+                        text: 'Menyatakan dengan sesungguhnya bahwa :'
+                    },
+                    {
+                        margin: [0, 2],
+                        columns: [
+                            {
+                                text: 'Nama',
+                                width: 90
+                            },
+                            {
+                                text: ':',
+                                width: 5
+                            },
+                            {
+                                text: user.value.profile.fullName
+                            },
+                        ],
+                    },
+                    {
+                        margin: [0, 2],
+                        columns: [
+                            {
+                                text: 'NIM',
+                                width: 90
+                            },
+                            {
+                                text: ':',
+                                width: 5
+                            },
+                            {
+                                text: user.value.profile.NIM
+                            },
+                        ],
+                    },
+                    {
+                        margin: [0, 2],
+                        columns: [
+                            {
+                                text: 'Kelas',
+                                width: 90
+                            },
+                            {
+                                text: ':',
+                                width: 5
+                            },
+                            {
+                                text: user.value.profile.class
+                            },
+                        ],
+                    },
+                    {
+                        margin: [0, 10],
+                        text: `Adalah mahasiswa yang benar - benar aktif dalam Himpunan Mahasiswa Informatika (HIMATIKA) ITSNU Pekalongan periode ${new Date(organizer?.period.start!).getFullYear()}/${new Date(organizer?.period.end!).getFullYear()}.`
+                    },
+                    {
+                        text: 'Demikian surat keterangan keaktifan mahasiswa ini dibuat sebagaimana mestinya.'
+                    },
+                    {
+                        margin: [0, 20],
+                        alignment: 'right',
+                        text: [
+                            {
+                                text: 'Pekalongan, '
+                            },
+                            {
+                                text: new Date(Date.now()).toLocaleDateString('id-ID', { dateStyle: 'long' }),
+                            }
+                        ]
+                    },
+                    {
+                        margin: [0, 30],
+                        alignment: 'center',
+                        bold: true,
+                        stack: [
+                            'HIMPUNAN MAHASISWA INFORMATIKA',
+                            'INSTITUT TEKNOLOGI DAN SAINS NAHDLATUL ULAMA',
+                            'PEKALONGAN'
+                        ]
+                    },
+                    {
+                        margin: [0, 30, 0, 30],
+                        alignment: 'center',
+                        bold: true,
+                        text: 'Mengetahui'
+                    },
+                    {
+                        alignment: 'center',
+                        bold: true,
+                        columns: [
+                            {
+                                stack: [
+                                    {
+                                        text: 'Ketua Umum',
+                                    },
+                                    {
+                                        margin: [0, 80, 0, 0],
+                                        stack: [
+                                            {
+                                                text: (organizer?.dailyManagement.find((dm) => dm.position.includes('Ketua') || dm.position.includes('Chairman'))?.profile as IProfile).fullName,
+                                                decoration: 'underline'
+                                            },
+                                            {
+                                                text: (organizer?.dailyManagement.find((dm) => dm.position.includes('Ketua') || dm.position.includes('Chairman'))?.profile as IProfile).NIM,
+                                                bold: false
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                stack: [
+                                    {
+                                        text: 'Sekretaris Umum',
+                                    },
+                                    {
+                                        margin: [0, 80, 0, 0],
+                                        stack: [
+                                            {
+                                                text: (organizer?.dailyManagement.find((dm) => dm.position.includes('Sekretaris') || dm.position.includes('Secretary'))?.profile as IProfile).fullName,
+                                                decoration: 'underline'
+                                            },
+                                            {
+                                                text: (organizer?.dailyManagement.find((dm) => dm.position.includes('Sekretaris') || dm.position.includes('Secretary'))?.profile as IProfile).NIM,
+                                                bold: false
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                        ]
+                    }
+                ]
+            }
+        ],
+        images: {
+            himaLogo: config.public.public_uri + "img/logo.png",
+            itsnuLogo: config.public.public_uri + "img/itsnu-logo.png",
+        },
+        pageMargins: [20, 25],
+        pageSize: 'A4',
+        defaultStyle: {
+            fontSize: 12,
+            font: "Times"
+        }
     }).download(`${user.value.profile.fullName}-Surat-Keatifan`);
 }
 
