@@ -1,31 +1,23 @@
 <script setup lang='ts'>
 import { useWindowSize } from '@vueuse/core';
-import type { IAdministrator, IDepartement, IPeriod, IProfile } from '~/types';
+import type { IProfile } from '~/types';
 
-/**
- * Fetches the list of administrators from the API
- */
-const { data: administrators } = await useAsyncData(() => $fetch<IAdministrator[]>("/api/administrator"));
+const { organizers } = useOrganizer();
 
-/**
- * Fetches the list of departments from the API
- */
-const { data: departementsData } = await useAsyncData(() => $fetch<IDepartement[]>("/api/departement"));
+const organizer = computed(() => {
+    if (organizers) {
+        return organizers.find((organizer) => new Date(organizer.period.start).getFullYear() === Number(selectedPeriod.value.split(" - ")[0]) && new Date(organizer.period.end).getFullYear() === Number(selectedPeriod.value.split(" - ")[1]));
+    }
+    return null;
+});
 
-/**
- * Reactive reference to the current administrator
- */
-const administrator = ref<IAdministrator | undefined>();
-
-/**
- * Reactive reference to the list of departments
- */
-const departements = ref<IDepartement[] | undefined>();
-
-/**
- * Reactive reference to the current department period
- */
-const departementPeriod = ref<IPeriod | undefined>();
+const periods = computed(() => {
+    if (organizers) {
+        return organizers.map((organizer) => `${new Date(organizer.period.start).getFullYear()} - ${new Date(organizer.period.end).getFullYear()}`);
+    }
+    return [];
+});
+const selectedPeriod = ref(periods.value[0] || "");
 
 /**
  * Defines the tab items for the About Us section
@@ -42,17 +34,36 @@ const tabItems = [
         description: ''
     },
     {
-        label: 'Pengurus Harian',
-        key: 'ph',
-        description: ''
-    },
-    {
-        label: 'Departemen',
-        key: 'departemen',
+        label: 'Organizer',
+        key: 'organizer',
         description: ''
     },
 ];
 
+const items = [
+    {
+        label: 'Daily Manager',
+        slot: 'dailyManager',
+        description: ''
+    },
+    {
+        label: 'Departments',
+        slot: 'departments',
+        description: ''
+    },
+];
+
+const departementsTabs = computed(() => {
+    if (organizer.value) {
+        return organizer.value?.department.map((department) => {
+            return {
+                slot: 'department',
+                label: department.name,
+            }
+        })
+    }
+    return []
+})
 /**
  * Use VueUse's useWindowSize composable for responsive design
  */
@@ -71,36 +82,6 @@ const responsiveClasses = computed(() => ({
     contentText: isMobile.value ? 'text-base' : 'text-lg',
     gridCols: isMobile.value ? 'grid-cols-1' : 'grid-cols-2',
 }));
-
-/**
- * Lifecycle hook that runs after the component is mounted
- */
-onMounted(async () => {
-    // Find the current administrator based on the current year
-    if (administrators.value) {
-        administrator.value = administrators.value?.find((admin) => {
-            const currentYear = new Date().getFullYear();
-            const startYear = new Date(admin.period.start).getFullYear();
-            const endYear = new Date(admin.period.end).getFullYear();
-            return startYear <= currentYear && endYear >= currentYear;
-        });
-    }
-
-    // Filter departments based on the current year
-    if (departementsData.value) {
-        departements.value = departementsData.value?.filter((departement) => {
-            const currentYear = new Date().getFullYear();
-            const startYear = new Date(departement.period.start).getFullYear();
-            const endYear = new Date(departement.period.end).getFullYear();
-            return startYear <= currentYear && endYear >= currentYear;
-        });
-    }
-
-    // Set the department period if departments are available
-    if (departements.value && departements.value.length > 0) {
-        departementPeriod.value = departements.value[0].period;
-    }
-})
 </script>
 <template>
     <UCard>
@@ -167,28 +148,33 @@ onMounted(async () => {
                                     Informatika.</li>
                             </ul>
                         </div>
-                        <div v-if="item.key === 'ph'" class="w-full p-4 rounded-lg">
+                        <div v-if="item.key === 'organizer'" class="w-full p-4 rounded-lg">
                             <h1 :class="['mb-4 font-bold text-center text-gray-400', responsiveClasses.contentText]"
-                                v-if="administrator"><span>{{
-                                    new Date(administrator?.period.start!).getFullYear() }}</span> - <span>{{ new
-                                        Date(administrator?.period.end!).getFullYear() }}</span> </h1>
-                            <div :class="['max-w-4xl py-8 mx-auto justify-items-center', responsiveClasses.gridCols]"
-                                v-if="administrator">
-                                <ProfileCard v-for="member, i in administrator.AdministratorMembers" class="mb-8"
-                                    :profile="member.profile as IProfile" :subtitle="member.role" />
-                            </div>
-                        </div>
-                        <div v-if="item.key === 'departemen'" class="w-full p-4 rounded-lg">
-                            <h1 :class="['mb-4 font-bold text-center text-gray-400', responsiveClasses.contentText]"
-                                v-if="departements"><span>{{
-                                    new
-                                        Date(departementPeriod?.start!).getFullYear() }}</span> - <span>{{ new
-                                        Date(departementPeriod?.end!).getFullYear() }}</span> </h1>
-                            <div :class="['max-w-4xl py-8 mx-auto justify-items-center', responsiveClasses.gridCols]"
-                                v-if="departements">
-                                <ProfileCard v-for="member, i in departements" class="mb-8"
-                                    :profile="member.profile as IProfile" :subtitle="member.departement" />
-                            </div>
+                                v-if="organizer">
+                                <USelect v-model="selectedPeriod" :options="periods" class="w-full mx-auto md:w-1/2" />
+                            </h1>
+                            <UTabs :items="items">
+                                <template #dailyManager="{ item, index }">
+                                    <div class="grid w-full grid-cols-1 gap-4 py-3 md:grid-cols-3">
+                                        <ProfileCard v-for="dailyManager in organizer?.dailyManagement"
+                                            :profile="(dailyManager.profile as IProfile)"
+                                            :subtitle="dailyManager.position" />
+                                    </div>
+                                </template>
+                                <template #departments="{ item }">
+                                    <UTabs :items="departementsTabs">
+                                        <template #department="{ item, index }">
+                                            <ProfileCard v-if="organizer?.department[index].coordinator"
+                                                :profile="(organizer?.department[index].coordinator as IProfile)"
+                                                subtitle="Coordinator" class="mt-8" />
+                                            <div class="grid w-full grid-cols-1 gap-4 py-3 mt-8 md:grid-cols-3">
+                                                <ProfileCard v-for="member in organizer?.department[index].members"
+                                                    :profile="(member as IProfile)" subtitle="Member" />
+                                            </div>
+                                        </template>
+                                    </UTabs>
+                                </template>
+                            </UTabs>
                         </div>
                     </UCard>
                 </template>

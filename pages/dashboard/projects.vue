@@ -5,8 +5,7 @@ import type { IProfile, IProject } from '~/types';
 /**
  * Composables for role and department checks
  */
-const { isAdmin } = useRole(["Secretary", "viceSecretary", "Chairman"]);
-const { isDept } = useDept();
+const { isOrganizer } = useOrganizer();
 
 /**
  * User authentication and toast notifications
@@ -222,7 +221,7 @@ const visiblePages = computed(() => isMobile.value ? 3 : 5)
         <UCard class="mt-6">
             <div class="flex flex-col items-center justify-between gap-4 px-4 md:flex-row-reverse md:gap-8 md:px-8">
                 <UButton label="Add Project" block class="w-full text-base font-bold md:text-xl md:w-auto"
-                    @click="AddModal" v-if="isAdmin || isDept" icon="i-heroicons-plus" trailing color="blue" />
+                    @click="AddModal" v-if="isOrganizer" icon="i-heroicons-plus" trailing color="blue" />
             </div>
             <div class="flex flex-col w-full gap-3 px-4 py-6 md:px-8 md:py-12 md:flex-row">
                 <div
@@ -257,7 +256,7 @@ const visiblePages = computed(() => isMobile.value ? 3 : 5)
                                 {{ project?.title }}
                             </h5>
                             <UButton icon="i-heroicons-pencil-square" variant="link" @click="EditModal"
-                                v-if="isAdmin || isDept" :size="responsiveUISizes.button" />
+                                v-if="isOrganizer" :size="responsiveUISizes.button" />
                         </div>
                         <ul role="list" class="my-5 space-y-3">
                             <li class="flex items-center">
@@ -340,7 +339,7 @@ const visiblePages = computed(() => isMobile.value ? 3 : 5)
                                 </UPopover>
                                 <UButton color="gray" variant="solid" :size="responsiveUISizes.button"
                                     icon="i-heroicons-users"
-                                    :disabled="!canMeRegister(project.canRegister, project.deadline) || !isMeRegistered(project) || isAdmin || isDept"
+                                    :disabled="!canMeRegister(project.canRegister, project.deadline) || !isMeRegistered(project) || isOrganizer"
                                     @click="registeredModal">
                                     Registered
                                 </UButton>

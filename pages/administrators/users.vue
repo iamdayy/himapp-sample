@@ -22,8 +22,7 @@ const { $api } = useNuxtApp();
 /**
  * User role and department hooks
  */
-const { isAdmin } = useRole();
-const { isDept } = useDept();
+const { isOrganizer } = useOrganizer();
 
 /**
  * Modal and toast hooks
@@ -291,9 +290,9 @@ const colorbadge = (status: "active" | "inactive" | "free" | "deleted") => {
         <UCard class="px-4 mt-6 md:px-8">
             <template #header>
                 <UButton label="New" :size="responsiveUISizes.button" :ui="{ rounded: 'rounded-full' }"
-                    v-if="isAdmin || isDept" block @click="addModal" />
+                    v-if="isOrganizer" block @click="addModal" />
                 <UButton label="Import" :size="responsiveUISizes.button" :ui="{ rounded: 'rounded-full' }"
-                    class="mx-auto my-3" v-if="isAdmin || isDept" to="/administrators/import" />
+                    class="mx-auto my-3" v-if="isOrganizer" to="/administrators/import" />
             </template>
             <div class="w-full py-3">
                 <!-- Filters -->

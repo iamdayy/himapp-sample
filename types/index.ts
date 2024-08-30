@@ -57,15 +57,10 @@ export interface IProfile {
   enteredYear?: number;
   agendas?: IAgenda[];
   projects?: IProject[];
-  isAdministrator?: {
-    role: string;
-    period: IPeriod;
-  };
-  isDepartement?: IDepartement;
-  organizer: IOrganizer;
-  organizersDailyManagement: IOrganizer[];
-  organizersDepartmentCoordinator: IOrganizer[];
-  organizersDepartmentMembers: IOrganizer[];
+  organizer?: IOrganizer;
+  organizersDailyManagement?: IOrganizer[];
+  organizersDepartmentCoordinator?: IOrganizer[];
+  organizersDepartmentMembers?: IOrganizer[];
 }
 
 /**

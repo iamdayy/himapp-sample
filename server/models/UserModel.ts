@@ -69,7 +69,7 @@ const userSchema = new Schema<IUserSchema, IUserModel, IUserMethods>({
           transform: (doc: IOrganizer, id: any) => {
             if (doc) {
               return {
-                role: "Coordinator Departement",
+                role: "Coordinator Department",
                 period: doc.period,
               };
             }
@@ -95,7 +95,7 @@ const userSchema = new Schema<IUserSchema, IUserModel, IUserMethods>({
           transform: (doc: IOrganizer, id: any) => {
             if (doc) {
               return {
-                role: "Member Departement",
+                role: "Member Department",
                 period: doc.period,
               };
             }

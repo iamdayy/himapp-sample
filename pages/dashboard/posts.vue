@@ -21,7 +21,7 @@ useHead({
 const { $api } = useNuxtApp();
 const modal = useModal();
 const toast = useToast();
-
+const { isOrganizer } = useOrganizer();
 /**
  * Pagination and sorting state
  */
@@ -145,21 +145,24 @@ const PublishModal = (slug: string) => {
  * @param {IPost} post - The post to generate items for
  * @returns {Array} Array of dropdown items
  */
-const items = (post: IPost) => [[
+const items = (post: IPost): Array<any> => [[
     {
         label: 'Delete',
         icon: 'i-heroicons-trash',
-        click: () => DeleteModal(post.slug!)
+        click: () => DeleteModal(post.slug!),
+        disabled: !isOrganizer.value
     },
     {
         label: 'Edit',
         icon: 'i-heroicons-pencil-square',
-        click: () => EditModal(post)
+        click: () => EditModal(post),
+        disabled: !isOrganizer.value
     },
     {
         label: 'Publish',
         icon: 'i-ion-arrow-up-right-box-outline',
-        click: () => PublishModal(post.slug!)
+        click: () => PublishModal(post.slug!),
+        disabled: !isOrganizer.value
     }
 ]]
 
@@ -191,7 +194,7 @@ const responsiveClasses = computed(() => ({
         </div>
         <UCard>
             <template #header>
-                <UButton :class="responsiveClasses.button" label="Add Post" @click="AddModal" />
+                <UButton :class="responsiveClasses.button" v-if="isOrganizer" label="Add Post" @click="AddModal" />
                 <div :class="['flex flex-wrap justify-between', responsiveClasses.pagination]">
                     <div class="flex items-center gap-1.5 mb-2 sm:mb-0">
                         <span class="text-sm leading-5">Rows per page:</span>

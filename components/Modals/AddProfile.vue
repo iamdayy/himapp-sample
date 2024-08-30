@@ -31,7 +31,7 @@ const colleger = ref<IProfile>({
     },
     class: "",
     semester: 1,
-    status: "free"
+    status: "free",
 });
 
 const addColleger = async () => {

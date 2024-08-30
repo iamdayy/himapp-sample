@@ -1,7 +1,6 @@
 <script setup lang='ts'>
 import { ModalsCropImage } from "#components";
 import imageCompression from "browser-image-compression";
-import type { IAdministrator } from '~/types';
 
 // Define page metadata
 definePageMeta({
@@ -20,7 +19,7 @@ const config = useRuntimeConfig();
 const { data: user, refresh } = useAuth();
 
 // Fetch administrators data
-const { data: administrators } = await useAsyncData(() => $fetch<IAdministrator[]>("/api/administrator"));
+const { organizers } = useOrganizer();
 
 // Get stats
 const { all, allCanMeRegister } = useStats();
@@ -71,7 +70,6 @@ const onFileChange = async ($event: Event) => {
  * Generate and download the activeness letter
  */
 const getActivinessLetter = () => {
-    const administrator = administrators.value?.find((admin) => new Date(admin.period.start).getFullYear() <= new Date(Date.now()).getFullYear() && new Date(admin.period.end).getFullYear() >= new Date(Date.now()).getFullYear());
 
     const pdfMake = usePDFMake();
     pdfMake.fonts = {

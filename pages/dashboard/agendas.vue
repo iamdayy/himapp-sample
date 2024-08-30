@@ -26,8 +26,7 @@ const colorMode = useColorMode();
 const { canMeRegister } = useCanMeRegister();
 const { data: user } = useAuth();
 const { agendas, refreshAgendas } = useAgendas();
-const { isDept } = useDept();
-const { isAdmin } = useRole();
+const { isOrganizer } = useOrganizer();
 
 /**
  * Computed property to determine if dark mode is active
@@ -223,7 +222,7 @@ const responsiveUISizes = computed(() => ({
         <UCard class="px-8 mt-6">
             <UButton label="New" :size="responsiveUISizes.button"
                 class="my-3 text-lg font-bold text-gray-700 md:text-2xl dark:text-gray-700"
-                :ui="{ rounded: 'rounded-full' }" @click="AddModal" v-if="isAdmin || isDept" block />
+                :ui="{ rounded: 'rounded-full' }" @click="AddModal" v-if="isOrganizer" block />
             <div class="flex flex-col w-full gap-3 py-4 md:py-12 md:flex-row">
                 <ClientOnly>
                     <VCalendar :attributes="attributes" class="mx-auto shadow-lg md:max-w-sm" v-if="agendas"
@@ -262,9 +261,8 @@ const responsiveUISizes = computed(() => ({
                             <h5 :class="['font-medium text-gray-500 dark:text-gray-400', responsiveClasses.eventTitle]">
                                 {{ agenda?.title }}
                             </h5>
-                            <UButton v-if="isAdmin || isDept" icon="i-heroicons-pencil-square" color="gray"
-                                variant="ghost" :ui="{ rounded: 'rounded-full' }" @click="EditModal"
-                                :size="responsiveUISizes.button" />
+                            <UButton v-if="isOrganizer" icon="i-heroicons-pencil-square" color="gray" variant="ghost"
+                                :ui="{ rounded: 'rounded-full' }" @click="EditModal" :size="responsiveUISizes.button" />
                         </div>
                         <ul role="list" class="my-5 space-y-3">
                             <li v-for="(item, index) in ['date', 'time', 'location', 'visibility', 'description']"
@@ -318,7 +316,7 @@ const responsiveUISizes = computed(() => ({
                                 </UButton>
                                 <UButton class="flex-1" color="gray" block variant="solid"
                                     :size="responsiveUISizes.button" icon="i-heroicons-users"
-                                    :disabled="!canMeRegister(agenda.canRegister, agenda.date) || !isMeRegistered(agenda) || isAdmin || isDept"
+                                    :disabled="!canMeRegister(agenda.canRegister, agenda.date) || !isMeRegistered(agenda) || isOrganizer"
                                     @click="registeredModal">
                                     Registered
                                 </UButton>
