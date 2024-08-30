@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
     const auth = checkAuth(event);
     if (auth) {
       const user = await ensureAuth(event);
-      if (user.profile.isAdministrator || user.profile.isDepartement) {
+      if (user.profile.organizer) {
         // Administrators and department users can see all posts
         query = {};
       }

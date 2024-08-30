@@ -5,10 +5,10 @@ import { IOrganizer } from "~/types";
 export default defineEventHandler(async (event) => {
   try {
     const user = await ensureAuth(event);
-    if (!user.profile.isAdministrator) {
+    if (!user.profile.organizer) {
       throw createError({
         statusCode: 403,
-        statusMessage: "Administrator access required.",
+        statusMessage: "You must be admin / departement to use this endpoint",
       });
     }
 

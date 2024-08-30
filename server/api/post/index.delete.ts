@@ -14,11 +14,10 @@ export default defineEventHandler(async (event) => {
   try {
     // Ensure the user is authenticated and has the necessary permissions
     const user = await ensureAuth(event);
-    if (!user.profile.isAdministrator && !user.profile.isDepartement) {
+    if (!user.profile.organizer) {
       throw createError({
         statusCode: 403,
-        statusMessage:
-          "Unauthorized: Only administrators or department members can delete posts",
+        statusMessage: "You must be admin / departement to use this endpoint",
       });
     }
 

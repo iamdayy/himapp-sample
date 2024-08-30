@@ -24,11 +24,10 @@ export default defineEventHandler(async (event) => {
     let newPath = "";
 
     // Check user authorization
-    if (!user.profile.isAdministrator && !user.profile.isDepartement) {
+    if (!user.profile.organizer) {
       throw createError({
         statusCode: 403,
-        statusMessage:
-          "You must be administrator or departement to use this endpoint",
+        statusMessage: "You must be admin / departement to use this endpoint",
       });
     }
 

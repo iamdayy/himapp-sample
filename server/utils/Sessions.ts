@@ -41,7 +41,22 @@ export const checkSession = async (payload: string) => {
       });
     }
 
-    return user;
+    return {
+      username: user.username,
+      profile: {
+        NIM: user.profile.NIM,
+        fullName: user.profile.fullName,
+        avatar: user.profile.avatar,
+        email: user.profile.email,
+        class: user.profile.class,
+        semester: user.profile.semester,
+        enteredYear: user.profile.enteredYear,
+        status: user.profile.status,
+        agendas: user.profile.agendas,
+        projects: user.profile.projects,
+        organizer: user.profile.organizer,
+      },
+    };
   } catch (error: any) {
     throw error;
   }

@@ -10,11 +10,10 @@ export default defineEventHandler(async (ev) => {
   try {
     // Ensure the user is authenticated and has the necessary permissions
     const user = await ensureAuth(ev);
-    if (!user.profile.isAdministrator && !user.profile.isDepartement) {
+    if (!user.profile.organizer) {
       throw createError({
         statusCode: 403,
-        statusMessage:
-          "You must be administrator or departement to use this endpoint",
+        statusMessage: "You must be admin / departement to use this endpoint",
       });
     }
 

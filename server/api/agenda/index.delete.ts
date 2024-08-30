@@ -8,6 +8,19 @@ import { AgendaModel } from "~/server/models/AgendaModel";
  */
 export default defineEventHandler(async (event) => {
   try {
+    const user = await ensureAuth(event);
+    if (!user) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "You must be logged in to access this",
+      });
+    }
+    if (!user.profile.organizer) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "You must be admin / departement to access this",
+      });
+    }
     // Get the agenda ID from the route parameters
     const id = getRouterParam(event, "id");
 

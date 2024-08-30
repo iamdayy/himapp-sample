@@ -62,6 +62,10 @@ export interface IProfile {
     period: IPeriod;
   };
   isDepartement?: IDepartement;
+  organizer: IOrganizer;
+  organizersDailyManagement: IOrganizer[];
+  organizersDepartmentCoordinator: IOrganizer[];
+  organizersDepartmentMembers: IOrganizer[];
 }
 
 /**

@@ -123,30 +123,47 @@ profileSchema.virtual("agendas", {
   },
 });
 
-/**
- * Virtual field to check if the profile is an administrator.
- */
-profileSchema.virtual("isAdministrator", {
-  ref: "Administrator",
+// Virtual for dailyManagement
+profileSchema.virtual("organizersDailyManagement", {
+  ref: "Organizer",
   localField: "_id",
-  foreignField: "AdministratorMembers.profile",
+  foreignField: "dailyManagement.profile",
   justOne: true,
   match: {
     "period.end": { $gte: new Date() },
   },
 });
 
-/**
- * Virtual field to check if the profile belongs to a department.
- */
-profileSchema.virtual("isDepartement", {
-  ref: "Departement",
+// Virtual for department coordinator
+profileSchema.virtual("organizersDepartmentCoordinator", {
+  ref: "Organizer",
   localField: "_id",
-  foreignField: "profile",
+  foreignField: "department.coordinator",
+  justOne: true,
+
+  match: {
+    "period.end": { $gte: new Date() },
+  },
+});
+
+// Virtual for department members
+profileSchema.virtual("organizersDepartmentMembers", {
+  ref: "Organizer",
+  localField: "_id",
+  foreignField: "department.members",
   justOne: true,
   match: {
     "period.end": { $gte: new Date() },
   },
+});
+
+// Combine all organizers
+profileSchema.virtual("organizer").get(function () {
+  return (
+    this.organizersDailyManagement ||
+    this.organizersDepartmentCoordinator ||
+    this.organizersDepartmentMembers
+  );
 });
 
 // Create a text index for searching profiles

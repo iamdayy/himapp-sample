@@ -63,16 +63,11 @@ export default defineEventHandler(async (event) => {
     const auth = checkAuth(event);
     if (auth) {
       const user = await ensureAuth(event);
-      if (user.profile.isAdministrator) {
+      if (user.profile.organizer) {
         if (!roles.includes("Internal")) {
           roles.push("Internal");
         }
         roles.push("Admin");
-      }
-      if (user.profile.isDepartement) {
-        if (!roles.includes("Internal")) {
-          roles.push("Internal");
-        }
         roles.push("Departement");
       }
     }

@@ -5,6 +5,7 @@ import {
   IDepartmentSchema,
   IOrganizerSchema,
 } from "~/types/ISchemas";
+import { ProfileModel } from "./ProfileModel";
 
 const DailyManagementSchema = new Schema<IDailyManagementSchema>({
   position: {
@@ -15,7 +16,13 @@ const DailyManagementSchema = new Schema<IDailyManagementSchema>({
     type: Schema.Types.ObjectId,
     ref: "Profile",
     required: true,
-    autopopulate: true,
+    autopopulate: {
+      model: ProfileModel,
+      select: "NIM avatar fullName email class semester createdAt",
+      match: {
+        status: "active",
+      },
+    },
   },
 });
 
@@ -28,14 +35,26 @@ const DepartmentSchema = new Schema<IDepartmentSchema>({
     type: Schema.Types.ObjectId,
     ref: "Profile",
     required: true,
-    autopopulate: true,
+    autopopulate: {
+      model: ProfileModel,
+      select: "NIM avatar fullName email class semester createdAt",
+      match: {
+        status: "active",
+      },
+    },
   },
   members: [
     {
       type: Schema.Types.ObjectId,
       ref: "Profile",
       required: true,
-      autopopulate: true,
+      autopopulate: {
+        model: ProfileModel,
+        select: "NIM avatar fullName email class semester createdAt",
+        match: {
+          status: "active",
+        },
+      },
     },
   ],
 });

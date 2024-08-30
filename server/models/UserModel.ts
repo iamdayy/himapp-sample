@@ -1,11 +1,10 @@
 import bcrypt from "bcrypt";
 import mongoose, { Model, Schema, Types } from "mongoose";
 import mongooseAutoPopulate from "mongoose-autopopulate";
-import { IAdministrator, IProfile, IUser } from "~/types";
+import { IOrganizer, IProfile, IUser } from "~/types";
 import { IUserSchema } from "~/types/ISchemas";
-import { AdministratorModel } from "./AdministratorModel";
 import { AgendaModel } from "./AgendaModel";
-import { DepartementModel } from "./DepartementModel";
+import OrganizerModel from "./OrganizerModel";
 import { ProfileModel } from "./ProfileModel";
 import { ProjectModel } from "./ProjectModel";
 
@@ -65,22 +64,42 @@ const userSchema = new Schema<IUserSchema, IUserModel, IUserMethods>({
           model: AgendaModel,
         },
         {
-          path: "isAdministrator",
-          model: AdministratorModel,
-          transform: (doc: IAdministrator, id: any) => {
+          path: "organizersDepartmentCoordinator",
+          model: OrganizerModel,
+          transform: (doc: IOrganizer, id: any) => {
             if (doc) {
               return {
-                role: doc.AdministratorMembers.find(
-                  (adm) => (adm.profile as IProfile).id == id
-                )?.role,
+                role: "Coordinator Departement",
                 period: doc.period,
               };
             }
           },
         },
         {
-          path: "isDepartement",
-          model: DepartementModel,
+          path: "organizersDailyManagement",
+          model: OrganizerModel,
+          transform: (doc: IOrganizer, id: any) => {
+            if (doc) {
+              return {
+                role: doc.dailyManagement.find(
+                  (daily) => (daily.profile as IProfile).id == id
+                )?.position,
+                period: doc.period,
+              };
+            }
+          },
+        },
+        {
+          path: "organizersDepartmentMembers",
+          model: OrganizerModel,
+          transform: (doc: IOrganizer, id: any) => {
+            if (doc) {
+              return {
+                role: "Member Departement",
+                period: doc.period,
+              };
+            }
+          },
         },
       ],
     },

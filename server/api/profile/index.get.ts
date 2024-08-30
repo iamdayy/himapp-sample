@@ -1,7 +1,7 @@
 import { SortOrder } from "mongoose";
-import { AdministratorModel } from "~/server/models/AdministratorModel";
+import OrganizerModel from "~/server/models/OrganizerModel";
 import { ProfileModel } from "~/server/models/ProfileModel";
-import { IAdministrator, IEvent, IProfile, IProject } from "~/types";
+import { IAgenda, IOrganizer, IProfile, IProject } from "~/types";
 import { IReqProfileQuery } from "~/types/IRequestPost";
 
 type ISortable = {
@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    if (!user.profile.isDepartement && !user.profile.isAdministrator) {
+    if (!user.profile.organizer) {
       throw createError({
         statusCode: 403,
         statusMessage: "You must be admin / departement to access this",
@@ -73,9 +73,9 @@ export default defineEventHandler(async (event) => {
     // Fetch profiles with populated fields
     const profiles = await ProfileModel.find(query)
       .populate({
-        path: "events",
+        path: "agendas",
         select: "title date at description -_id",
-        transform: (doc: IEvent) => ({
+        transform: (doc: IAgenda) => ({
           title: doc.title,
           date: doc.date,
           at: doc.at,
@@ -92,19 +92,40 @@ export default defineEventHandler(async (event) => {
         }),
       })
       .populate({
-        path: "isDepartement",
-        select: "departement period -_id",
-        options: { autopopulate: false },
-      })
-      .populate({
-        path: "isAdministrator",
-        model: AdministratorModel,
-        transform: (doc: IAdministrator, id) => {
+        path: "organizersDailyManagement",
+        model: OrganizerModel,
+        transform: (doc: IOrganizer, id: any) => {
           if (doc) {
             return {
-              role: doc.AdministratorMembers.find(
-                (adm) => (adm.profile as IProfile).id == id
-              )?.role,
+              role: doc.dailyManagement.find(
+                (daily) => (daily.profile as IProfile).id == id
+              )?.position,
+              period: doc.period,
+            };
+          }
+          return null;
+        },
+      })
+      .populate({
+        path: "organizersDepartmentCoordinator",
+        model: OrganizerModel,
+        transform: (doc: IOrganizer, id: any) => {
+          if (doc) {
+            return {
+              role: "Coordinator Departement",
+              period: doc.period,
+            };
+          }
+          return null;
+        },
+      })
+      .populate({
+        path: "organizersDepartmentMembers",
+        model: OrganizerModel,
+        transform: (doc: IOrganizer, id: any) => {
+          if (doc) {
+            return {
+              role: "Member Departement",
               period: doc.period,
             };
           }
@@ -119,7 +140,22 @@ export default defineEventHandler(async (event) => {
       .limit(Number(perPage));
 
     return {
-      profiles,
+      profiles: profiles.map((profile) => {
+        return {
+          NIM: profile.NIM,
+          fullName: profile.fullName,
+          email: profile.email,
+          avatar: profile.avatar,
+          class: profile.class,
+          semester: profile.semester,
+          enteredYear: profile.enteredYear,
+          createdAt: profile.createdAt,
+          status: profile.status,
+          agendas: profile.agendas,
+          projects: profile.projects,
+          organizers: profile.organizer,
+        };
+      }),
       length,
       filters,
     };
