@@ -8,6 +8,10 @@ definePageMeta({
     middleware: 'auth',
 });
 
+useHead({
+    title: 'Organizers',
+});
+
 // Retrieve organizer status and list of organizers
 const { isOrganizer, organizers } = useOrganizer();
 const modal = useModal();
