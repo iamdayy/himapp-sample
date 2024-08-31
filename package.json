@@ -34,7 +34,8 @@
     "nuxt-echarts": "^0.1.0",
     "nuxt-tiptap-editor": "^1.2.0",
     "vue": "latest",
-    "vue-advanced-cropper": "^2.8.9"
+    "vue-advanced-cropper": "^2.8.9",
+    "yup": "^1.4.0"
   },
   "private": true,
   "scripts": {

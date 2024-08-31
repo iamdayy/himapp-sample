@@ -48,6 +48,7 @@ export const checkSession = async (payload: string) => {
         fullName: user.profile.fullName,
         avatar: user.profile.avatar,
         email: user.profile.email,
+        birth: user.profile.birth,
         class: user.profile.class,
         semester: user.profile.semester,
         enteredYear: user.profile.enteredYear,

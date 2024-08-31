@@ -435,23 +435,18 @@ const accessGetActivinessLetter = computed(() => ((all.value / allCanMeRegister.
                         <dl class="max-w-md text-gray-900 dark:text-white">
                             <!-- Organization details -->
                             <div class="flex flex-col pb-6">
-                                <dt class="mb-1 text-gray-500 md:text-lg dark:text-gray-400">
-                                    {{ user.profile.isAdministrator ? 'Daily Manager' : user.profile.isDepartement ?
-                                        'Departement Manager' : 'Member' }}
-                                </dt>
+                                <dt class="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Position</dt>
                                 <dd class="text-lg font-semibold">
-                                    {{ user.profile.isAdministrator.role || user.profile.isDepartement.departement }}
+                                    {{ user.profile.organizer.role || 'Member' }}
                                 </dd>
-                                <dd class="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                    {{ `${new Date(user.profile.isAdministrator.period.start ||
-                                        user.profile.isDepartement.period.start).getFullYear()} - ${new
-                                            Date(user.profile.isAdministrator.period.end ||
-                                                user.profile.isDepartement.period.end).getFullYear()}` }}
+                                <dd class="text-sm font-light text-gray-500 dark:text-gray-400">
+                                    {{ `${new Date(user.profile.organizer.period.start).getFullYear()} - ${new
+                                        Date(user.profile.organizer.period.end).getFullYear()}` }}
                                 </dd>
                             </div>
                             <div class="flex flex-col pb-6">
-                                <dt class="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Events</dt>
-                                <dd class="text-lg font-semibold">{{ user.profile.events.length }}</dd>
+                                <dt class="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Agendas</dt>
+                                <dd class="text-lg font-semibold">{{ user.profile.agendas.length }}</dd>
                             </div>
                             <div class="flex flex-col pt-3">
                                 <dt class="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Projects</dt>

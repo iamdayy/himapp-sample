@@ -35,7 +35,7 @@ const changeMode = () => {
 const navigation: ILink[] = [
     { name: 'Home', href: '/', current: true },
     { name: 'About', href: '#about', current: false },
-    { name: 'Events', href: '#events', current: false },
+    { name: 'Agendas', href: '#agendas', current: false },
     { name: 'Projects', href: '#projects', current: false },
 ] as ILink[]
 

@@ -56,11 +56,17 @@ const itemsIsLogged = [
         icon: 'i-heroicons-code-bracket',
         to: '/dashboard/projects'
     }],
-    [{
-        label: 'Sign out',
-        slot: 'SignOut',
-        icon: 'i-heroicons-arrow-right-start-on-rectangle'
-    }]
+    [
+        {
+            label: 'Config',
+            icon: 'i-heroicons-cog',
+            to: '/administrators/config'
+        },
+        {
+            label: 'Sign out',
+            slot: 'SignOut',
+            icon: 'i-heroicons-arrow-right-start-on-rectangle'
+        }]
 ]
 
 /**
@@ -145,6 +151,13 @@ const links = [
             to: '/dashboard/projects'
         },
         {
+            label: 'Post',
+            icon: 'i-heroicons-clipboard-document-list',
+            to: '/dashboard/posts'
+        }
+    ],
+    [
+        {
             label: 'Users',
             icon: 'i-heroicons-users',
             to: '/administrators/users'
@@ -155,11 +168,11 @@ const links = [
             to: '/administrators/organizers'
         },
         {
-            label: 'Post',
-            icon: 'i-heroicons-clipboard-document-list',
-            to: '/dashboard/posts'
-        },
-    ]
+            label: 'Config',
+            icon: 'i-heroicons-cog',
+            to: '/administrators/config'
+        }
+    ],
 ]
 </script>
 

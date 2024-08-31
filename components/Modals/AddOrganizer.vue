@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IOrganizer } from '~/types';
+import type { IConfig, IOrganizer } from '~/types';
 
 const modal = useModal();
 const { $api } = useNuxtApp();
@@ -14,6 +14,38 @@ const items = [
     }
 ]
 
+const { data } = await useAsyncData<{ body: IConfig }>(() => $fetch("/api/config"));
+const { organizer: org } = useOrganizer();
+const dailyManagements = computed(() => {
+    if (!data.value) return [];
+    return data.value?.body.dailyManagements.map((management) => {
+        return {
+            position: management,
+            profile: 0,
+        }
+    })
+});
+
+const departements = computed(() => {
+    if (!data.value) return [];
+    return data.value?.body.departments.map((department) => {
+        return {
+            name: department,
+            coordinator: 0,
+            members: [],
+        }
+    })
+});
+
+const organizer = ref<IOrganizer>({
+    dailyManagement: dailyManagements.value,
+    department: departements.value,
+    period: {
+        start: new Date(),
+        end: new Date(Date.now() + 12 * 30 * 24 * 60 * 60 * 1000)
+    }
+});
+
 const departementsTabs = computed(() => {
     return organizer.value.department.map((department) => {
         return {
@@ -21,27 +53,8 @@ const departementsTabs = computed(() => {
             label: department.name,
         }
     })
-})
-
-const organizer = ref<IOrganizer>({
-    dailyManagement: [
-        {
-            position: '',
-            profile: 0,
-        }
-    ],
-    department: [
-        {
-            name: 'New Departement',
-            coordinator: 0,
-            members: [0],
-        }
-    ],
-    period: {
-        start: new Date(),
-        end: new Date(Date.now() + 12 * 30 * 24 * 60 * 60 * 1000)
-    }
 });
+
 
 const addDailyManager = () => {
     organizer.value.dailyManagement.push({
@@ -94,8 +107,8 @@ watch(() => organizer.value.period.start, (newVal) => {
             <template #header>
                 <div class="flex justify-between w-full">
                     <h2 class="text-xl font-semibold dark:text-gray-200">Add Organizer</h2>
-                    <UButton icon="i-heroicons-x-mark" :padded="false" variant="link" color="gray"
-                        @click="modal.close" />
+                    <UButton icon="i-heroicons-x-mark" :padded="false" variant="link" color="gray" @click="modal.close"
+                        v-if="org?.role.includes('Ketua') || org?.role.includes('Chairman')" />
                 </div>
             </template>
             <div class="mb-6 ms-3">
@@ -117,28 +130,19 @@ watch(() => organizer.value.period.start, (newVal) => {
                 <template #dailyManager="{ item }">
                     <UCard>
                         <div class="grid grid-cols-12 gap-2" v-for="(profile, i) in organizer.dailyManagement" :key="i">
-                            <div class="col-span-5">
+                            <div class="col-span-6">
                                 <label for="Position"
                                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Position</label>
                                 <UInput type="text" name="Position" id="Position" placeholder="Leader, Secretary, etc."
                                     required v-model="organizer.dailyManagement[i].position" class="w-full" />
                             </div>
-                            <div class="col-span-5">
+                            <div class="col-span-6">
                                 <label for="NIM"
                                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIM</label>
                                 <UInput type="text" name="NIM" id="NIM" placeholder="21060202001" required
                                     v-model="organizer.dailyManagement[i].profile" class="w-full" />
                             </div>
-                            <div class="flex items-end justify-center col-span-1">
-                                <UButton @click="removeDailyManager(i)" icon="i-heroicons-minus" color="red"
-                                    variant="outline" size="sm" :padded="false" class="mb-2"
-                                    :disabled="organizer.dailyManagement.length === 1">
-                                </UButton>
-                            </div>
                         </div>
-                        <UButton @click="addDailyManager" block icon="i-heroicons-plus" color="gray" variant="outline"
-                            size="sm" class="mt-2">
-                        </UButton>
                     </UCard>
                 </template>
                 <template #departements="{ item }">
@@ -184,19 +188,7 @@ watch(() => organizer.value.period.start, (newVal) => {
                                             </template>
                                         </UButton>
                                     </div>
-                                    <div class="col-span-12">
-                                        <UButton @click="deleteDepartement(index)" block icon="i-heroicons-minus"
-                                            variant="solid" size="sm" color="red" class="mt-2"
-                                            :disabled="organizer.department.length === 1">
-                                        </UButton>
-                                    </div>
                                 </div>
-                                <UButton @click="addDepartement(index)" block variant="solid" size="sm" color="gray"
-                                    label="Add New Departement" class="mt-2">
-                                    <template #trailing>
-                                        <UIcon name="i-heroicons-plus" />
-                                    </template>
-                                </UButton>
                             </template>
                         </UTabs>
                     </UCard>

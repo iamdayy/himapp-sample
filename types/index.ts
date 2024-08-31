@@ -11,6 +11,11 @@ export type TRole =
   | "External"
   | "No";
 
+export type IConfig = {
+  dailyManagements: string[];
+  departments: string[];
+};
+
 /**
  * Represents a link with a name, href, and optional current status.
  */

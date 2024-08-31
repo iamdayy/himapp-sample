@@ -87,11 +87,17 @@ const itemsIsLogged = [
         icon: 'i-heroicons-code-bracket',
         to: '/dashboard/projects'
     }],
-    [{
-        label: 'Sign out',
-        slot: 'SignOut',
-        icon: 'i-heroicons-arrow-right-start-on-rectangle'
-    }]
+    [
+        {
+            label: 'Config',
+            icon: 'i-heroicons-cog',
+            to: '/administrators/config'
+        },
+        {
+            label: 'Sign out',
+            slot: 'SignOut',
+            icon: 'i-heroicons-arrow-right-start-on-rectangle'
+        }]
 ]
 
 /**
@@ -157,6 +163,13 @@ const links = computed(() => [
             to: '/dashboard/projects'
         },
         {
+            label: 'Post',
+            icon: 'i-heroicons-clipboard-document-list',
+            to: '/dashboard/posts'
+        }
+    ],
+    [
+        {
             label: 'Users',
             icon: 'i-heroicons-users',
             to: '/administrators/users'
@@ -167,9 +180,9 @@ const links = computed(() => [
             to: '/administrators/organizers'
         },
         {
-            label: 'Post',
-            icon: 'i-heroicons-clipboard-document-list',
-            to: '/dashboard/posts'
+            label: 'Config',
+            icon: 'i-heroicons-cog',
+            to: '/administrators/config'
         },
     ]
 ])
@@ -262,7 +275,7 @@ onMounted(() => {
                                     <div>
                                         <h2 class="text-2xl font-extrabold text-gray-800 md:text-4xl dark:text-white">{{
                                             user.username
-                                        }}
+                                            }}
                                         </h2>
                                         <h2 class="text-lg font-semibold text-gray-800 md:text-xl dark:text-gray-200">{{
                                             user.profile.NIM }}
@@ -298,7 +311,7 @@ onMounted(() => {
                                 <div class="flex items-center justify-between w-full mb-2">
                                     <h2 class="text-3xl text-gray-700 text-bold dark:text-gray-400">{{
                                         agendasMe.length
-                                        }}</h2>
+                                    }}</h2>
                                     <UIcon name="i-heroicons-calendar" class="text-6xl" />
                                 </div>
                                 <ClientOnly>
@@ -312,7 +325,7 @@ onMounted(() => {
                                 <div class="flex items-center justify-between w-full mb-2">
                                     <h2 class="text-3xl text-gray-700 text-bold dark:text-gray-400">{{
                                         projectsMe.length
-                                        }}</h2>
+                                    }}</h2>
                                     <UIcon name="i-heroicons-code-bracket" class="text-6xl" />
                                 </div>
                                 <ClientOnly>
@@ -324,8 +337,8 @@ onMounted(() => {
                         <UCard>
                             <template #header>
                                 <div class="flex justify-between w-full">
-                                    <h2 class="text-xl font-semibold dark:text-gray-200">Events</h2>
-                                    <NuxtLink to="/dashboard/events">
+                                    <h2 class="text-xl font-semibold dark:text-gray-200">Agendas</h2>
+                                    <NuxtLink to="/dashboard/agendas">
                                         see more...
                                     </NuxtLink>
                                 </div>
@@ -431,7 +444,7 @@ onMounted(() => {
                                 <div>
                                     <h2 class="text-xl font-extrabold text-gray-800 dark:text-white">{{
                                         user.username
-                                    }}
+                                        }}
                                     </h2>
                                     <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">{{
                                         user.profile.NIM }}
