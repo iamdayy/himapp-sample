@@ -363,7 +363,7 @@ const accessGetActivinessLetter = computed(() => ((all.value / allCanMeRegister.
                         variant="link" color="green" @click="editMode = !editMode" />
                 </div>
             </template>
-            <div class="flex flex-col-reverse w-full gap-3 pt-12 lg:flex-row">
+            <div class="flex w-full gap-3 pt-12 md:flex-col-reverse">
                 <div class="flex flex-col w-full gap-3 pt-12 md:w-2/3 md:flex-row">
                     <div class="w-full p-4 pt-12 sm:p-8 md:w-1/2">
                         <h2
