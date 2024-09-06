@@ -116,33 +116,6 @@ export interface IOrganizer {
   department: IDepartment[];
   period: IPeriod;
 }
-
-// TODO: DELETE THIS
-/**
- * Represents a department affiliation for a user.
- */
-export interface IDepartement {
-  profile: Types.ObjectId | IProfile | number;
-  departement: string;
-  period: IPeriod;
-}
-
-/**
- * Represents a member of the administration with their role.
- */
-export interface IAdministratorMember {
-  role: string;
-  profile: Types.ObjectId | IProfile | number;
-}
-
-/**
- * Represents the administration structure with members and period.
- */
-export interface IAdministrator {
-  AdministratorMembers: IAdministratorMember[];
-  period: IPeriod;
-}
-
 /**
  * Represents a committee member for an event.
  */
@@ -213,4 +186,10 @@ export interface IPost {
   published?: boolean;
   publishedAt?: Date;
   related?: IPost[]; // Virtual field for related posts
+}
+
+export interface IPhoto {
+  _id: string;
+  title: string;
+  image: string;
 }

@@ -1,16 +1,14 @@
 import type { Document } from "mongoose";
 import type {
   IAddress,
-  IAdministrator,
-  IAdministratorMember,
   IAgenda,
   ICommittee,
   IConfig,
   IContributor,
   IDailyManagement,
-  IDepartement,
   IDepartment,
   IOrganizer,
+  IPhoto,
   IPost,
   IProfile,
   IProject,
@@ -50,32 +48,16 @@ export interface IProfileSchema extends Omit<IProfile, "id">, Document {
   updatedAt: Date;
 }
 
-export interface IOrganizerSchema extends Omit<IOrganizer, "id">, Document {}
+export interface IOrganizerSchema extends Omit<IOrganizer, "_id">, Document {
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export interface IDailyManagementSchema
   extends Omit<IDailyManagement, "id">,
     Document {}
 
 export interface IDepartmentSchema extends Omit<IDepartment, "id">, Document {}
-
-// TODO: DELETE THIS
-
-/**
- * Extends the IDepartement interface with Document.
- */
-export interface IDepartementSchema extends IDepartement, Document {}
-
-/**
- * Extends the IAdministratorMember interface with Document.
- */
-export interface IAdministratorMemberSchema
-  extends IAdministratorMember,
-    Document {}
-
-/**
- * Extends the IAdministrator interface with Document.
- */
-export interface IAdministratorSchema extends IAdministrator, Document {}
 
 /**
  * Extends the IAddress interface with Document.
@@ -117,3 +99,5 @@ export interface IProjectSchema extends Omit<IProject, "_id">, Document {
  * Extends the IPost interface with Document.
  */
 export interface IPostSchema extends IPost, Document {}
+
+export interface IPhotoSchema extends IPhoto, Document {}

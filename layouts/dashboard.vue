@@ -154,7 +154,7 @@ const links = [
             label: 'Post',
             icon: 'i-heroicons-clipboard-document-list',
             to: '/dashboard/posts'
-        }
+        },
     ],
     [
         {
@@ -171,7 +171,12 @@ const links = [
             label: 'Config',
             icon: 'i-heroicons-cog',
             to: '/administrators/config'
-        }
+        },
+        {
+            label: 'Photos',
+            icon: 'i-heroicons-photo',
+            to: '/administrators/photos'
+        },
     ],
 ]
 </script>

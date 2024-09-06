@@ -1,8 +1,17 @@
 <script setup lang='ts'>
 import { useWindowSize } from '@vueuse/core';
-import type { IProfile } from '~/types';
+import type { IPhoto, IProfile } from '~/types';
 
 const { organizers } = useOrganizer();
+
+const { $api } = useNuxtApp();
+
+const { data: photos } = useAsyncData('photos', () => $api<IPhoto[]>('/api/photo'));
+
+function getRandomItems(arr: IPhoto[], num: number) {
+    const shuffled = [...arr].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, num);
+}
 
 const organizer = computed(() => {
     if (organizers) {
@@ -89,7 +98,7 @@ const responsiveClasses = computed(() => ({
             <h2 :class="['font-extrabold dark:text-200', responsiveClasses.headerText]">About Us</h2>
         </template>
         <div class="flex flex-col-reverse items-center gap-2 px-3 py-8 lg:flex-row">
-            <div class="lg:w-1/2 dark:text-white md:px-2" data-aos="fade-right" data-aos-easing="ease-in-out"
+            <div class="md:w-1/2 dark:text-white md:px-2" data-aos="fade-right" data-aos-easing="ease-in-out"
                 data-aos-duration="1000" data-aos-anchor=".about">
                 <p :class="responsiveClasses.contentText">Himpunan Mahasiswa Informatika atau yang sering disebut
                     HIMATIKA
@@ -107,11 +116,8 @@ const responsiveClasses = computed(() => ({
                     baik secara keilmuan maupun sosial.
                 </p>
             </div>
-            <div class="overflow-hidden shadow-md lg:w-1/2 rounded-tr-2xl rounded-bl-3xl" data-aos="fade-left"
-                data-aos-easing="ease-in-out" data-aos-duration="800" data-aos-anchor=".about">
-                <NuxtImg src="/img/fobar.png" loading="lazy"
-                    class="transition duration-500 ease-out cursor-pointer hover:scale-125" />
-            </div>
+            <RandomBuble v-if="photos" :photos="getRandomItems(photos, 12)" data-aos="fade-left"
+                data-aos-easing="ease-in-out" data-aos-duration="800" data-aos-anchor=".about" />
         </div>
         <div class="flex flex-col justify-center px-3 py-8">
             <UTabs :items="tabItems" class="w-full">
