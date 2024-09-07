@@ -12,6 +12,20 @@ export default defineEventHandler(async (event) => {
     // Get the slug from the query parameters
     const { slug } = getQuery<IReqPostQuery>(event);
 
+    const user = event.context.auth;
+    if (!user) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "You must be logged in to use this endpoint",
+      });
+    }
+    if (!event.context.organizer) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "You must be admin / departement to use this endpoint",
+      });
+    }
+
     // Find the post by slug
     const post = await PostModel.findOne({ slug }, {}, { autopopulate: false });
     if (!post) {

@@ -9,15 +9,17 @@ import { ProfileModel } from "~/server/models/ProfileModel";
 export default defineEventHandler(async (event) => {
   try {
     // Ensure the user is authenticated
-    const user = await ensureAuth(event);
     const { NIM } = getQuery(event);
+    const user = event.context.auth;
+    if (!user) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "You must be logged in to use this endpoint",
+      });
+    }
 
     // Check if the user has permission to delete the profile
-    if (
-      user.profile.NIM != NIM &&
-      !user.profile.isAdministrator &&
-      !user.profile.isDepartement
-    ) {
+    if (user.profile.NIM != NIM && !event.context.organizer) {
       throw createError({
         statusCode: 403,
         statusMessage:

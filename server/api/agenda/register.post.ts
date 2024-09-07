@@ -11,6 +11,14 @@ import { ProfileModel } from "~/server/models/ProfileModel";
 export default defineEventHandler(async (ev) => {
   const { NIM, id } = await readBody(ev);
   try {
+    // Ensure the user is authenticated and has the necessary permissions
+    const user = ev.context.auth;
+    if (!user) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "You must be logged in to use this endpoint",
+      });
+    }
     // Find the agenda by ID
     const agenda = await AgendaModel.findById(id);
     if (!agenda) {

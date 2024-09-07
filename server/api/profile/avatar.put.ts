@@ -22,7 +22,13 @@ export default defineEventHandler(async (event) => {
     let newPath = "";
 
     // Ensure the user is authenticated and authorized
-    const user = await ensureAuth(event);
+    const user = event.context.auth;
+    if (!user) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "You must be logged in to use this endpoint",
+      });
+    }
     if (user.profile.NIM != NIM) {
       throw createError({
         statusCode: 403,

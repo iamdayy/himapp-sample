@@ -13,6 +13,15 @@ export default defineEventHandler(async (ev) => {
     // Read the request body
     const { NIM, id, task } = await readBody(ev);
 
+    // Ensure the user is authenticated
+    const user = ev.context.auth;
+    if (!user) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "You must be logged in to use this endpoint",
+      });
+    }
+
     // Find the project by ID
     const project = await ProjectModel.findById(id);
     if (!project) {

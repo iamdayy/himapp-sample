@@ -11,8 +11,14 @@ import { IContributor, IProject } from "~/types";
 export default defineEventHandler(async (ev) => {
   try {
     // Ensure the user is authenticated and has the necessary permissions
-    const user = await ensureAuth(ev);
-    if (!user.profile.organizer) {
+    const user = ev.context.auth;
+    if (!user) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "You must be logged in to use this endpoint",
+      });
+    }
+    if (!ev.context.organizer) {
       throw createError({
         statusCode: 403,
         statusMessage: "You must be admin / departement to use this endpoint",

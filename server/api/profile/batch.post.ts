@@ -10,8 +10,14 @@ import { IProfile } from "~/types";
 export default defineEventHandler(async (event) => {
   try {
     // Ensure the user is authenticated and has the necessary permissions
-    const user = await ensureAuth(event);
-    if (!user.profile.isAdministrator && !user.profile.isDepartement) {
+    const user = event.context.auth;
+    if (!user) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "You must be logged in to use this endpoint",
+      });
+    }
+    if (!event.context.organizer) {
       throw createError({
         statusCode: 403,
         statusMessage:

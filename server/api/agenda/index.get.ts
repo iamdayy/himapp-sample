@@ -60,8 +60,8 @@ export default defineEventHandler(async (event) => {
     const roles: string[] = ["All", "External"];
     const auth = checkAuth(event);
     if (auth) {
-      const user = await ensureAuth(event);
-      if (user.profile.organizer) {
+      const user = event.context.auth;
+      if (event.context.organizer) {
         if (!roles.includes("Internal")) {
           roles.push("Internal");
         }
