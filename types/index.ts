@@ -193,3 +193,50 @@ export interface IPhoto {
   title: string;
   image: string;
 }
+
+export interface IVote {
+  user: Types.ObjectId | IProfile;
+  voteType: "upvote" | "downvote";
+}
+
+export interface IQuestion {
+  _id?: string;
+  title: string;
+  body: string;
+  tags: string[];
+  author: Types.ObjectId | IProfile;
+  createdAt: Date;
+  updatedAt: Date;
+  votes: IVote[];
+  totalVotes: number;
+  answers: IAnswer[] | Types.ObjectId[];
+}
+
+export interface IAnswer {
+  _id?: string;
+  body: string;
+  author: Types.ObjectId | IProfile;
+  createdAt: Date;
+  updatedAt: Date;
+  votes: IVote[];
+  totalVotes: number;
+  isAccepted: boolean;
+}
+
+export interface IComment {
+  _id?: string;
+  body: string;
+  author: Types.ObjectId | IProfile;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IForm {
+  title: string;
+  description: string;
+  by: IProfile | Types.ObjectId | number;
+  questions: IQuestion[];
+  invites: IProfile[] | number[] | Types.ObjectId;
+  public: boolean;
+  answers: IAnswer[];
+}

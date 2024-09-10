@@ -42,7 +42,6 @@ export default defineNuxtConfig({
     provider: {
       type: "refresh",
       endpoints: {
-        signUp: false,
         signIn: { path: "/signin", method: "post" },
         signOut: { path: "/signout", method: "get" },
         getSession: { path: "/session", method: "get" },

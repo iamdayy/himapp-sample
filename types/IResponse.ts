@@ -1,4 +1,4 @@
-import type { IPost, IProfile, IProject, IUser } from ".";
+import type { IPost, IProfile, IProject, IQuestion, IUser } from ".";
 
 /**
  * Interface representing a paginated response.
@@ -41,4 +41,14 @@ export interface IProfileResponse extends IPaginateResponse {
 export interface IPostResponse extends IPaginateResponse {
   /** An array of posts matching the query. */
   posts: IPost[];
+}
+
+export interface IQuestionResponse extends IPaginateResponse {
+  /** An array of questions matching the query. */
+  data: IQuestion[];
+}
+
+export interface IQuestionDetailResponse {
+  /** An array of questions matching the query. */
+  data: IQuestion;
 }

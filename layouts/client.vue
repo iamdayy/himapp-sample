@@ -37,6 +37,7 @@ const navigation: ILink[] = [
     { name: 'About', href: '#about', current: false },
     { name: 'Agendas', href: '#agendas', current: false },
     { name: 'Projects', href: '#projects', current: false },
+    { name: 'Forum', href: '/forum', current: false },
 ] as ILink[]
 
 /**

@@ -1,5 +1,5 @@
 import type { SortOrder } from "mongoose";
-import type { IAgenda, IProfile } from ".";
+import type { IAgenda, IProfile, IQuestion } from ".";
 
 /**
  * Interface for pagination query parameters.
@@ -91,4 +91,25 @@ export interface IReqPostQuery extends IReqQueryPaginate {
   order: string;
   /** Post slug for filtering. */
   slug: string;
+}
+
+export interface IReqQuestionQuery extends IReqQueryPaginate {
+  /** Field to sort the results by. */
+  sort: string;
+  /** Sort order. */
+  order: string;
+  /** Question ID for filtering. */
+  id: string;
+  /** Tags for filtering. */
+  tags: string[];
+  /** Search term for filtering questions. */
+  search: string;
+  /** Whether to filter by answered questions. */
+  answered: string;
+  /** Whether to filter by unanswered questions. */
+  unanswered: string;
+}
+
+export interface IReqQuestion extends IQuestion {
+  isAnonymous: boolean;
 }

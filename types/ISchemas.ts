@@ -2,16 +2,20 @@ import type { Document } from "mongoose";
 import type {
   IAddress,
   IAgenda,
+  IAnswer,
+  IComment,
   ICommittee,
   IConfig,
   IContributor,
   IDailyManagement,
   IDepartment,
+  IForm,
   IOrganizer,
   IPhoto,
   IPost,
   IProfile,
   IProject,
+  IQuestion,
   IRegistered,
   ISession,
   IUser,
@@ -100,4 +104,27 @@ export interface IProjectSchema extends Omit<IProject, "_id">, Document {
  */
 export interface IPostSchema extends IPost, Document {}
 
-export interface IPhotoSchema extends IPhoto, Document {}
+export interface IPhotoSchema extends Omit<IPhoto, "_id">, Document {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IQuestionSchema extends Omit<IQuestion, "_id">, Document {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IAnswerSchema extends Omit<IAnswer, "_id">, Document {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ICommentSchema extends Omit<IComment, "_id">, Document {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IFormSchema extends Omit<IForm, "_id">, Document {
+  createdAt: Date;
+  updatedAt: Date;
+}
