@@ -30,11 +30,11 @@ jobs:
 
       - name: ⚙️ Save Assets
         uses: appleboy/ssh-action@master
-        with: 
+        with:
           host: ${{ secrets.SSH_HOST }}
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd {{ env.APP_DIR }}/.output/public
             mv img /temp/cacheHimapp/img
@@ -60,7 +60,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          password: ${{ secrets.SSH_PASSWORD }}
           source: ".output/"
           target: ${{ env.APP_DIR }}
 
@@ -70,7 +70,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ${{ env.APP_DIR }}/.output
             bun install
