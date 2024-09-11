@@ -63,5 +63,4 @@ jobs:
           script: |
             cd ${{ env.APP_DIR }}/.output
             bun install
-            mv /temp/cacheHimapp/img public/img
             pm2 restart himapp.iamdayy.my.id || pm2 start server.js --name himapp.iamdayy.my.id
