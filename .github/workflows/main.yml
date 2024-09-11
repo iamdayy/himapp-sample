@@ -37,7 +37,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd /var/www/himapp/.output/
-            mv public/img /temp/cacheHimapp/img
+            mv /var/www/himapp/public/img /temp/cacheHimapp/img
 
       - name: 🛠️ Build App
         run: npm run build
