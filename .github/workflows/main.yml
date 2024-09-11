@@ -62,5 +62,6 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ${{ env.APP_DIR }}/.output
+            ls
             bun install
             pm2 restart himapp.iamdayy.my.id || pm2 start server.js --name himapp.iamdayy.my.id
