@@ -1,0 +1,78 @@
+name: 🚀 Deploy Nuxt.js 3 App to VPS
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: 🏗️ Build
+    runs-on: ubuntu-latest
+    env:
+      APP_DIR: /var/www/himapp.iamdayy.my.id
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: 📦 Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: ⚙️ Save Assets
+        uses: appleboy/ssh-action@master
+        with: 
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd {{ env.APP_DIR }}/.output/public
+            mv img /temp/cacheHimapp/img
+
+      - name: 🛠️ Build App
+        run: npm run build
+
+      - name: 🗑️ Remove node_modules from .output/server
+        run: rm -rf .output/server/node_modules
+
+      - name: 📝 Modify package.json
+        run: |
+          mv .output/server/package.json .output/package.json
+          jq '{name: .name, version: .version, private: .private, dependencies: .bundledDependencies}' .output/package.json > .output/temp.json
+          mv .output/temp.json .output/package.json
+
+      - name: 📝 Create server.js
+        run: echo "import('./server/index.mjs');" > .output/server.js
+
+      - name: 📤 Deploy to VPS
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: ".output/"
+          target: ${{ env.APP_DIR }}
+
+      - name: 🚀 Install dependencies and restart Server with PM2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ env.APP_DIR }}/.output
+            bun install
+            mv /temp/cacheHimapp/img public/img
+            pm2 restart himapp.iamdayy.my.id || pm2 start server.js --name himapp.iamdayy.my.id
