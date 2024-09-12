@@ -16,16 +16,18 @@ const { data, refresh } = useLazyAsyncData(() =>
     })
     , {
         default: () => ({
-            posts: [],
-            length: 0
+            data: {
+                posts: [],
+                length: 0
+            }
         }),
         watch: [page, pageCount, sort,]
 
     })
-const pageTotal = computed(() => data.value.length) // This value should be dynamic coming from the API
+const pageTotal = computed(() => data.value.data?.length) // This value should be dynamic coming from the API
 const pageFrom = computed(() => (page.value - 1) * pageCount.value + 1)
-const pageTo = computed(() => Math.min(page.value * pageCount.value, pageTotal.value))
-const pageCountOptions = computed(() => [10, 20, 50, 100, 200, data.value.length]);
+const pageTo = computed(() => Math.min(page.value * pageCount.value, pageTotal.value || 0))
+const pageCountOptions = computed(() => [10, 20, 50, 100, 200, data.value.data?.length || 0]);
 </script>
 <template>
     <UCard>
@@ -33,7 +35,7 @@ const pageCountOptions = computed(() => [10, 20, 50, 100, 200, data.value.length
             <h2 class="text-2xl font-extrabold md:text-4xl dark:text-white">Posts</h2>
         </template>
         <div class="flex flex-col gap-3 md:flex-row">
-            <NuxtLink v-for="post, i in data.posts" :to="`/post/${post.slug}`">
+            <NuxtLink v-for="post, i in data.data?.posts" :to="`/post/${post.slug}`">
                 <UCard class="max-w-lg min-h-32">
                     <template #header>
                         <NuxtImg :src="post.mainImage" class="mx-auto rounded-lg" />

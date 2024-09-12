@@ -1,18 +1,18 @@
 import { PostModel } from "~/server/models/PostModel";
 import { IReqPostQuery } from "~/types/IRequestPost";
-
+import type { IResponse } from "~/types/IResponse";
 /**
  * Handles GET requests for publishing a post.
  * @param {H3Event} event - The H3 event object.
  * @returns {Promise<Object>} An object containing the status code and message of the operation.
  * @throws {H3Error} If the post is not found, the user is not authorized, or if a system error occurs.
  */
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<IResponse> => {
   try {
     // Get the slug from the query parameters
     const { slug } = getQuery<IReqPostQuery>(event);
 
-    const user = event.context.auth;
+    const user = event.context.user;
     if (!user) {
       throw createError({
         statusCode: 403,
@@ -63,11 +63,11 @@ export default defineEventHandler(async (event) => {
     };
   } catch (error: any) {
     // Handle any errors that occur during the process
-    return createError({
+    return {
       statusCode: error.statusCode || 500,
-      message:
+      statusMessage:
         error.message ||
         "An unexpected error occurred while publishing the post",
-    });
+    };
   }
 });

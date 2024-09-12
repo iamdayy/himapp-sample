@@ -1,4 +1,5 @@
 import { ProfileModel } from "~/server/models/ProfileModel";
+import { IResponse } from "~/types/IResponse";
 
 /**
  * Handles DELETE requests for marking a user profile as deleted.
@@ -6,11 +7,11 @@ import { ProfileModel } from "~/server/models/ProfileModel";
  * @returns {Promise<Object>} An object containing the status code and message of the operation.
  * @throws {H3Error} If the user is not authorized, the profile is not found, or if a system error occurs.
  */
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<IResponse> => {
   try {
     // Ensure the user is authenticated
     const { NIM } = getQuery(event);
-    const user = event.context.auth;
+    const user = event.context.user;
     if (!user) {
       throw createError({
         statusCode: 403,
@@ -32,7 +33,7 @@ export default defineEventHandler(async (event) => {
     if (!profile) {
       throw createError({
         statusCode: 404,
-        message: "Profile not found",
+        statusMessage: "Profile not found",
       });
     }
 
@@ -46,11 +47,11 @@ export default defineEventHandler(async (event) => {
     };
   } catch (error: any) {
     // Handle any errors that occur during the process
-    return createError({
+    return {
       statusCode: error.statusCode || 500,
-      message:
+      statusMessage:
         error.message ||
         "An unexpected error occurred while deleting the profile",
-    });
+    };
   }
 });

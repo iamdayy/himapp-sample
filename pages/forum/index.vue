@@ -18,7 +18,7 @@ const isMobile = computed(() => width.value < 768);
  */
 const page = ref(1);
 const pageCount = ref(10);
-const pageTotal = computed(() => data.value.length);
+const pageTotal = computed(() => data.value?.data?.length ?? 0);
 const pageFrom = computed(() => (page.value - 1) * pageCount.value + 1);
 const pageTo = computed(() => Math.min(page.value * pageCount.value, pageTotal.value));
 const pageCountOptions = computed(() => {
@@ -72,8 +72,12 @@ const { data } = useLazyAsyncData<IQuestionResponse>('questions', () => $fetch<I
     {
         watch: [page, pageCount, search, sort, order, tagSelected, answered, unanswered],
         default: () => ({
-            data: [],
-            length: 0
+            data: {
+                questions: [],
+                length: 0
+            },
+            statusCode: 500,
+            statusMessage: "Internal server error"
         })
     });
 
@@ -85,7 +89,7 @@ const responsiveUISizes = {
 
 // Add these computed properties
 const sortedQuestions = computed(() => {
-    return data.value?.data.sort((a, b) => b.totalVotes - a.totalVotes);
+    return data.value?.data?.questions.sort((a, b) => b.totalVotes - a.totalVotes);
 });
 
 
@@ -123,7 +127,8 @@ const formatDate = (date: Date) => {
                 </div>
             </template>
             <div class="w-full py-3">
-                <ul class="w-full divide-y divide-gray-200 dark:divide-gray-700" v-if="sortedQuestions.length > 0">
+                <ul class="w-full divide-y divide-gray-200 dark:divide-gray-700"
+                    v-if="sortedQuestions && sortedQuestions.length > 0">
                     <li class="py-4" v-for="item in sortedQuestions" :key="item._id">
                         <NuxtLink :to="`/forum/${item._id}`"
                             class="flex items-center p-2 rounded-lg hover:bg-gray-800/15 dark:hover:bg-gray-200/15">

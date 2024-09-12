@@ -1,6 +1,6 @@
 import { ConfigModel } from "~/server/models/ConfigModel";
-
-export default defineEventHandler(async (event) => {
+import type { IConfigResponse } from "~/types/IResponse";
+export default defineEventHandler(async (event): Promise<IConfigResponse> => {
   try {
     const config = await ConfigModel.find();
     if (config.length === 0) {
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
     return {
       statusCode: 200,
       statusMessage: "Success",
-      body: lastConfigItem,
+      data: lastConfigItem,
     };
   } catch (error: any) {
     throw createError({

@@ -71,7 +71,7 @@ const onFileChange = async ($event: Event) => {
  * Generate and download the activeness letter
  */
 const getActivinessLetter = () => {
-    const organizer = organizers?.find((org) => new Date(org.period.start).getFullYear() <= new Date(Date.now()).getFullYear() && new Date(org.period.end).getFullYear() >= new Date(Date.now()).getFullYear() + 1);
+    const organizer = organizers?.value?.find((org) => new Date(org.period.start).getFullYear() <= new Date(Date.now()).getFullYear() && new Date(org.period.end).getFullYear() >= new Date(Date.now()).getFullYear() + 1);
 
     const pdfMake = usePDFMake();
     pdfMake.fonts = {

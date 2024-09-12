@@ -1,5 +1,6 @@
 <script setup lang='ts'>
 import type { IProfile } from '~/types';
+import type { IResponse } from '~/types/IResponse';
 
 const toast = useToast();
 const modal = useModal();
@@ -37,7 +38,7 @@ const colleger = ref<IProfile>({
 const addColleger = async () => {
     loading.value = true;
     try {
-        const added = await $api("/api/profile", {
+        const added = await $api<IResponse>("/api/profile", {
             method: "post",
             body: colleger.value
         });
@@ -45,7 +46,7 @@ const addColleger = async () => {
             toast.add({ title: "Failed to add new Colleger", description: added.statusMessage });
         }
         emit("triggerRefresh");
-        toast.add({ title: added.statusMessage! });
+        toast.add({ title: added.statusMessage });
         modal.close();
     } catch (error: any) {
         toast.add({ title: "Failed to add new Colleger", description: error.message });

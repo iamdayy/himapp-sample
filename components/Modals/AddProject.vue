@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import type { IProject } from '~/types';
-import type { IProfileResponse } from '~/types/IResponse';
+import type { IProfileResponse, IResponse } from '~/types/IResponse';
 
 // Access Nuxt app instance and utilities
 const { $api } = useNuxtApp();
@@ -46,7 +46,7 @@ const project = ref<IProject>({
  * @returns {string | undefined} The full name of the user, or undefined if not found
  */
 const getNameFromNIM = (NIM?: number): string | undefined => {
-    return data.value?.profiles.find((profile) => profile.NIM == NIM)?.fullName;
+    return data.value?.data?.profiles.find((profile) => profile.NIM == NIM)?.fullName;
 }
 
 /**
@@ -56,7 +56,7 @@ const getNameFromNIM = (NIM?: number): string | undefined => {
  */
 const addProject = async (): Promise<void> => {
     try {
-        const added = await $api("/api/project", {
+        const added = await $api<IResponse>("/api/project", {
             method: "POST",
             body: project.value
         });

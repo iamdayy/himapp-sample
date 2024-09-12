@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { ModalsAddAgenda, ModalsEditAgenda, ModalsRegisteredUsers } from "#components";
 import type { IAgenda, IProfile } from "~/types";
-
+import type { IResponse } from "~/types/IResponse";
 /**
  * Define page metadata
  */
@@ -27,7 +27,7 @@ const { canMeRegister } = useCanMeRegister();
 const { data: user } = useAuth();
 const { agendas, refreshAgendas } = useAgendas();
 const { isOrganizer } = useOrganizer();
-
+const { $api } = useNuxtApp();
 /**
  * Computed property to determine if dark mode is active
  */
@@ -160,7 +160,7 @@ const registeredModal = () => {
 const register = async (id: string) => {
     registerForm.value.id = id;
     try {
-        const response = await $fetch("/api/agenda/register", {
+        const response = await $api<IResponse>("/api/agenda/register", {
             method: "post",
             body: registerForm.value
         });

@@ -1,12 +1,13 @@
 import { SortOrder } from "mongoose";
 import { QuestionModel } from "~/server/models/QuestionModel";
 import { IReqQuestionQuery } from "~/types/IRequestPost";
+import { IQuestionResponse } from "~/types/IResponse";
 
 type ISortable = {
   [key: string]: SortOrder;
 };
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<IQuestionResponse> => {
   try {
     const { page, perPage, order, sort, tags, search, answered, unanswered } =
       getQuery<IReqQuestionQuery>(event);
@@ -27,7 +28,6 @@ export default defineEventHandler(async (event) => {
     if (unanswered === "true") {
       query.answers = { $exists: false };
     }
-    console.log(query);
     const length = await QuestionModel.countDocuments(query);
     const questions = await QuestionModel.find(query)
       .sort(sortOpt)
@@ -36,13 +36,15 @@ export default defineEventHandler(async (event) => {
     return {
       statusCode: 200,
       statusMessage: "Questions fetched successfully",
-      data: questions,
-      length,
+      data: {
+        questions: questions.map((question) => question.toJSON()),
+        length,
+      },
     };
   } catch (error: any) {
-    throw createError({
+    return {
       statusCode: 500,
       statusMessage: error.message,
-    });
+    };
   }
 });

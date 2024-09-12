@@ -3,11 +3,12 @@ import { readFiles } from "h3-formidable";
 import { firstValues } from "h3-formidable/helpers";
 import path from "path";
 import { PhotoModel } from "~/server/models/PhotoModel";
+import { IResponse } from "~/types/IResponse";
 const config = useRuntimeConfig();
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<IResponse> => {
   try {
     // Ensure the user is authenticated and has the necessary permissions
-    const user = event.context.auth;
+    const user = event.context.user;
     if (!user) {
       throw createError({
         statusCode: 403,
@@ -59,12 +60,11 @@ export default defineEventHandler(async (event) => {
     return {
       statusCode: 200,
       statusMessage: "Photo added successfully",
-      photo,
     };
   } catch (error: any) {
-    return createError({
+    return {
       statusCode: error.statusCode || 500,
       statusMessage: error.message || "Internal Server Error",
-    });
+    };
   }
 });

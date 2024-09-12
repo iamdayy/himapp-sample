@@ -1,17 +1,17 @@
 import { ProfileModel } from "~/server/models/ProfileModel";
 import { ProjectModel } from "~/server/models/ProjectModel";
 import { IProject } from "~/types";
-
+import { IResponse } from "~/types/IResponse";
 /**
  * Handles POST requests for creating a new project.
  * @param {H3Event} event - The H3 event object.
  * @returns {Promise<Object>} An object containing the status code and message of the operation.
  * @throws {H3Error} If the user is not authorized, the project is not saved, or if a system error occurs.
  */
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<IResponse> => {
   try {
     // Ensure the user is authenticated and has the necessary permissions
-    const user = event.context.auth;
+    const user = event.context.user;
     if (!user) {
       throw createError({
         statusCode: 403,
@@ -55,10 +55,10 @@ export default defineEventHandler(async (event) => {
     };
   } catch (error: any) {
     // Handle any errors that occur during the process
-    return createError({
-      statusCode: error.statusCode,
-      message: error.message,
-    });
+    return {
+      statusCode: error.statusCode || 500,
+      statusMessage: error.message || "An unexpected error occurred",
+    };
   }
 });
 

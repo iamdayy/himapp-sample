@@ -1,17 +1,17 @@
 import { ProfileModel } from "~/server/models/ProfileModel";
 import { ProjectModel } from "~/server/models/ProjectModel";
 import { IContributor, IProject } from "~/types";
-
+import type { IResponse } from "~/types/IResponse";
 /**
  * Handles PUT requests for updating an existing project.
  * @param {H3Event} ev - The H3 event object.
  * @returns {Promise<Object>} An object containing the status code and message of the operation.
  * @throws {H3Error} If the user is not authorized, the project is not found, or if a system error occurs.
  */
-export default defineEventHandler(async (ev) => {
+export default defineEventHandler(async (ev): Promise<IResponse> => {
   try {
     // Ensure the user is authenticated and has the necessary permissions
-    const user = ev.context.auth;
+    const user = ev.context.user;
     if (!user) {
       throw createError({
         statusCode: 403,
@@ -63,10 +63,10 @@ export default defineEventHandler(async (ev) => {
     };
   } catch (error: any) {
     // Handle any errors that occur during the process
-    return createError({
-      statusCode: error.statusCode,
-      message: error.message,
-    });
+    return {
+      statusCode: error.statusCode || 500,
+      statusMessage: error.message || "An unexpected error occurred",
+    };
   }
 });
 

@@ -1,5 +1,5 @@
 import type { IProject } from "~/types";
-import type { IProjectResponse } from "~/types/IResponse";
+import type { IProjectsResponse } from "~/types/IResponse";
 
 export const useProjects = () => {
   const { $api } = useNuxtApp();
@@ -7,8 +7,8 @@ export const useProjects = () => {
   const perPage = ref<number>(10);
   const { canMeRegister } = useCanMeRegister();
   const { data: user } = useAuth();
-  const { data, refresh: refreshProjects } = useLazyAsyncData(() =>
-    $api<IProjectResponse>("/api/project", {
+  const { data, refresh: refreshProjects } = useLazyAsyncData("projects", () =>
+    $api<IProjectsResponse>("/api/project", {
       query: {
         page: page.value,
         perPage: perPage.value,
@@ -16,16 +16,16 @@ export const useProjects = () => {
     })
   );
   const projects = computed<IProject[] | undefined>(() => {
-    return data.value?.projects;
+    return data.value?.data?.projects;
   });
   const totalProjects = computed<number | undefined>(() => {
-    return data.value?.length;
+    return data.value?.data?.length;
   });
   const projectsMe = computed<IProject[]>(() => {
     return user.value?.profile.projects;
   });
   const ProjectsCanMeRegistered = computed<IProject[] | undefined>(() => {
-    return data.value?.projects.filter((Project) =>
+    return data.value?.data?.projects?.filter((Project) =>
       canMeRegister(Project.canRegister)
     );
   });

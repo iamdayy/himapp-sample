@@ -13,7 +13,7 @@ useHead({
 });
 
 // Retrieve organizer status and list of organizers
-const { isOrganizer, organizers } = useOrganizer();
+const { isOrganizer, organizers, refreshOrganizers } = useOrganizer();
 const modal = useModal();
 
 /**
@@ -21,8 +21,8 @@ const modal = useModal();
  * @returns {Array<string>} An array of strings representing the periods.
  */
 const periods = computed(() => {
-    if (organizers) {
-        return organizers.map((organizer) =>
+    if (organizers.value) {
+        return organizers.value.map((organizer) =>
             `${new Date(organizer.period.start).getFullYear()} - ${new Date(organizer.period.end).getFullYear()}`
         );
     }
@@ -37,8 +37,8 @@ const selectedPeriod = ref(periods.value[0] || "");
  * @returns {IProfile | null} The current organizer profile or null if not found.
  */
 const organizer = computed(() => {
-    if (organizers) {
-        return organizers.find((organizer) =>
+    if (organizers.value) {
+        return organizers.value.find((organizer) =>
             new Date(organizer.period.start).getFullYear() === Number(selectedPeriod.value.split(" - ")[0]) &&
             new Date(organizer.period.end).getFullYear() === Number(selectedPeriod.value.split(" - ")[1])
         );
@@ -57,7 +57,11 @@ const isTablet = computed(() => width.value >= 640 && width.value < 1024);
  * Open the modal for adding a new organizer.
  */
 const addModal = () => {
-    modal.open(ModalsAddOrganizer);
+    modal.open(ModalsAddOrganizer, {
+        onRefreshTrigger: () => {
+            refreshOrganizers();
+        }
+    });
 }
 
 // Define the items for the tabs in the UI

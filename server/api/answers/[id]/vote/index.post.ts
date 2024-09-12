@@ -1,8 +1,9 @@
 import { AnswerModel } from "~/server/models/AnswerModel";
 import { ProfileModel } from "~/server/models/ProfileModel";
 import { IProfile } from "~/types";
+import { IVoteResponse } from "~/types/IResponse";
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<IVoteResponse> => {
   try {
     const answerId = event.context.params?.id;
     const { voteType } = await readBody(event);
@@ -84,9 +85,9 @@ export default defineEventHandler(async (event) => {
     };
   } catch (error) {
     console.error("Error voting on answer:", error);
-    throw createError({
+    return {
       statusCode: 500,
       statusMessage: "Internal server error",
-    });
+    };
   }
 });

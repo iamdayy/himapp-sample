@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import type { IAgenda } from '~/types';
-import type { IProfileResponse } from '~/types/IResponse';
+import type { IProfileResponse, IResponse } from '~/types/IResponse';
 
 // Access Nuxt app instance and utilities
 const { $api } = useNuxtApp();
@@ -61,14 +61,15 @@ const deleteCommittee = (i: number) => {
  */
 const addAgenda = async () => {
     try {
-        const added = await $api("/api/agenda", {
+        const added = await $api<IResponse>("/api/agenda", {
             method: "post",
             body: newAgenda.value,
         });
-        toast.add({ title: "Success add new agenda at " + new Date(newAgenda.value.date).toLocaleDateString() });
+        toast.add({ title: added.statusMessage });
         emits('trigger-refresh');
+        modal.close();
     } catch (error: any) {
-        toast.add({ title: "Failed to add new Agenda" });
+        toast.add({ title: error.response.data.statusMessage, color: 'red' });
     }
 }
 
@@ -78,7 +79,7 @@ const addAgenda = async () => {
  * @returns {string|undefined} - Full name of the user
  */
 const getNameFromNIM = (NIM?: number) => {
-    return profile.value?.profiles.find((profile) => profile.NIM == NIM)?.fullName;
+    return profile.value?.data?.profiles.find((profile) => profile.NIM == NIM)?.fullName;
 }
 
 /**

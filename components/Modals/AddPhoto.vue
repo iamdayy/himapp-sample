@@ -2,7 +2,7 @@
 import { ModalsCropImage } from '#components';
 import imageCompression from 'browser-image-compression';
 import type { IPhoto } from '~/types';
-
+import type { IResponse } from '~/types/IResponse';
 /**
  * Composables
  */
@@ -47,11 +47,11 @@ const addPhoto = async () => {
             }
             body.append(key, v as string);
         });
-        const added = await $api("/api/photo", {
+        const added = await $api<IResponse>("/api/photo", {
             method: "POST",
             body
         });
-        toast.add({ title: added.statusMessage! });
+        toast.add({ title: added.statusMessage });
         modal.close();
         emit("triggerRefresh");
     } catch (error) {

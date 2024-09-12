@@ -64,7 +64,11 @@ export default defineEventHandler(async (event) => {
       }
     });
 
-    return jsonData;
+    return {
+      statusCode: 200,
+      statusMessage: "Data imported successfully",
+      data: jsonData,
+    };
   } catch (error) {
     return error;
   }

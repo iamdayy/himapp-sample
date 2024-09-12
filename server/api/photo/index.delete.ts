@@ -1,10 +1,11 @@
 import fs from "fs";
 import path from "path";
 import { PhotoModel } from "~/server/models/PhotoModel";
+import { IResponse } from "~/types/IResponse";
 const config = useRuntimeConfig();
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<IResponse> => {
   try {
-    const user = event.context.auth;
+    const user = event.context.user;
     if (!user) {
       throw createError({
         statusCode: 403,
@@ -40,9 +41,9 @@ export default defineEventHandler(async (event) => {
     }
     return { statusCode: 200, statusMessage: "Photo deleted" };
   } catch (error: any) {
-    return createError({
+    return {
       statusCode: error.statusCode || 500,
       statusMessage: error.message || "Internal Server Error",
-    });
+    };
   }
 });

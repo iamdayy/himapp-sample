@@ -2,6 +2,7 @@
 import { ModalsCropImage } from '#components';
 import imageCompression from 'browser-image-compression';
 import type { IPost } from '~/types';
+import type { IResponse } from '~/types/IResponse';
 
 /**
  * Composables
@@ -53,11 +54,11 @@ const addPost = async () => {
             }
             body.append(key, v as string);
         });
-        const added = await $api("/api/post", {
+        const added = await $api<IResponse>("/api/post", {
             method: "POST",
             body
         });
-        toast.add({ title: added.statusMessage! });
+        toast.add({ title: added.statusMessage });
         modal.close();
         emit("triggerRefresh");
     } catch (error) {

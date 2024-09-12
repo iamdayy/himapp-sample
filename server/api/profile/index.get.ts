@@ -22,7 +22,11 @@ export default defineEventHandler(async (event) => {
     // If NIM is provided without pagination, return a single profile
     if (NIM && !perPage && !page) {
       const profile = await ProfileModel.findOne({ NIM });
-      return profile;
+      return {
+        statusCode: 200,
+        statusMessage: "Profile fetched",
+        data: profile,
+      };
     }
 
     let query: any = {};
@@ -43,7 +47,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Ensure user is authenticated and authorized
-    const user = await ensureAuth(event);
+    const user = event.context.user;
     if (!user) {
       throw createError({
         statusCode: 403,
@@ -140,29 +144,33 @@ export default defineEventHandler(async (event) => {
       .limit(Number(perPage));
 
     return {
-      profiles: profiles.map((profile) => {
-        return {
-          NIM: profile.NIM,
-          fullName: profile.fullName,
-          email: profile.email,
-          avatar: profile.avatar,
-          class: profile.class,
-          semester: profile.semester,
-          enteredYear: profile.enteredYear,
-          createdAt: profile.createdAt,
-          status: profile.status,
-          agendas: profile.agendas,
-          projects: profile.projects,
-          organizers: profile.organizer,
-        };
-      }),
-      length,
-      filters,
+      statusCode: 200,
+      statusMessage: "Profiles fetched",
+      data: {
+        profiles: profiles.map((profile) => {
+          return {
+            NIM: profile.NIM,
+            fullName: profile.fullName,
+            email: profile.email,
+            avatar: profile.avatar,
+            class: profile.class,
+            semester: profile.semester,
+            enteredYear: profile.enteredYear,
+            createdAt: profile.createdAt,
+            status: profile.status,
+            agendas: profile.agendas,
+            projects: profile.projects,
+            organizers: profile.organizer,
+          };
+        }),
+        length,
+        filters,
+      },
     };
   } catch (error: any) {
     return createError({
       statusCode: error.statusCode || 500,
-      message:
+      statusMessage:
         error.message || "An unexpected error occurred while fetching profiles",
     });
   }

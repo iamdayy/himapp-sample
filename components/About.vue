@@ -4,25 +4,28 @@ import type { IPhoto, IProfile } from '~/types';
 
 const { organizers } = useOrganizer();
 
-const { $api } = useNuxtApp();
 
-const { data: photos } = useAsyncData('photos', () => $api<IPhoto[]>('/api/photo'));
+const { data: photos } = useAsyncData('photos', () => $fetch<IPhoto[]>('/api/photo'));
 
-function getRandomItems(arr: IPhoto[], num: number) {
-    const shuffled = [...arr].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, num);
-}
+const randomPhotos = computed(() => {
+    if (photos.value) {
+        const shuffled = [...photos.value].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, 12);
+    }
+    return [];
+});
+
 
 const organizer = computed(() => {
-    if (organizers) {
-        return organizers.find((organizer) => new Date(organizer.period.start).getFullYear() === Number(selectedPeriod.value.split(" - ")[0]) && new Date(organizer.period.end).getFullYear() === Number(selectedPeriod.value.split(" - ")[1]));
+    if (organizers.value) {
+        return organizers.value.find((organizer) => new Date(organizer.period.start).getFullYear() === Number(selectedPeriod.value.split(" - ")[0]) && new Date(organizer.period.end).getFullYear() === Number(selectedPeriod.value.split(" - ")[1]));
     }
     return null;
 });
 
 const periods = computed(() => {
-    if (organizers) {
-        return organizers.map((organizer) => `${new Date(organizer.period.start).getFullYear()} - ${new Date(organizer.period.end).getFullYear()}`);
+    if (organizers.value) {
+        return organizers.value?.map((organizer) => `${new Date(organizer.period.start).getFullYear()} - ${new Date(organizer.period.end).getFullYear()}`);
     }
     return [];
 });
@@ -116,8 +119,8 @@ const responsiveClasses = computed(() => ({
                     baik secara keilmuan maupun sosial.
                 </p>
             </div>
-            <RandomBuble v-if="photos" :photos="getRandomItems(photos, 12)" data-aos="fade-left"
-                data-aos-easing="ease-in-out" data-aos-duration="800" data-aos-anchor=".about" />
+            <RandomBuble v-if="photos" :photos="randomPhotos" data-aos="fade-left" data-aos-easing="ease-in-out"
+                data-aos-duration="800" data-aos-anchor=".about" />
         </div>
         <div class="flex flex-col justify-center px-3 py-8">
             <UTabs :items="tabItems" class="w-full">

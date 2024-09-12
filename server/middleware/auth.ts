@@ -1,5 +1,7 @@
 export default defineEventHandler(async (event) => {
-  if (checkAuth(event)) {
+  const isAuthenticated = checkAuth(event);
+
+  if (isAuthenticated) {
     event.context.user = await ensureAuth(event);
     event.context.organizer = event.context.user.profile.organizer;
   }

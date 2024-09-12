@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import type { IProfile, IProject } from '~/types';
-import type { IProfileResponse } from '~/types/IResponse';
+import type { IProfileResponse, IResponse } from '~/types/IResponse';
 
 const toast = useToast();
 const modal = useModal();
@@ -55,7 +55,7 @@ const project = computed<IProject>(() => {
  * @returns {string | undefined} The full name of the user, or undefined if not found
  */
 const getNameFromNIM = (NIM?: number): string | undefined => {
-    return data.value?.profiles.find((profile) => profile.NIM == NIM)?.fullName;
+    return data.value?.data?.profiles.find((profile) => profile.NIM == NIM)?.fullName;
 }
 
 /**
@@ -65,7 +65,7 @@ const getNameFromNIM = (NIM?: number): string | undefined => {
  */
 const editProject = async (): Promise<void> => {
     try {
-        const added = await $api("/api/project", {
+        const added = await $api<IResponse>("/api/project", {
             method: "put",
             query: {
                 id: project.value?._id

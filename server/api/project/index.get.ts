@@ -1,7 +1,7 @@
 import { ProfileModel } from "~/server/models/ProfileModel";
 import { ProjectModel } from "~/server/models/ProjectModel";
-import { checkAuth } from "~/server/utils/authHelper";
 import { IReqProjectQuery } from "~/types/IRequestPost";
+import { IProjectsResponse } from "~/types/IResponse";
 
 /**
  * Retrieves the NIM (Student ID) from a given profile ID.
@@ -28,7 +28,7 @@ const getNimFromID = async (id: string): Promise<number> => {
  * @returns {Promise<Object>} An object containing project data or a list of projects.
  * @throws {H3Error} If the project is not found or if a system error occurs.
  */
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<IProjectsResponse> => {
   try {
     const { perPage, page, id } = getQuery<IReqProjectQuery>(event);
 
@@ -53,25 +53,33 @@ export default defineEventHandler(async (event) => {
       );
 
       return {
-        ...project.toJSON(),
-        contributors,
+        statusCode: 200,
+        statusMessage: "Project fetched",
+        data: {
+          project: {
+            ...project.toJSON(),
+            contributors,
+          },
+        },
       };
     }
 
     // If no ID is provided, return a list of projects
     const roles: string[] = ["All", "External"];
-    const auth = checkAuth(event);
-    if (auth) {
-      const user = await ensureAuth(event);
-      if (user.profile.organizer) {
+    const user = event.context.user;
+    if (user) {
+      if (event.context.organizer) {
         if (!roles.includes("Internal")) {
           roles.push("Internal");
         }
-        roles.push("Admin");
-        roles.push("Departement");
+        if (!roles.includes("Admin")) {
+          roles.push("Admin");
+        }
+        if (!roles.includes("Departement")) {
+          roles.push("Departement");
+        }
       }
     }
-
     const projectsLength = await ProjectModel.countDocuments({
       canSee: { $in: roles },
     });
@@ -83,13 +91,17 @@ export default defineEventHandler(async (event) => {
       .limit(Number(perPage));
 
     return {
-      projects,
-      length: projectsLength,
+      statusCode: 200,
+      statusMessage: "Projects fetched",
+      data: {
+        projects: projects.map((project) => project.toJSON()),
+        length: projectsLength,
+      },
     };
   } catch (error: any) {
-    return createError({
+    return {
       statusCode: error.statusCode || 500,
-      message: error.message || "An unexpected error occurred",
-    });
+      statusMessage: error.message || "An unexpected error occurred",
+    };
   }
 });

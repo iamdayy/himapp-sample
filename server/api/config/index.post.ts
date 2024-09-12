@@ -2,7 +2,7 @@ import { ConfigModel } from "~/server/models/ConfigModel";
 import type { IConfig } from "~/types";
 export default defineEventHandler(async (event) => {
   try {
-    const user = event.context.auth;
+    const user = event.context.user;
     if (!user) {
       throw createError({
         statusCode: 403,
@@ -17,7 +17,11 @@ export default defineEventHandler(async (event) => {
     }
     const body = await readBody<IConfig>(event);
     const config = await ConfigModel.create(body);
-    return config;
+    return {
+      statusCode: 200,
+      statusMessage: "Config created",
+      data: config,
+    };
   } catch (error: any) {
     throw createError({
       statusCode: 500,

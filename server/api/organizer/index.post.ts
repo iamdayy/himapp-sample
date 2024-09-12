@@ -1,10 +1,11 @@
 import OrganizerModel from "~/server/models/OrganizerModel";
 import { ProfileModel } from "~/server/models/ProfileModel";
 import { IOrganizer } from "~/types";
+import { IResponse } from "~/types/IResponse";
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<IResponse> => {
   try {
-    const user = event.context.auth;
+    const user = event.context.user;
     if (!user) {
       throw createError({
         statusCode: 403,
@@ -19,7 +20,6 @@ export default defineEventHandler(async (event) => {
     }
 
     const body = await readBody<IOrganizer>(event);
-    console.log(body);
 
     const dailyManagementPromises = body.dailyManagement.map(async (daily) => {
       const profileId = await getProfileIdByNim(daily.profile as number);
@@ -48,7 +48,6 @@ export default defineEventHandler(async (event) => {
       Promise.all(dailyManagementPromises),
       Promise.all(departmentPromises),
     ]);
-    console.log(dailyManagement, department);
     const organizer = await OrganizerModel.create({
       dailyManagement,
       department,
@@ -58,13 +57,12 @@ export default defineEventHandler(async (event) => {
     return {
       statusCode: 200,
       statusMessage: "Organizer created successfully.",
-      organizer,
     };
   } catch (error: any) {
-    return createError({
+    return {
       statusCode: error.statusCode || 500,
       statusMessage: error.message || "Internal server error.",
-    });
+    };
   }
 });
 

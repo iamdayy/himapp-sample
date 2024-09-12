@@ -40,8 +40,10 @@ const { data, refresh } = useLazyAsyncData(() => $api<IPostResponse>('/api/post'
     }
 }), {
     default: () => ({
-        posts: [],
-        length: 0
+        data: {
+            posts: [],
+            length: 0
+        }
     }),
     watch: [page, pageCount, sort]
 });
@@ -49,10 +51,10 @@ const { data, refresh } = useLazyAsyncData(() => $api<IPostResponse>('/api/post'
 /**
  * Computed properties for pagination
  */
-const pageTotal = computed(() => data.value.length)
+const pageTotal = computed(() => data.value.data?.length || 0)
 const pageFrom = computed(() => (page.value - 1) * pageCount.value + 1)
-const pageTo = computed(() => Math.min(page.value * pageCount.value, pageTotal.value))
-const pageCountOptions = computed(() => [10, 20, 50, 100, 200, data.value.length]);
+const pageTo = computed(() => Math.min(page.value * pageCount.value, pageTotal.value || 0))
+const pageCountOptions = computed(() => [10, 20, 50, 100, 200, pageTotal.value || 0]);
 
 /**
  * Publish a post
@@ -218,14 +220,14 @@ const responsiveClasses = computed(() => ({
                 </div>
             </template>
             <div class="flex flex-wrap gap-3">
-                <UCard :class="['min-h-32', responsiveClasses.card]" v-for="post, i in data.posts" :key="i">
+                <UCard :class="['min-h-32', responsiveClasses.card]" v-for="post, i in data.data?.posts" :key="i">
                     <template #header>
                         <NuxtImg :src="post.mainImage" class="w-full mx-auto rounded-lg" />
                     </template>
                     <div class="space-y-2">
                         <NuxtLink :to="`/post/${post.slug}`" class="text-xl font-semibold sm:text-4xl line-clamp-1">{{
                             post.title
-                        }}</NuxtLink>
+                            }}</NuxtLink>
                     </div>
                     <template #footer>
                         <UCard class="min-w-full min-h-12" :ui="{ body: { padding: 'p-1 sm:p-1 px-3 sm:px-3' } }">

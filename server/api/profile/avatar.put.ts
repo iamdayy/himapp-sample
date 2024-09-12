@@ -2,6 +2,7 @@ import fs from "fs";
 import { readFiles } from "h3-formidable";
 import path from "path";
 import { ProfileModel } from "~/server/models/ProfileModel";
+import { IResponse } from "~/types/IResponse";
 
 const config = useRuntimeConfig();
 
@@ -11,7 +12,7 @@ const config = useRuntimeConfig();
  * @returns {Promise<Object>} An object containing the status code, message, and updated avatar URL.
  * @throws {H3Error} If the user is not authorized, the profile is not found, or if a system error occurs.
  */
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<IResponse> => {
   try {
     const { files } = await readFiles(event);
     const { NIM } = getQuery(event);
@@ -22,7 +23,7 @@ export default defineEventHandler(async (event) => {
     let newPath = "";
 
     // Ensure the user is authenticated and authorized
-    const user = event.context.auth;
+    const user = event.context.user;
     if (!user) {
       throw createError({
         statusCode: 403,
@@ -42,7 +43,7 @@ export default defineEventHandler(async (event) => {
     if (!profile) {
       throw createError({
         statusCode: 404,
-        message: "Profile not found",
+        statusMessage: "Profile not found",
       });
     }
 
@@ -77,14 +78,13 @@ export default defineEventHandler(async (event) => {
     return {
       statusCode: 200,
       statusMessage: `Avatar for user ${profile.NIM} updated successfully`,
-      avatar: profile.avatar,
     };
   } catch (error: any) {
-    return createError({
+    return {
       statusCode: error.statusCode || 500,
-      message:
+      statusMessage:
         error.message ||
         "An unexpected error occurred while updating the avatar",
-    });
+    };
   }
 });

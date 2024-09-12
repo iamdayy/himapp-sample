@@ -1,13 +1,13 @@
 import { PostModel } from "~/server/models/PostModel";
 import { IReqPostQuery } from "~/types/IRequestPost";
-
+import type { IPostResponse } from "~/types/IResponse";
 /**
  * Handles GET requests for retrieving posts.
  * @param {H3Event} event - The H3 event object.
  * @returns {Promise<Object>} The post data or an array of posts with total count.
  * @throws {H3Error} If an error occurs during the process.
  */
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<IPostResponse> => {
   try {
     const { perPage, page, slug, sort, order } = getQuery<IReqPostQuery>(event);
 
@@ -20,7 +20,11 @@ export default defineEventHandler(async (event) => {
           statusMessage: "Post not found",
         });
       }
-      return post.toJSON();
+      return {
+        statusCode: 200,
+        statusMessage: "Post fetched",
+        data: post.toJSON(),
+      };
     }
 
     // Set up query for multiple posts
@@ -35,10 +39,9 @@ export default defineEventHandler(async (event) => {
     }
 
     // Check user authentication and permissions
-    const auth = checkAuth(event);
-    if (auth) {
-      const user = await ensureAuth(event);
-      if (user.profile.organizer) {
+    const user = event.context.user;
+    if (user) {
+      if (event.context.organizer) {
         // Administrators and department users can see all posts
         query = {};
       }
@@ -55,15 +58,19 @@ export default defineEventHandler(async (event) => {
 
     // Return posts and total count
     return {
-      posts,
-      length: postsLength,
+      statusCode: 200,
+      statusMessage: "Posts fetched",
+      data: {
+        posts,
+        length: postsLength,
+      },
     };
   } catch (error: any) {
     // Handle any errors that occur during the process
-    return createError({
+    return {
       statusCode: error.statusCode || 500,
-      message:
+      statusMessage:
         error.message || "An unexpected error occurred while fetching posts",
-    });
+    };
   }
 });

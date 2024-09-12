@@ -20,7 +20,7 @@ const isDarkMode = computed(() => colorMode.value === 'dark');
 /**
  * Fetch agendas data from the API
  */
-const { data: agendas } = useAsyncData(() => $api<IAgenda[]>("/api/agenda"));
+const { agendas, pendingAgendas, refreshAgendas } = useAgendas();
 
 /**
  * Reactive reference for the selected date
@@ -131,7 +131,15 @@ const responsiveClasses = computed(() => ({
         <template #header>
             <h2 :class="['font-extrabold dark:text-white', responsiveClasses.cardHeader]">Agendas</h2>
         </template>
-        <div class="flex flex-col w-full gap-3 md:flex-row">
+        <div v-if="pendingAgendas || !agendas" class="flex items-center justify-center">
+            <UProgress animate="carousel" v-if="pendingAgendas" />
+            <UButton label="Refresh" v-else @click="refreshAgendas" color="blue" variant="ghost" size="lg">
+                <template #trailing>
+                    <UIcon name="i-heroicons-arrow-path" class="w-8 h-8" />
+                </template>
+            </UButton>
+        </div>
+        <div v-else class="flex flex-col w-full gap-3 md:flex-row">
             <clientOnly>
                 <div :class="['mx-auto shadow-lg', responsiveClasses.calendarWrapper]">
                     <VCalendar v-if="agendas" expanded :attributes="attributes" class="shadow-lg" :is-dark="isDarkMode"

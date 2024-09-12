@@ -31,7 +31,6 @@
     "mongoose-autopopulate": "^1.1.0",
     "nuxt": "^3.12.4",
     "nuxt-app": "file:",
-    "nuxt-echarts": "^0.1.0",
     "nuxt-tiptap-editor": "^1.2.0",
     "vue": "latest",
     "vue-advanced-cropper": "^2.8.9",
@@ -53,5 +52,8 @@
     "@types/formidable": "^3.4.5",
     "@types/jsonwebtoken": "^9.0.6",
     "nuxt-pdfmake": "^0.0.19"
-  }
+  },
+  "trustedDependencies": [
+    "nuxt-app"
+  ]
 }

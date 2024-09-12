@@ -1,12 +1,11 @@
 <script lang="ts" setup>
-
+import type { IResponse, ITagsResponse } from '~/types/IResponse';
 definePageMeta({
     layout: 'client',
 });
 
-const { data: user } = useAuth();
 const { $api } = useNuxtApp();
-
+const router = useRouter();
 const toast = useToast();
 
 const title = ref('');
@@ -14,7 +13,7 @@ const body = ref('');
 const tags = ref<{ label: string, id: number }[]>([]);
 const anonymous = ref(false);
 const isSubmitting = ref(false);
-const { data, pending, error } = useAsyncData('tags', () => $api('/api/tags'));
+const { data, pending, error } = useAsyncData('tags', () => $api<ITagsResponse>('/api/tags'));
 const tagsOptions = computed(() => {
     if (pending.value) return [];
     if (error.value) return [];
@@ -37,7 +36,7 @@ const submitQuestion = async () => {
 
     try {
         // Assuming you have an API endpoint for creating questions
-        const response = await $api('/api/questions', {
+        const response = await $api<IResponse>('/api/questions', {
             method: 'POST',
             body: JSON.stringify({
                 title: title.value,
@@ -47,8 +46,13 @@ const submitQuestion = async () => {
             }),
         });
 
+        toast.add({
+            title: response.statusMessage,
+            color: 'green',
+        });
+
         // Redirect to the new question page
-        navigateTo(`/forum/${(response.question as any)._id}`);
+        router.back();
     } catch (error: any) {
         console.error('Error submitting question:', error);
         toast.add({

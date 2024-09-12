@@ -120,7 +120,7 @@ const pageCount = ref(10);
 /**
  * Fetch data from API
  */
-const { data, pending, refresh } = await useLazyAsyncData<IProfileResponse>('users', () => $api<IProfileResponse>('/api/profile', {
+const { data, pending, refresh } = await useLazyAsyncData('users', () => $api<IProfileResponse>('/api/profile', {
     query: {
         search: search.value,
         page: page.value,
@@ -133,9 +133,11 @@ const { data, pending, refresh } = await useLazyAsyncData<IProfileResponse>('use
     }
 }), {
     default: () => ({
-        profiles: [],
-        filters: [],
-        length: 0
+        data: {
+            profiles: [],
+            filters: [],
+            length: 0
+        }
     }),
     watch: [page, search, pageCount, sort, filter, filterBy, deleted]
 });
@@ -143,7 +145,7 @@ const { data, pending, refresh } = await useLazyAsyncData<IProfileResponse>('use
 /**
  * Computed properties for pagination
  */
-const pageTotal = computed(() => data.value.length);
+const pageTotal = computed(() => data.value.data.length);
 const pageFrom = computed(() => (page.value - 1) * pageCount.value + 1);
 const pageTo = computed(() => Math.min(page.value * pageCount.value, pageTotal.value));
 const pageCountOptions = computed(() => {
@@ -180,7 +182,7 @@ const generateXlsx = async () => {
     try {
         let toExcel = selectedRows.value;
         if (selectedRows.value.length == 0) {
-            toExcel = (await $api<IProfileResponse>('/api/profile')).profiles;
+            toExcel = (await $api<IProfileResponse>('/api/profile')).data.profiles;
         }
         const response = await $fetch<Blob>('/api/sheet/export', {
             method: "post",
@@ -302,7 +304,7 @@ const colorbadge = (status: "active" | "inactive" | "free" | "deleted") => {
                     <div class="flex flex-col w-full gap-3 md:flex-row md:w-auto">
                         <USelectMenu v-model="filterBy" :options="filterable" placeholder="Filter By"
                             :size="responsiveUISizes.select" class="w-full md:w-40" />
-                        <USelectMenu v-model="filter" :options="data.filters" multiple
+                        <USelectMenu v-model="filter" :options="data.data.filters" multiple
                             :placeholder="filterBy?.label || 'none'" :disabled="!filterBy"
                             :size="responsiveUISizes.select" class="w-full md:w-40" />
                     </div>
@@ -350,10 +352,10 @@ const colorbadge = (status: "active" | "inactive" | "free" | "deleted") => {
 
                 <!-- Table -->
                 <div class="overflow-x-auto">
-                    <UTable v-model="selectedRows" v-model:sort="sort" :rows="data.profiles" :columns="columnsTable"
-                        :loading="pending" sort-asc-icon="i-heroicons-arrow-up" sort-desc-icon="i-heroicons-arrow-down"
-                        sort-mode="manual" class="w-full" :ui="{ default: { checkbox: { color: 'gray' } } }"
-                        @select="select">
+                    <UTable v-model="selectedRows" v-model:sort="sort" :rows="data.data.profiles"
+                        :columns="columnsTable" :loading="pending" sort-asc-icon="i-heroicons-arrow-up"
+                        sort-desc-icon="i-heroicons-arrow-down" sort-mode="manual" class="w-full"
+                        :ui="{ default: { checkbox: { color: 'gray' } } }" @select="select">
                         <template #id-data="{ index }">
                             <span>{{ index + 1 }}</span>
                         </template>

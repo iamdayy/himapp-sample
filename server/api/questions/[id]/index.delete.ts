@@ -1,6 +1,8 @@
 import { QuestionModel } from "~/server/models/QuestionModel";
 import { IProfile } from "~/types";
-export default defineEventHandler(async (event) => {
+import type { IResponse } from "~/types/IResponse";
+
+export default defineEventHandler(async (event): Promise<IResponse> => {
   try {
     const { id } = event.context.params as { id: string };
     const user = event.context.user;
@@ -32,9 +34,9 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Question deleted successfully",
     };
   } catch (error: any) {
-    throw createError({
+    return {
       statusCode: 500,
       statusMessage: error.message,
-    });
+    };
   }
 });

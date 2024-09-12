@@ -1,5 +1,6 @@
 <script setup lang='ts'>
 import type { IProfile } from '~/types';
+import type { IResponse } from '~/types/IResponse';
 
 /**
  * Toast notification composable
@@ -86,7 +87,7 @@ const member = computed({
 const Save = async () => {
     loading.value = true;
     try {
-        const added = await $api("/api/profile", {
+        const added = await $api<IResponse>("/api/profile", {
             method: "put",
             query: {
                 NIM: props.NIM

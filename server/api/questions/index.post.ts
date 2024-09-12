@@ -1,8 +1,9 @@
 import { ProfileModel } from "~/server/models/ProfileModel";
 import { QuestionModel } from "~/server/models/QuestionModel";
 import { IReqQuestion } from "~/types/IRequestPost";
+import type { IResponse } from "~/types/IResponse";
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<IResponse> => {
   try {
     const { title, body, tags, isAnonymous } = await readBody<IReqQuestion>(
       event
@@ -36,12 +37,11 @@ export default defineEventHandler(async (event) => {
     return {
       statusCode: 201,
       statusMessage: "Question created successfully",
-      question,
     };
   } catch (error: any) {
-    throw createError({
+    return {
       statusCode: 500,
       statusMessage: error.message,
-    });
+    };
   }
 });

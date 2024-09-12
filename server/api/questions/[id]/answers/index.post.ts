@@ -1,8 +1,9 @@
 import { AnswerModel } from "~/server/models/AnswerModel";
 import { ProfileModel } from "~/server/models/ProfileModel";
 import { QuestionModel } from "~/server/models/QuestionModel";
+import type { IResponse } from "~/types/IResponse";
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<IResponse> => {
   try {
     const questionId = event.context.params?.id;
     const { content, isAnonymous } = await readBody<{
@@ -58,13 +59,12 @@ export default defineEventHandler(async (event) => {
     return {
       statusCode: 201,
       statusMessage: "Answer added successfully",
-      answer: newAnswer,
     };
   } catch (error) {
     console.error("Error adding answer:", error);
-    throw createError({
+    return {
       statusCode: 500,
       statusMessage: "Internal server error",
-    });
+    };
   }
 });

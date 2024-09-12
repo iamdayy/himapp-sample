@@ -69,7 +69,11 @@ export default defineEventHandler(async (event) => {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
 
-    return blob;
+    return {
+      statusCode: 200,
+      statusMessage: "Data exported successfully",
+      data: blob,
+    };
   } catch (error) {
     console.error("Error exporting to Excel:", error);
     setResponseStatus(event, 500); // Internal Server Error

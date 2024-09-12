@@ -1,20 +1,20 @@
 import { Types } from "mongoose";
 import { ProfileModel } from "~/server/models/ProfileModel";
 import { ProjectModel } from "~/server/models/ProjectModel";
-
+import type { IResponse } from "~/types/IResponse";
 /**
  * Handles POST requests for registering a user to a project.
  * @param {H3Event} ev - The H3 event object.
  * @returns {Promise<Object>} An object containing the status and message of the operation.
  * @throws {H3Error} If the project is not found, the registration fails, or if a system error occurs.
  */
-export default defineEventHandler(async (ev) => {
+export default defineEventHandler(async (ev): Promise<IResponse> => {
   try {
     // Read the request body
     const { NIM, id, task } = await readBody(ev);
 
     // Ensure the user is authenticated
-    const user = ev.context.auth;
+    const user = ev.context.user;
     if (!user) {
       throw createError({
         statusCode: 403,
@@ -57,16 +57,16 @@ export default defineEventHandler(async (ev) => {
 
     // Return success message
     return {
-      status: true,
+      statusCode: 200,
       statusMessage: `Successfully registered for project: ${project.title}`,
     };
   } catch (error: any) {
     // Handle any errors that occur during the process
-    throw createError({
+    return {
       statusCode: error.statusCode || 500,
       statusMessage:
         error.statusMessage ||
         "An unexpected error occurred during project registration",
-    });
+    };
   }
 });

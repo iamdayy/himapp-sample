@@ -1,4 +1,4 @@
-import type { IOrganizer } from "~/types";
+import type { IOrganizerResponse } from "~/types/IResponse";
 
 export const useOrganizer = () => {
   const { data: user, status } = useAuth();
@@ -7,8 +7,12 @@ export const useOrganizer = () => {
     period: { start: Date; end: Date };
   } | null>(null);
   const isOrganizer = ref<boolean>(false);
-  const { data } = useLazyAsyncData(() =>
-    $fetch<{ organizers: IOrganizer[] }>("/api/organizer")
+  const {
+    data,
+    refresh: refreshOrganizers,
+    pending: pendingOrganizers,
+  } = useLazyAsyncData("organizers", () =>
+    $fetch<IOrganizerResponse>("/api/organizer")
   );
   const fetchData = () => {
     organizer.value = null;
@@ -22,9 +26,12 @@ export const useOrganizer = () => {
   watchEffect(() => {
     fetchData();
   });
+  const organizers = computed(() => data.value?.data);
   return {
     organizer,
     isOrganizer,
-    organizers: data.value?.organizers,
+    organizers,
+    refreshOrganizers,
+    pendingOrganizers,
   };
 };

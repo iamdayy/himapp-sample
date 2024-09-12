@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import type { PropType } from 'vue';
 import type { IAgenda, IProfile } from '~/types';
-import type { IProfileResponse } from '~/types/IResponse';
+import type { IProfileResponse, IResponse } from '~/types/IResponse';
 
 // Fetch user profile data
 const { data: profile } = await useAsyncData(() => $api<IProfileResponse>("/api/profile"));
@@ -48,16 +48,16 @@ const deleteCommittee = (i: number) => {
  */
 const addAgenda = async () => {
     try {
-        await $api("/api/agenda", {
+        const edited = await $api<IResponse>("/api/agenda", {
             method: "put",
             body: Agenda.value,
             query: { id: Agenda.value._id }
         });
-        toast.add({ title: `Successfully edited event for ${new Date(Agenda.value.date).toLocaleDateString()}` });
+        toast.add({ title: edited.statusMessage });
         emits('trigger-refresh');
         modal.close();
     } catch (error: any) {
-        toast.add({ title: "Failed to edit Event", color: 'red' });
+        toast.add({ title: error.response.data.statusMessage, color: 'red' });
     }
 };
 
@@ -67,7 +67,7 @@ const addAgenda = async () => {
  * @returns {string | undefined} The full name of the user
  */
 const getNameFromNIM = (NIM?: number) => {
-    return profile.value?.profiles.find((profile) => profile.NIM == NIM)?.fullName;
+    return profile.value?.data?.profiles.find((profile) => profile.NIM == NIM)?.fullName;
 };
 
 // Responsive design setup

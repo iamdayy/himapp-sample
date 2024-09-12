@@ -1,8 +1,9 @@
 import { AnswerModel } from "~/server/models/AnswerModel";
 import { QuestionModel } from "~/server/models/QuestionModel";
 import { IProfile } from "~/types";
+import type { IResponse } from "~/types/IResponse";
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<IResponse> => {
   try {
     const questionId = event.context.params?.id;
     const answerId = event.context.params?.answerId;
@@ -55,10 +56,9 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Answer deleted successfully",
     };
   } catch (error) {
-    console.error("Error deleting answer:", error);
-    throw createError({
+    return {
       statusCode: 500,
       statusMessage: "Internal server error",
-    });
+    };
   }
 });

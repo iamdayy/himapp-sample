@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { IAnswer, IProfile } from '~/types';
-import type { IQuestionDetailResponse } from '~/types/IResponse';
+import type { IQuestionDetailResponse, IResponse, IVoteResponse } from '~/types/IResponse';
 
 definePageMeta({
     layout: 'client',
@@ -15,14 +15,14 @@ const newAnswer = ref('');
 const anonymous = ref(false);
 const isSubmitting = ref(false);
 
-const { data, refresh } = useAsyncData<IQuestionDetailResponse>('question', () => $api(`/api/questions/${route.params.id}`));
+const { data, refresh, pending } = useAsyncData<IQuestionDetailResponse>('question', () => $api(`/api/questions/${route.params.id}`));
 
 const submitAnswer = async () => {
     if (!newAnswer.value.trim()) return;
 
     isSubmitting.value = true;
     try {
-        const response = await $api(`/api/questions/${route.params.id}/answers`, {
+        const response = await $api<IResponse>('/api/questions/${route.params.id}/answers', {
             method: 'POST',
             body: JSON.stringify({
                 content: newAnswer.value,
@@ -50,7 +50,7 @@ const submitAnswer = async () => {
 
 const voteQuestion = async (voteType: 'upvote' | 'downvote') => {
     try {
-        const response = await $api(`/api/questions/${route.params.id}/vote`, {
+        const response = await $api<IResponse>(`/api/questions/${route.params.id}/vote`, {
             method: 'POST',
             body: JSON.stringify({
                 voteType,
@@ -74,7 +74,7 @@ const voteQuestion = async (voteType: 'upvote' | 'downvote') => {
 
 const voteAnswer = async (voteType: 'upvote' | 'downvote', id: string) => {
     try {
-        const response = await $api(`/api/answers/${id}/vote`, {
+        const response = await $api<IVoteResponse>(`/api/answers/${id}/vote`, {
             method: 'POST',
             body: JSON.stringify({
                 voteType,
@@ -82,14 +82,14 @@ const voteAnswer = async (voteType: 'upvote' | 'downvote', id: string) => {
         });
         refresh();
         toast.add({
-            title: voteType === 'upvote' ? 'Upvoted' : 'Downvoted',
+            title: response.statusMessage,
             color: 'green',
             description: 'Your vote has been submitted',
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error voting:', error);
         toast.add({
-            title: voteType === 'upvote' ? 'Error upvoting' : 'Error downvoting',
+            title: error.response.data.statusMessage,
             color: 'red',
             description: 'Please try again',
         });
@@ -111,36 +111,42 @@ const sortedAnswers = computed(() => {
 </script>
 
 <template>
-    <div class="px-4 mx-auto mt-8 mb-24 md:px-8" v-if="data?.data">
+    <div class="px-4 mx-auto mt-8 mb-24 md:px-8">
         <UCard>
+            <div v-if="!data?.data && pending">
+                <UCard>
+                    <USkeleton class="min-w-full min-h-full rounded-lg" />
+                </UCard>
+            </div>
             <UCard>
                 <template #header>
-                    <h1 class="text-2xl font-bold">{{ data.data.title }}</h1>
+                    <h1 class="text-2xl font-bold">{{ data?.data?.title }}</h1>
                     <div class="flex items-center mt-2 text-sm text-gray-500">
                         <NuxtImg class="w-6 h-6 mr-2 rounded-full"
-                            :src="data.data.author ? (data.data.author as IProfile).avatar : '/img/profile-blank.png'"
-                            :alt="data.data.author ? (data.data.author as IProfile).fullName : 'Anonymous'" />
-                        <span>{{ data.data.author ? (data.data.author as IProfile).fullName : 'Anonymous' }}</span>
+                            :src="data?.data?.author ? (data?.data?.author as IProfile).avatar : '/img/profile-blank.png'"
+                            :alt="data?.data?.author ? (data?.data?.author as IProfile).fullName : 'Anonymous'" />
+                        <span>{{ data?.data?.author ? (data?.data?.author as IProfile).fullName : 'Anonymous' }}</span>
                         <span class="mx-2">•</span>
-                        <span>asked {{ formatDate(data.data.createdAt) }}</span>
+                        <span>asked {{ formatDate(data?.data?.createdAt as Date) }}</span>
+
                     </div>
                 </template>
 
                 <div class="mt-4 mb-6">
-                    <TiptapShow :content="data.data.body" />
+                    <TiptapShow :content="data?.data?.body as string" />
                 </div>
 
                 <div class="flex items-center space-x-4">
                     <UButton icon="i-heroicons-arrow-up" color="gray" size="sm" variant="ghost" :padded="false"
                         @click="voteQuestion('upvote')" />
-                    <span class="text-sm font-semibold">{{ data.data.totalVotes }}</span>
+                    <span class="text-sm font-semibold">{{ data?.data?.totalVotes }}</span>
                     <UButton icon="i-heroicons-arrow-down" color="gray" size="sm" variant="ghost" :padded="false"
                         @click="voteQuestion('downvote')" />
                 </div>
 
                 <template #footer>
                     <div class="flex flex-wrap gap-2">
-                        <UBadge v-for="tag in data.data.tags" :key="tag" color="blue" variant="soft">
+                        <UBadge v-for="tag in data?.data?.tags" :key="tag" color="blue" variant="soft">
                             {{ tag }}
                         </UBadge>
                     </div>

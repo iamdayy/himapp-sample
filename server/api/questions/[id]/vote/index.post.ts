@@ -1,8 +1,9 @@
 import { ProfileModel } from "~/server/models/ProfileModel";
 import { QuestionModel } from "~/server/models/QuestionModel";
 import { IProfile } from "~/types";
+import type { IResponse } from "~/types/IResponse";
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<IResponse> => {
   try {
     const questionId = event.context.params?.id;
     const { voteType } = await readBody(event);
@@ -80,13 +81,11 @@ export default defineEventHandler(async (event) => {
     return {
       statusCode: 200,
       statusMessage: "Vote recorded successfully",
-      totalVotes: question.totalVotes,
     };
-  } catch (error) {
-    console.error("Error voting on question:", error);
-    throw createError({
+  } catch (error: any) {
+    return {
       statusCode: 500,
-      statusMessage: "Internal server error",
-    });
+      statusMessage: error.message,
+    };
   }
 });

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { array, object, string } from 'yup';
 import type { IConfig } from "~/types";
+import type { IConfigResponse, IResponse } from '~/types/IResponse';
 definePageMeta({
     layout: 'dashboard',
     middleware: 'auth'
@@ -10,11 +11,11 @@ useHead({
     title: 'Config'
 });
 
-const { data } = await useAsyncData<{ body: IConfig }>(() => $fetch("/api/config"));
+const { data } = await useAsyncData(() => $fetch<IConfigResponse>("/api/config"));
 const { organizer } = useOrganizer();
 const toast = useToast();
 
-const Config = ref<IConfig>(data.value?.body || { dailyManagements: [], departments: [] });
+const Config = ref<IConfig>(data.value?.data || { dailyManagements: [], departments: [] });
 const newDailyManagement = ref('');
 const openPopoverAddDailyManagement = ref(false);
 const newDepartment = ref('');
@@ -69,7 +70,7 @@ const schema = object({
 
 const onSubmit = async () => {
     try {
-        await $fetch('/api/config', {
+        await $fetch<IResponse>('/api/config', {
             method: 'POST',
             body: Config.value
         });

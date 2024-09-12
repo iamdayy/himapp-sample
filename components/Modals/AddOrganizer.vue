@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import type { IConfig, IOrganizer } from '~/types';
+import type { IOrganizer } from '~/types';
+import type { IConfigResponse, IOrganizerResponse, IProfileResponse } from '~/types/IResponse';
 
 const modal = useModal();
 const { $api } = useNuxtApp();
+const toast = useToast();
 const items = [
     {
         slot: 'dailyManager',
@@ -14,11 +16,17 @@ const items = [
     }
 ]
 
-const { data } = await useAsyncData<{ body: IConfig }>(() => $fetch("/api/config"));
+const { data } = await useAsyncData<IConfigResponse>(() => $fetch<IConfigResponse>("/api/config"));
+const { data: profileData } = await useAsyncData(() => $fetch<IProfileResponse>("/api/profile"));
 const { organizer: org } = useOrganizer();
+
+const emits = defineEmits<{
+    (e: 'refreshTrigger'): void
+}>();
+
 const dailyManagements = computed(() => {
     if (!data.value) return [];
-    return data.value?.body.dailyManagements.map((management) => {
+    return data.value?.data?.dailyManagements.map((management) => {
         return {
             position: management,
             profile: 0,
@@ -28,7 +36,7 @@ const dailyManagements = computed(() => {
 
 const departements = computed(() => {
     if (!data.value) return [];
-    return data.value?.body.departments.map((department) => {
+    return data.value?.data?.departments.map((department) => {
         return {
             name: department,
             coordinator: 0,
@@ -55,30 +63,6 @@ const departementsTabs = computed(() => {
     })
 });
 
-
-const addDailyManager = () => {
-    organizer.value.dailyManagement.push({
-        position: '',
-        profile: 0,
-    });
-}
-
-const removeDailyManager = (i: number) => {
-    organizer.value.dailyManagement.splice(i, 1);
-}
-
-const addDepartement = (i: number) => {
-    organizer.value.department.push({
-        name: 'New Departement',
-        coordinator: 0,
-        members: [],
-    });
-}
-
-const deleteDepartement = (i: number) => {
-    organizer.value.department.splice(i, 1);
-}
-
 const addMember = (i: number) => {
     (organizer.value.department[i].members as number[]).push(21060202001);
 }
@@ -88,11 +72,26 @@ const deleteMember = (i: number) => {
 }
 
 const addOrganizer = async () => {
-    const added = await $api('/api/organizer', {
+    const added = await $api<IOrganizerResponse>('/api/organizer', {
         method: 'POST',
         body: organizer.value,
     });
-    console.log(added);
+    toast.add({
+        title: 'Organizer added',
+        description: 'Organizer has been added',
+        color: 'green',
+    });
+    modal.close();
+    emits('refreshTrigger');
+}
+
+/**
+ * Get the full name of a user from their NIM
+ * @param {number | undefined} NIM - The NIM (Nomor Induk Mahasiswa) of the user
+ * @returns {string | undefined} The full name of the user, or undefined if not found
+ */
+const getNameFromNIM = (NIM?: number): string | undefined => {
+    return profileData.value?.data?.profiles.find((profile) => profile.NIM == NIM)?.fullName;
 }
 
 watch(() => organizer.value.period.start, (newVal) => {
@@ -141,6 +140,10 @@ watch(() => organizer.value.period.start, (newVal) => {
                                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIM</label>
                                 <UInput type="text" name="NIM" id="NIM" placeholder="21060202001" required
                                     v-model="organizer.dailyManagement[i].profile" class="w-full" />
+                                <label :for="`${organizer.dailyManagement[i].profile}-profile`"
+                                    class="block mt-1 text-sm font-medium text-gray-900 dark:text-white">{{
+                                        getNameFromNIM(organizer.dailyManagement[i].profile as number)
+                                    }}</label>
                             </div>
                         </div>
                     </UCard>
@@ -163,6 +166,10 @@ watch(() => organizer.value.period.start, (newVal) => {
                                         <UInput type="number" name="Coordinator" id="Coordinator"
                                             placeholder="21060202001" required
                                             v-model="organizer.department[index].coordinator" class="w-full" />
+                                        <label :for="`${organizer.department[index].coordinator}-profile`"
+                                            class="block mt-1 text-sm font-medium text-gray-900 dark:text-white">{{
+                                                getNameFromNIM(organizer.department[index].coordinator as number)
+                                            }}</label>
                                     </div>
                                     <div class="col-span-12">
                                         <label for="Member"
@@ -173,6 +180,10 @@ watch(() => organizer.value.period.start, (newVal) => {
                                                 <UInput type="number" name="Member" id="Member"
                                                     placeholder="21060202001" required
                                                     v-model="organizer.department[index].members[i]" class="w-full" />
+                                                <label :for="`${organizer.department[index].members[i]}-profile`"
+                                                    class="block mt-1 text-sm font-medium text-gray-900 dark:text-white">{{
+                                                        getNameFromNIM(organizer.department[index].members[i] as number)
+                                                    }}</label>
                                             </div>
                                             <div class="flex items-end justify-center col-span-1">
                                                 <UButton @click="deleteMember(index)" icon="i-heroicons-minus"
@@ -202,4 +213,4 @@ watch(() => organizer.value.period.start, (newVal) => {
             </template>
         </UCard>
     </UModal>
-</template>
+</template>, IProfileResponse

@@ -189,7 +189,7 @@ export interface IPost {
 }
 
 export interface IPhoto {
-  _id: string;
+  _id?: string;
   title: string;
   image: string;
 }

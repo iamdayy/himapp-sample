@@ -1,18 +1,18 @@
 import { Types } from "mongoose";
 import { AgendaModel } from "~/server/models/AgendaModel";
 import { ProfileModel } from "~/server/models/ProfileModel";
-
+import { IError, IResponse } from "~/types/IResponse";
 /**
  * Handles POST requests for registering a user to an event.
  * @param {H3Event} ev - The H3 event object.
  * @returns {Promise<Object>} The result of the registration operation.
  * @throws {H3Error} If an error occurs during the process.
  */
-export default defineEventHandler(async (ev) => {
+export default defineEventHandler(async (ev): Promise<IResponse | IError> => {
   const { NIM, id } = await readBody(ev);
   try {
     // Ensure the user is authenticated and has the necessary permissions
-    const user = ev.context.auth;
+    const user = ev.context.user;
     if (!user) {
       throw createError({
         statusCode: 403,
@@ -53,16 +53,16 @@ export default defineEventHandler(async (ev) => {
 
     // Return success response
     return {
-      status: true,
+      statusCode: 200,
       statusMessage: `Successfully registered for agenda: ${agenda.title}`,
     };
   } catch (error: any) {
     // Handle any errors that occur during the process
-    throw createError({
+    return {
       statusCode: error.statusCode || 500,
       statusMessage:
         error.message ||
         "An unexpected error occurred during agenda registration",
-    });
+    };
   }
 });

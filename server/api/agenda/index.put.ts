@@ -1,15 +1,15 @@
 import { AgendaModel } from "~/server/models/AgendaModel";
-
+import { IError, IResponse } from "~/types/IResponse";
 /**
  * Handles PUT requests for updating an existing event.
  * @param {H3Event} ev - The H3 event object.
  * @returns {Promise<Object>} The result of the update operation.
  * @throws {H3Error} If an error occurs during the process.
  */
-export default defineEventHandler(async (ev) => {
+export default defineEventHandler(async (ev): Promise<IResponse | IError> => {
   try {
     // Ensure the user is authenticated and has the necessary permissions
-    const user = ev.context.auth;
+    const user = ev.context.user;
     if (!user) {
       throw createError({
         statusCode: 403,
@@ -56,11 +56,11 @@ export default defineEventHandler(async (ev) => {
     };
   } catch (error: any) {
     // Handle any errors that occur during the process
-    return createError({
+    return {
       statusCode: error.statusCode || 500,
-      message:
+      statusMessage:
         error.message ||
         "An unexpected error occurred while updating the agenda",
-    });
+    };
   }
 });
