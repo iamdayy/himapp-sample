@@ -8,7 +8,7 @@ export default defineNuxtConfig({
     mongodb_uri: process.env.MONGODB_URI,
     mongodb_username: process.env.MONGODB_USERNAME,
     mongodb_password: process.env.MONGODB_PASSWORD,
-    dbName: "himatika",
+    dbName: process.env.DBNAME,
     mount: process.env.MOUNT,
     public: {
       appname: process.env.APPNAME,
