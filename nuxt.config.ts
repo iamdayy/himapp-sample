@@ -1,6 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2024-04-03",
+  nitro: {
+    preset: "bun",
+  },
   runtimeConfig: {
     mongodb_uri: process.env.MONGODB_URI,
     mongodb_username: process.env.MONGODB_USERNAME,
@@ -26,9 +29,10 @@ export default defineNuxtConfig({
     "nuxt-tiptap-editor",
     "@vueuse/nuxt",
   ],
-  ui: {
-    icons: ["heroicons", "uil", "ion", "ph"],
+  icon: {
+    collections: ["heroicons", "uil", "ion", "ph"],
   },
+  ui: {},
   tailwindcss: {
     cssPath: "~/assets/css/tailwind.css",
   },
