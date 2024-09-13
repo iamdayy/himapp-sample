@@ -20,7 +20,7 @@ const randomPhotos = computed(() => {
 
 const organizer = computed(() => {
     if (organizers.value) {
-        return organizers.value.find((organizer) => new Date(organizer.period.start).getFullYear() === Number(selectedPeriod.value.split(" - ")[0]) && new Date(organizer.period.end).getFullYear() === Number(selectedPeriod.value.split(" - ")[1]));
+        return organizers.value.find((organizer) => new Date(organizer.period.start).getFullYear() == Number(selectedPeriod.value.split(" - ")[0]) && new Date(organizer.period.end).getFullYear() == Number(selectedPeriod.value.split(" - ")[1]));
     }
     return null;
 });
