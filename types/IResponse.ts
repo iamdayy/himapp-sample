@@ -56,7 +56,10 @@ export interface IOrganizerResponse extends IResponse {
 }
 
 export interface IPhotoResponse extends IResponse {
-  data?: IPhoto[];
+  data?: {
+    photos: IPhoto[];
+    length: number;
+  };
 }
 
 /**

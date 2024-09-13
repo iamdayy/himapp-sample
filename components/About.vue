@@ -1,15 +1,17 @@
 <script setup lang='ts'>
 import { useWindowSize } from '@vueuse/core';
-import type { IPhoto, IProfile } from '~/types';
+import type { IProfile } from '~/types';
+import type { IPhotoResponse } from '~/types/IResponse';
 
 const { organizers } = useOrganizer();
 
 
-const { data: photos } = useAsyncData('photos', () => $fetch<IPhoto[]>('/api/photo'));
+const { data } = useAsyncData('photos', () => $fetch<IPhotoResponse>('/api/photo'));
 
 const randomPhotos = computed(() => {
-    if (photos.value) {
-        const shuffled = [...photos.value].sort(() => 0.5 - Math.random());
+
+    if (data.value) {
+        const shuffled = [...(data.value.data?.photos || [])].sort(() => 0.5 - Math.random());
         return shuffled.slice(0, 12);
     }
     return [];
@@ -119,8 +121,8 @@ const responsiveClasses = computed(() => ({
                     baik secara keilmuan maupun sosial.
                 </p>
             </div>
-            <RandomBuble v-if="photos" :photos="randomPhotos" data-aos="fade-left" data-aos-easing="ease-in-out"
-                data-aos-duration="800" data-aos-anchor=".about" />
+            <RandomBuble v-if="randomPhotos.length > 0" :photos="randomPhotos" data-aos="fade-left"
+                data-aos-easing="ease-in-out" data-aos-duration="800" data-aos-anchor=".about" />
         </div>
         <div class="flex flex-col justify-center px-3 py-8">
             <UTabs :items="tabItems" class="w-full">

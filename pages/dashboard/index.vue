@@ -180,6 +180,11 @@ const links = computed(() => [
             to: '/administrators/organizers'
         },
         {
+            label: 'Gallery',
+            icon: 'i-heroicons-photo',
+            to: '/administrators/photos'
+        },
+        {
             label: 'Config',
             icon: 'i-heroicons-cog',
             to: '/administrators/config'
@@ -277,7 +282,7 @@ onMounted(() => {
                                     <div>
                                         <h2 class="text-2xl font-bold text-gray-800 dark:text-white">{{
                                             user.username
-                                            }}
+                                        }}
                                         </h2>
                                         <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">{{
                                             user.profile.NIM }}
@@ -313,7 +318,7 @@ onMounted(() => {
                                 <div class="flex items-center justify-between w-full mb-2">
                                     <h2 class="text-3xl text-gray-700 text-bold dark:text-gray-400">{{
                                         agendasMe.length
-                                    }}</h2>
+                                        }}</h2>
                                     <UIcon name="i-heroicons-calendar" class="text-6xl" />
                                 </div>
                                 <ClientOnly>
@@ -327,7 +332,7 @@ onMounted(() => {
                                 <div class="flex items-center justify-between w-full mb-2">
                                     <h2 class="text-3xl text-gray-700 text-bold dark:text-gray-400">{{
                                         projectsMe.length
-                                    }}</h2>
+                                        }}</h2>
                                     <UIcon name="i-heroicons-code-bracket" class="text-6xl" />
                                 </div>
                                 <ClientOnly>
@@ -446,7 +451,7 @@ onMounted(() => {
                                 <div>
                                     <h2 class="text-xl font-extrabold text-gray-800 dark:text-white">{{
                                         user.username
-                                        }}
+                                    }}
                                     </h2>
                                     <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">{{
                                         user.profile.NIM }}
