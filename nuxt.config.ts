@@ -9,7 +9,7 @@ export default defineNuxtConfig({
     mongodb_username: process.env.MONGODB_USERNAME,
     mongodb_password: process.env.MONGODB_PASSWORD,
     dbName: process.env.DBNAME,
-    mount: process.env.MOUNT,
+    storageDir: process.env.STORAGE_DIR,
     public: {
       appname: process.env.APPNAME,
       api_uri: process.env.PUBLIC_URI_API,
@@ -18,6 +18,18 @@ export default defineNuxtConfig({
   },
   devtools: { enabled: true },
   ssr: false,
+  image: {
+    providers: {
+      imagekit: {
+        name: "localProvider",
+        provider: "~/providers/localProvider.ts",
+        options: {
+          // ... provider options
+          baseURL: process.env.PUBLIC_URI,
+        },
+      },
+    },
+  },
   modules: [
     "@nuxt/ui",
     "@nuxtjs/tailwindcss",
@@ -28,7 +40,11 @@ export default defineNuxtConfig({
     "nuxt-pdfmake",
     "nuxt-tiptap-editor",
     "@vueuse/nuxt",
+    "nuxt-file-storage",
   ],
+  fileStorage: {
+    mount: process.env.STORAGE_DIR,
+  },
   icon: {
     collections: ["heroicons", "uil", "ion", "ph"],
   },

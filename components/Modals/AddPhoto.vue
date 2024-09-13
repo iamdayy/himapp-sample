@@ -2,6 +2,7 @@
 import { ModalsCropImage } from '#components';
 import imageCompression from 'browser-image-compression';
 import type { IPhoto } from '~/types';
+import type { IReqPhoto } from '~/types/IRequestPost';
 import type { IResponse } from '~/types/IResponse';
 /**
  * Composables
@@ -9,7 +10,7 @@ import type { IResponse } from '~/types/IResponse';
 const { $api } = useNuxtApp();
 const toast = useToast();
 const modal = useModal();
-
+const { convert } = useImageToBase64();
 /**
  * Emits
  */
@@ -19,6 +20,7 @@ const emit = defineEmits(["triggerRefresh"]);
  * Reactive references
  */
 const openModal = ref<Boolean>(false);
+const loadingCompress = ref<Boolean>(false);
 const file = ref<File>();
 const fileToCropped = ref<{ blob: string, name: string }>({
     blob: "",
@@ -38,15 +40,16 @@ const photo = ref<IPhoto>({
  */
 const addPhoto = async () => {
     try {
-        const body = new FormData();
-        body.append('mainImage', file.value!);
-        Object.entries(photo.value).forEach(([key, value]) => {
-            let v = value;
-            if (typeof value == 'object') {
-                v = JSON.stringify(value)
-            }
-            body.append(key, v as string);
-        });
+        const body: IReqPhoto = {
+            image: {
+                name: file.value!.name,
+                content: await convert(file.value!),
+                size: file.value!.size.toString(),
+                type: file.value!.type,
+                lastModified: file.value!.lastModified.toString()
+            },
+            title: photo.value.title
+        }
         const added = await $api<IResponse>("/api/photo", {
             method: "POST",
             body
@@ -55,6 +58,7 @@ const addPhoto = async () => {
         modal.close();
         emit("triggerRefresh");
     } catch (error) {
+        console.log(error);
         toast.add({ title: "Failed to add new Photos" });
     }
 };
@@ -64,26 +68,36 @@ const addPhoto = async () => {
  * @param {File} f - Cropped image file
  */
 const onCropped = async (f: File) => {
-    const options = {
-        maxSizeMB: 0.2,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
+    try {
+        openModal.value = false;
+        file.value = f;
+        const blob = URL.createObjectURL(f);
+        fileToCropped.value.blob = blob;
+    } catch (error) {
+        console.log(error);
+        toast.add({ title: "Failed to compress image" });
     }
-    const compressedFile = await imageCompression(f, options);
-    file.value = compressedFile;
-    const blob = URL.createObjectURL(compressedFile);
-    fileToCropped.value.blob = blob;
 }
 
 /**
  * Handle image change
  * @param {File} f - Selected image file
  */
-const onChangeImage = (f: File) => {
-    const blob = URL.createObjectURL(f);
+const onChangeImage = async (f: File) => {
+    loadingCompress.value = true;
+    const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+        alwaysKeepResolution: true
+    }
+    const compressedFile = await imageCompression(f, options);
+    const blob = URL.createObjectURL(compressedFile);
+
     fileToCropped.value.name = f.name;
     fileToCropped.value.blob = blob;
     openModal.value = true;
+    loadingCompress.value = false;
 }
 
 
@@ -136,7 +150,9 @@ const uiSize = computed(() => isMobile.value ? 'sm' : isTablet.value ? 'md' : 'l
                         <label for="Title"
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Image</label>
                         <DropFile @change="onChangeImage" accept="image/*">
-                            <NuxtImg :src="fileToCropped.blob" v-if="file" />
+                            <div v-if="file">
+                                <NuxtImg :src="fileToCropped.blob" />
+                            </div>
                         </DropFile>
                         <ModalsCropImage v-model="openModal" :img="fileToCropped.blob" :stencil="{
                             movable: true,
@@ -145,8 +161,8 @@ const uiSize = computed(() => isMobile.value ? 'sm' : isTablet.value ? 'md' : 'l
                     </div>
                 </div>
                 <!-- Submit button -->
-                <UButton @click.prevent="addPhoto" label="Save" icon="i-heroicons-clipboard" block trailing
-                    :class="responsiveClasses.button" />
+                <UButton @click.prevent="addPhoto" :loading="loadingCompress" label="Save" icon="i-heroicons-clipboard"
+                    block trailing :class="responsiveClasses.button" />
             </div>
         </UCard>
     </UModal>

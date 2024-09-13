@@ -23,13 +23,13 @@ watch(data, () => {
     <div class="p-2 py-16 text-gray-100 md:mx-auto md:p-5 dark:text-gray-800">
         <UCard v-if="data?.data?.post">
             <template #header>
-                <h1 rel="noopener noreferrer" href="#"
-                    class="inline-block mb-2 text-3xl font-semibold text-gray-900 sm:text-5xl dark:text-gray-100">{{
-                        data?.data?.post?.title }}</h1>
+                <h1 class="inline-block mb-2 text-3xl font-semibold text-gray-900 sm:text-5xl dark:text-gray-100">{{
+                    data?.data?.post?.title }}</h1>
 
             </template>
             <div class="max-w-screen-xl mx-auto mb-6 space-y-2">
-                <NuxtImg :src="data?.data?.post?.mainImage" w="128" class="object-cover w-full rounded" />
+                <NuxtImg provider="localProvider" :src="data?.data?.post?.mainImage as string" w="128"
+                    class="object-cover w-full rounded" />
                 <p class="text-xs text-gray-400 dark:text-gray-600">By
                     <span class="text-xs hover:underline">{{ (data?.data?.post?.author as IProfile).fullName }}</span>
                     on

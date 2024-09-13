@@ -16,6 +16,14 @@ export type IConfig = {
   departments: string[];
 };
 
+export interface IFile {
+  name: string;
+  content: string;
+  size: string;
+  type: string;
+  lastModified: string;
+}
+
 /**
  * Represents a link with a name, href, and optional current status.
  */
@@ -175,7 +183,7 @@ export interface IProject {
  */
 export interface IPost {
   title: string;
-  mainImage: string; // URL of the main image
+  mainImage: string | IFile; // URL of the main image
   body: string;
   slug?: string;
   categories: {
@@ -191,7 +199,7 @@ export interface IPost {
 export interface IPhoto {
   _id?: string;
   title: string;
-  image: string;
+  image: string | IFile;
 }
 
 export interface IVote {

@@ -38,7 +38,7 @@ const pageCountOptions = computed(() => [10, 20, 50, 100, 200, data.value.data?.
             <NuxtLink v-for="post, i in data.data?.posts" :to="`/post/${post.slug}`">
                 <UCard class="max-w-lg min-h-32">
                     <template #header>
-                        <NuxtImg :src="post.mainImage" class="mx-auto rounded-lg" />
+                        <NuxtImg provider="localProvider" :src="post.mainImage as string" class="mx-auto rounded-lg" />
                     </template>
                     <div class="space-y-2">
                         <h2 class="text-xl font-semibold md:text-2xl line-clamp-1">{{ post.title }}</h2>

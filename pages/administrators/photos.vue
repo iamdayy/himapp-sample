@@ -112,7 +112,8 @@ const deletePhoto = (id: string) => {
             <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-4">
                 <div v-for="(group, groupIndex) in groupedPhotos" :key="groupIndex" class="grid gap-4">
                     <div v-for="photo in group" :key="photo.title" class="relative group w-96">
-                        <NuxtImg class="object-cover w-full h-full rounded-lg" :src="photo.image" :alt="photo.title" />
+                        <NuxtImg provider="localProvider" class="object-cover w-full h-full rounded-lg"
+                            :src="photo.image as string" :alt="photo.title" />
                         <div
                             class="absolute top-0 left-0 flex flex-col items-center justify-center w-full h-0 duration-500 bg-black opacity-0 group-hover:h-full group-hover:opacity-70">
                             <UButton icon="i-heroicons-trash" size="xl" variant="ghost" color="red"

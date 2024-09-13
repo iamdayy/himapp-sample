@@ -228,8 +228,9 @@ onMounted(() => {
                             @change="changeMode" size="lg" class="mr-4" />
                         <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
                             :popper="{ placement: 'bottom-start' }">
-                            <NuxtImg v-if="isLoggedIn" :src="user.profile.avatar || '/img/profile-blank.png'" width="24"
-                                height="24" class="object-cover rounded-full max-w-8 aspect-square" />
+                            <NuxtImg provider="localProvider" v-if="isLoggedIn"
+                                :src="user.profile.avatar || '/img/profile-blank.png'"
+                                class="object-cover rounded-full max-w-8 aspect-square" />
                             <UAvatar v-else icon="i-heroicons-arrow-right-end-on-rectangle" />
 
                             <template #account="{ item }">
@@ -265,19 +266,20 @@ onMounted(() => {
         <main>
             <div class="px-3 py-6 pt-20 mx-auto sm:px-6 lg:px-8 dark:bg-indigo-900/40 bg-gray-200/40">
                 <div class="flex flex-col w-full px-4 py-3 space-y-6 md:flex-row md:space-y-0 md:space-x-6">
-                    <UCard class="hidden w-full md:w-1/3 lg:w-1/4 md:block"
+                    <UCard class="hidden w-full overflow-auto md:w-1/3 text-wrap lg:w-1/4 md:block"
                         :ui="{ divide: 'divide-y divide-gray-200/60 dark:divide-gray-800/60' }">
                         <template #header>
                             <NuxtLink to="/dashboard/profile">
                                 <div class="flex items-center w-full gap-6">
-                                    <NuxtImg :src="user.profile.avatar || '/img/profile-blank.png'" width="180"
-                                        height="180" class="object-cover rounded-full max-w-36 aspect-square" />
+                                    <NuxtImg provider="localProvider"
+                                        :src="user.profile.avatar || '/img/profile-blank.png'"
+                                        class="object-cover rounded-full max-w-36 aspect-square" />
                                     <div>
-                                        <h2 class="text-2xl font-extrabold text-gray-800 md:text-4xl dark:text-white">{{
+                                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">{{
                                             user.username
                                             }}
                                         </h2>
-                                        <h2 class="text-lg font-semibold text-gray-800 md:text-xl dark:text-gray-200">{{
+                                        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">{{
                                             user.profile.NIM }}
                                         </h2>
                                     </div>

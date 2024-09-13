@@ -1,10 +1,10 @@
 import fs from "fs";
-import { readFiles } from "h3-formidable";
-import { firstValues } from "h3-formidable/helpers";
 import { Types } from "mongoose";
 import path from "path";
 import { PostModel } from "~/server/models/PostModel";
 import { ProfileModel } from "~/server/models/ProfileModel";
+import { IFile } from "~/types";
+import { IReqPost } from "~/types/IRequestPost";
 import type { IResponse } from "~/types/IResponse";
 const config = useRuntimeConfig();
 
@@ -17,10 +17,8 @@ const config = useRuntimeConfig();
 export default defineEventHandler(async (event): Promise<IResponse> => {
   try {
     const { slug } = getQuery(event);
-    const BASE_MAINIMAGE_FOLDER = "img/posts";
+    const BASE_MAINIMAGE_FOLDER = "/uploads/img/posts";
     let imageUrl = "";
-    let oldPath = "";
-    let newPath = "";
 
     // Check user authorization
     const user = event.context.user;
@@ -46,55 +44,46 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
       });
     }
 
-    // Parse the multipart form data
-    const { fields, files, form } = await readFiles(event);
-    const exceptions = [""];
-    const single = firstValues(form, fields, exceptions);
-
+    const body = await readBody<IReqPost>(event);
+    const mainImage = body.mainImage as IFile;
     // Handle main image upload
-    if (files.mainImage) {
-      const mainImage = files.mainImage[0];
-      if (mainImage.mimetype?.startsWith("image/")) {
+    if (mainImage) {
+      if (mainImage.type?.startsWith("image/")) {
         // Remove old image if it exists
         if (post.mainImage) {
-          const exist = fs.existsSync(
-            `${path.join(config.mount, post.mainImage)}`
+          const imagePath = path.join(
+            config.storageDir,
+            post.mainImage as string
           );
-          if (exist) {
-            fs.rmSync(`${path.join(config.mount, post.mainImage)}`);
+          if (fs.existsSync(imagePath)) {
+            deleteFile(post.mainImage as string);
           }
         }
         // Save new image
-        let imageName =
-          Date.now() +
-          Math.round(Math.random() * 100000) +
-          mainImage.originalFilename!;
-        oldPath = mainImage.filepath;
-        newPath = `${path.join(
-          config.mount,
-          BASE_MAINIMAGE_FOLDER,
-          imageName
-        )}`;
-        fs.copyFileSync(oldPath, newPath);
-        imageUrl = `/${BASE_MAINIMAGE_FOLDER}/${imageName}`;
+        const hasedImage = await storeFileLocally(
+          mainImage,
+          12,
+          BASE_MAINIMAGE_FOLDER
+        );
+        imageUrl = `/${BASE_MAINIMAGE_FOLDER}/${hasedImage}`;
       } else {
         throw createError({
           statusMessage: "Please upload nothing but images.",
         });
       }
     } else {
-      imageUrl = post.mainImage;
+      imageUrl = post.mainImage as string;
     }
 
     // Update post properties
-    post.title = single.title as unknown as string;
+    post.title = body.title;
     post.mainImage = imageUrl;
-    post.slug = (single.title as unknown as string)
+    post.slug = body.title
       .toLowerCase()
       .replace(/ /g, "-")
       .replace(/[^\w-]+/g, "");
-    post.categories = JSON.parse(single.categories as unknown as string);
-    post.body = single.body as unknown as string;
+    post.categories = body.categories;
+    post.body = body.body;
 
     // Save the updated post
     const saved = await post.save();

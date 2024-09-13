@@ -2,6 +2,7 @@
 import { ModalsCropImage } from '#components';
 import imageCompression from 'browser-image-compression';
 import type { IPost } from '~/types';
+import type { IReqPost } from '~/types/IRequestPost';
 import type { IResponse } from '~/types/IResponse';
 
 /**
@@ -28,7 +29,7 @@ const fileToCropped = ref<{ blob: string, name: string }>({
     blob: "",
     name: ""
 });
-
+const { convert } = useImageToBase64();
 /**
  * Post data structure
  */
@@ -45,15 +46,19 @@ const post = ref<IPost>({
  */
 const addPost = async () => {
     try {
-        const body = new FormData();
-        body.append('mainImage', file.value!);
-        Object.entries(post.value).forEach(([key, value]) => {
-            let v = value;
-            if (typeof value == 'object') {
-                v = JSON.stringify(value)
-            }
-            body.append(key, v as string);
-        });
+        const body: IReqPost = {
+            title: post.value.title,
+            mainImage: {
+                name: file.value!.name,
+                content: await convert(file.value!),
+                size: file.value!.size.toString(),
+                type: file.value!.type,
+                lastModified: file.value!.lastModified.toString()
+            },
+            body: post.value.body,
+            slug: post.value.slug,
+            categories: post.value.categories
+        }
         const added = await $api<IResponse>("/api/post", {
             method: "POST",
             body
@@ -71,14 +76,8 @@ const addPost = async () => {
  * @param {File} f - Cropped image file
  */
 const onCropped = async (f: File) => {
-    const options = {
-        maxSizeMB: 0.2,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-    }
-    const compressedFile = await imageCompression(f, options);
-    file.value = compressedFile;
-    const blob = URL.createObjectURL(compressedFile);
+    file.value = f;
+    const blob = URL.createObjectURL(f);
     fileToCropped.value.blob = blob;
 }
 
@@ -86,8 +85,15 @@ const onCropped = async (f: File) => {
  * Handle image change
  * @param {File} f - Selected image file
  */
-const onChangeImage = (f: File) => {
-    const blob = URL.createObjectURL(f);
+const onChangeImage = async (f: File) => {
+    const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+        alwaysKeepResolution: true
+    }
+    const compressedFile = await imageCompression(f, options);
+    const blob = URL.createObjectURL(compressedFile);
     fileToCropped.value.name = f.name;
     fileToCropped.value.blob = blob;
     openModal.value = true;

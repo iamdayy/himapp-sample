@@ -139,8 +139,9 @@ const items = computed(() => isLoggedIn.value ? itemsIsLogged(user.value) : item
                         <UDropdown :items="items"
                             :ui="{ width: 'max-w-36', item: { disabled: 'cursor-text select-text' } }"
                             :popper="{ placement: 'bottom-start' }">
-                            <NuxtImg v-if="isLoggedIn" :src="user.profile.avatar || '/img/profile-blank.png'" width="24"
-                                height="24" class="object-cover rounded-full max-w-8 aspect-square" />
+                            <NuxtImg v-if="isLoggedIn" provider="localProvider"
+                                :src="user.profile.avatar || '/img/profile-blank.png'"
+                                class="object-cover rounded-full max-w-8 aspect-square" />
                             <UButton v-else icon="i-heroicons-arrow-right-end-on-rectangle" variant="link"
                                 color="gray" />
 

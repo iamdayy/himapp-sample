@@ -1,7 +1,8 @@
 import fs from "fs";
-import { readFiles } from "h3-formidable";
 import path from "path";
 import { ProfileModel } from "~/server/models/ProfileModel";
+import { IFile } from "~/types";
+import { IReqProfileAvatar } from "~/types/IRequestPost";
 import { IResponse } from "~/types/IResponse";
 
 const config = useRuntimeConfig();
@@ -14,13 +15,11 @@ const config = useRuntimeConfig();
  */
 export default defineEventHandler(async (event): Promise<IResponse> => {
   try {
-    const { files } = await readFiles(event);
     const { NIM } = getQuery(event);
-    const avatarFile = files.avatar![0];
-    const BASE_AVATAR_FOLDER = "img/avatars";
+    const body = await readBody<IReqProfileAvatar>(event);
+    const avatarFile = body.avatar as IFile;
+    const BASE_AVATAR_FOLDER = "/uploads/img/avatars";
     let imageUrl = "";
-    let oldPath = "";
-    let newPath = "";
 
     // Ensure the user is authenticated and authorized
     const user = event.context.user;
@@ -49,21 +48,20 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
 
     // Remove old avatar if it exists
     if (profile.avatar) {
-      const oldAvatarPath = path.join(config.mount, profile.avatar);
+      const oldAvatarPath = path.join(config.storageDir, profile.avatar);
       if (fs.existsSync(oldAvatarPath)) {
-        fs.rmSync(oldAvatarPath);
+        deleteFile(profile.avatar);
       }
     }
 
     // Process and save the new avatar
-    if (avatarFile.mimetype?.startsWith("image/")) {
-      const imageName = `${Date.now()}_${Math.round(
-        Math.random() * 100000
-      )}_${avatarFile.originalFilename!}`;
-      oldPath = avatarFile.filepath;
-      newPath = path.join(config.mount, BASE_AVATAR_FOLDER, imageName);
-      fs.copyFileSync(oldPath, newPath);
-      imageUrl = `/${BASE_AVATAR_FOLDER}/${imageName}`;
+    if (avatarFile.type?.startsWith("image/")) {
+      const hashedName = await storeFileLocally(
+        avatarFile,
+        12,
+        BASE_AVATAR_FOLDER
+      );
+      imageUrl = `${BASE_AVATAR_FOLDER}/${hashedName}`;
     } else {
       throw createError({
         statusCode: 400,

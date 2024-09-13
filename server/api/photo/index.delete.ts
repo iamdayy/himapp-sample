@@ -25,20 +25,21 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
         statusMessage: "No photo id provided",
       });
     }
-    const photo = await PhotoModel.findByIdAndDelete(id);
+    const photo = await PhotoModel.findById(id);
+    // Delete the associated main image file if it exists
+    if (photo && photo.image) {
+      const imagePath = path.join(config.storageDir, photo.image);
+      if (fs.existsSync(imagePath)) {
+        deleteFile(photo.image);
+      }
+    }
     if (!photo) {
       throw createError({
         statusCode: 404,
         statusMessage: "Photo not found",
       });
     }
-    // Delete the associated main image file if it exists
-    if (photo.image) {
-      const imagePath = path.join(config.mount, photo.image);
-      if (fs.existsSync(imagePath)) {
-        fs.rmSync(imagePath);
-      }
-    }
+    await PhotoModel.findByIdAndDelete(id);
     return { statusCode: 200, statusMessage: "Photo deleted" };
   } catch (error: any) {
     return {

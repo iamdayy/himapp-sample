@@ -23,7 +23,10 @@ export default defineEventHandler(async (event): Promise<IPostResponse> => {
       return {
         statusCode: 200,
         statusMessage: "Post fetched",
-        data: post.toJSON(),
+        data: {
+          post: post.toJSON(),
+          length: 1,
+        },
       };
     }
 

@@ -2,6 +2,7 @@
 import { ModalsCropImage } from "#components";
 import imageCompression from "browser-image-compression";
 import type { IProfile } from "~/types";
+import type { IReqProfileAvatar } from "~/types/IRequestPost";
 
 // Define page metadata
 definePageMeta({
@@ -21,7 +22,7 @@ const { data: user, refresh } = useAuth();
 
 // Fetch administrators data
 const { organizers } = useOrganizer();
-
+const { convert } = useImageToBase64();
 // Get stats
 const { all, allCanMeRegister } = useStats();
 const { $api } = useNuxtApp();
@@ -46,21 +47,29 @@ const onFileChange = async ($event: Event) => {
     }
     if (target && target.files) {
         file.value = target.files[0];
-        const body = new FormData();
-        const blob = URL.createObjectURL(file.value);
+        const compressedFile = await imageCompression(file.value, options);
+        const blob = URL.createObjectURL(compressedFile);
         modal.open(ModalsCropImage, {
             img: blob,
             title: file.value.name,
             async onCropped(file) {
-                const compressedFile = await imageCompression(file, options);
-                body.append('avatar', compressedFile);
+                const body: IReqProfileAvatar = {
+                    avatar: {
+                        name: file.name,
+                        content: await convert(file),
+                        size: file.size,
+                        type: file.type,
+                        lastModified: file.lastModified
+                    }
+                }
                 await $api("/api/profile/avatar", {
                     method: "put",
                     query: {
                         NIM: user.value.profile.NIM
                     },
-                    body,
+                    body
                 });
+                modal.close();
                 refresh();
             }
         });
@@ -363,7 +372,7 @@ const accessGetActivinessLetter = computed(() => ((all.value / allCanMeRegister.
                         variant="link" color="green" @click="editMode = !editMode" />
                 </div>
             </template>
-            <div class="flex w-full gap-3 pt-12 md:flex-col-reverse">
+            <div class="flex flex-col-reverse w-full gap-3 pt-12 md:flex-row">
                 <div class="flex flex-col w-full gap-3 pt-12 md:w-2/3 md:flex-row">
                     <div class="w-full p-4 pt-12 sm:p-8 md:w-1/2">
                         <h2
@@ -459,7 +468,7 @@ const accessGetActivinessLetter = computed(() => ((all.value / allCanMeRegister.
                     <UCard class="mx-2 md:mx-8">
                         <!-- User avatar and profile summary -->
                         <div class="relative w-56 h-56 mx-auto -mt-32 overflow-hidden rounded-full group">
-                            <NuxtImg :src="user.profile.avatar || '/img/profile-blank.png'" width="224" height="224"
+                            <NuxtImg provider="localProvider" :src="user.profile.avatar || '/img/profile-blank.png'"
                                 class="object-cover rounded-full max-w-56 aspect-square" />
                             <div
                                 class="absolute top-0 left-0 flex items-center justify-center w-full h-0 gap-2 duration-500 bg-orange-400 rounded-full opacity-0 bg-opacity-95 group-hover:h-full group-hover:opacity-100">

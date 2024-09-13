@@ -222,12 +222,13 @@ const responsiveClasses = computed(() => ({
             <div class="flex flex-wrap gap-3">
                 <UCard :class="['min-h-32', responsiveClasses.card]" v-for="post, i in data.data?.posts" :key="i">
                     <template #header>
-                        <NuxtImg :src="post.mainImage" class="w-full mx-auto rounded-lg" />
+                        <NuxtImg provider="localProvider" :src="post.mainImage as string"
+                            class="w-full mx-auto rounded-lg" />
                     </template>
                     <div class="space-y-2">
                         <NuxtLink :to="`/post/${post.slug}`" class="text-xl font-semibold sm:text-4xl line-clamp-1">{{
                             post.title
-                            }}</NuxtLink>
+                        }}</NuxtLink>
                     </div>
                     <template #footer>
                         <UCard class="min-w-full min-h-12" :ui="{ body: { padding: 'p-1 sm:p-1 px-3 sm:px-3' } }">

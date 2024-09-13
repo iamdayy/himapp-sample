@@ -1,8 +1,6 @@
-import fs from "fs";
-import { readFiles } from "h3-formidable";
-import { firstValues } from "h3-formidable/helpers";
-import path from "path";
 import { PhotoModel } from "~/server/models/PhotoModel";
+import { IFile } from "~/types";
+import type { IReqPhoto } from "~/types/IRequestPost";
 import { IResponse } from "~/types/IResponse";
 const config = useRuntimeConfig();
 export default defineEventHandler(async (event): Promise<IResponse> => {
@@ -21,37 +19,26 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
         statusMessage: "You must be admin / departement to use this endpoint",
       });
     }
-    const { fields, files, form } = await readFiles(event);
-    const exceptions = [""];
-    const single = firstValues(form, fields, exceptions);
+    const body = await readBody<IReqPhoto>(event);
 
-    const BASE_PHOTO_FOLDER = "img/photos";
+    const BASE_PHOTO_FOLDER = "/uploads/img/photos";
     let imageUrl = "";
-    let oldPath = "";
-    let newPath = "";
-
+    const image = body.image as IFile;
     // Handle main image upload
-    const mainImage = files.mainImage![0];
-    if (mainImage.mimetype?.startsWith("image/")) {
-      let imageName =
-        Date.now() +
-        Math.round(Math.random() * 100000) +
-        mainImage.originalFilename!;
-      oldPath = mainImage.filepath;
-      newPath = `${path.join(config.mount, BASE_PHOTO_FOLDER, imageName)}`;
-      fs.copyFileSync(oldPath, newPath);
-      imageUrl = `/${BASE_PHOTO_FOLDER}/${imageName}`;
+    if (image.type?.startsWith("image/")) {
+      const hashedName = await storeFileLocally(image, 12, BASE_PHOTO_FOLDER);
+      imageUrl = `${BASE_PHOTO_FOLDER}/${hashedName}`;
     } else {
       throw createError({
         statusMessage: "Please upload nothing but images.",
       });
     }
 
-    const body = {
-      ...single,
+    const newPhoto = {
+      ...body,
       image: imageUrl,
     };
-    const photo = await PhotoModel.create(body);
+    const photo = await PhotoModel.create(newPhoto);
     if (!photo) {
       throw createError({
         statusMessage: "Failed to add new photo",

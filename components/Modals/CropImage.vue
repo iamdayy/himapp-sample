@@ -59,7 +59,6 @@ const crop = () => {
             type: blob.type
         });
         emits('cropped', file);
-        model.value = false;
     });
 };
 

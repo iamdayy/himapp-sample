@@ -199,8 +199,9 @@ const links = [
                         <!-- User dropdown -->
                         <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
                             :popper="{ placement: 'bottom-start' }">
-                            <NuxtImg v-if="isLoggedIn" :src="user.profile.avatar || '/img/profile-blank.png'" width="24"
-                                height="24" class="object-cover rounded-full max-w-8 aspect-square" />
+                            <NuxtImg v-if="isLoggedIn" provider="localProvider"
+                                :src="user.profile.avatar || '/img/profile-blank.png'"
+                                class="object-cover rounded-full max-w-8 aspect-square" />
                             <UAvatar v-else icon="i-heroicons-arrow-right-end-on-rectangle" />
 
                             <template #account="{ item }">
@@ -242,7 +243,7 @@ const links = [
 
         <!-- Slide-over for mobile -->
         <USlideover v-model="openSlideOver" :overlay="false" side="left">
-            <div class="flex-1 p-4">
+            <div class="flex-1 p-4 overflow-auto">
                 <UButton icon="i-heroicons-chevron-left" size="xl" variant="link" color="gray" v-if="route.path != '/'"
                     @click="() => { router.back(); openSlideOver = false }" />
                 <UButton color="gray" variant="ghost" size="sm" icon="i-heroicons-x-mark-20-solid"
@@ -252,7 +253,8 @@ const links = [
                         <div class="flex w-full gap-2">
                             <UAvatar :src="user.profile.avatar" size="lg" />
                             <div>
-                                <h2 class="text-xl font-extrabold text-gray-800 dark:text-white">{{ user.username }}
+                                <h2 class="text-xl font-extrabold text-gray-800 dark:text-white">{{
+                                    user.username }}
                                 </h2>
                                 <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">{{ user.profile.NIM
                                     }}</h2>

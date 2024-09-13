@@ -1,10 +1,8 @@
-import fs from "fs";
-import { readFiles } from "h3-formidable";
-import { firstValues } from "h3-formidable/helpers";
 import { Types } from "mongoose";
-import path from "path";
 import { PostModel } from "~/server/models/PostModel";
 import { ProfileModel } from "~/server/models/ProfileModel";
+import { IFile } from "~/types";
+import { IReqPost } from "~/types/IRequestPost";
 import type { IResponse } from "~/types/IResponse";
 const config = useRuntimeConfig();
 
@@ -31,27 +29,18 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
       });
     }
 
-    const BASE_MAINIMAGE_FOLDER = "img/posts";
+    const BASE_MAINIMAGE_FOLDER = "/uploads/img/posts";
     let imageUrl = "";
-    let oldPath = "";
-    let newPath = "";
 
-    // Parse the multipart form data
-    const { fields, files, form } = await readFiles(event);
-    const exceptions = [""];
-    const single = firstValues(form, fields, exceptions);
-
-    // Handle main image upload
-    const mainImage = files.mainImage![0];
-    if (mainImage.mimetype?.startsWith("image/")) {
-      let imageName =
-        Date.now() +
-        Math.round(Math.random() * 100000) +
-        mainImage.originalFilename!;
-      oldPath = mainImage.filepath;
-      newPath = `${path.join(config.mount, BASE_MAINIMAGE_FOLDER, imageName)}`;
-      fs.copyFileSync(oldPath, newPath);
-      imageUrl = `/${BASE_MAINIMAGE_FOLDER}/${imageName}`;
+    const body = await readBody<IReqPost>(event);
+    const mainImage = body.mainImage as IFile;
+    if (mainImage.type?.startsWith("image/")) {
+      const hashedName = await storeFileLocally(
+        mainImage,
+        12,
+        BASE_MAINIMAGE_FOLDER
+      );
+      imageUrl = `${BASE_MAINIMAGE_FOLDER}/${hashedName}`;
     } else {
       throw createError({
         statusMessage: "Please upload nothing but images.",
@@ -59,10 +48,10 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
     }
 
     // Prepare post data
-    const body = {
-      ...single,
-      categories: JSON.parse(single.categories as unknown as string),
-      slug: (single.title as unknown as string)
+    const newPost = {
+      ...body,
+      categories: body.categories,
+      slug: body.title
         .toLowerCase()
         .replace(/ /g, "-")
         .replace(/[^\w-]+/g, ""),
@@ -71,13 +60,13 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
     };
 
     // Create and save the new post
-    const post = new PostModel(body);
+    const post = new PostModel(newPost);
     const saved = await post.save();
     if (!saved) {
-      return {
-        statusCode: 400,
+      throw createError({
+        statusCode: 500,
         statusMessage: `Failed to add new Post ${post.title}`,
-      };
+      });
     }
 
     return {

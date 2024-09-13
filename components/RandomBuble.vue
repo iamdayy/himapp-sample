@@ -52,12 +52,12 @@ onMounted(() => {
                 left: photo.x + 'px',
                 top: photo.y + 'px'
             }" @click="selectPhoto(photo)">
-            <NuxtImg :src="photo.image" alt="logo"
+            <NuxtImg provider="localStorage" :src="photo.image" alt="logo"
                 class="object-cover transition-all duration-300 rounded-full filter blur-sm hover:blur-none" />
         </div>
         <div v-if="photoSelected"
             class="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 min-w-2xl">
-            <NuxtImg :src="photoSelected.image" alt="logo"
+            <NuxtImg provider="localStorage" :src="photoSelected.image" alt="logo"
                 class="transition duration-500 ease-out cursor-pointer min-w-3xl hover:scale-125" />
         </div>
     </div>

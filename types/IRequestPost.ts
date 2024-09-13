@@ -1,5 +1,5 @@
 import type { SortOrder } from "mongoose";
-import type { IAgenda, IProfile, IQuestion } from ".";
+import type { IAgenda, IFile, IPhoto, IPost, IProfile, IQuestion } from ".";
 
 /**
  * Interface for pagination query parameters.
@@ -69,6 +69,13 @@ export interface IReqProfileQuery extends IReqQueryPaginate {
 export interface IReqProfile extends IProfile {}
 
 /**
+ * Interface for profile avatar request, extending IProfile.
+ */
+export interface IReqProfileAvatar {
+  avatar: IFile;
+}
+
+/**
  * Interface for event request, extending IEvent.
  */
 export interface IReqAgenda extends IAgenda {}
@@ -93,6 +100,11 @@ export interface IReqPostQuery extends IReqQueryPaginate {
   slug: string;
 }
 
+/**
+ * Interface for post request, extending IPost.
+ */
+export interface IReqPost extends IPost {}
+
 export interface IReqQuestionQuery extends IReqQueryPaginate {
   /** Field to sort the results by. */
   sort: string;
@@ -108,6 +120,16 @@ export interface IReqQuestionQuery extends IReqQueryPaginate {
   answered: string;
   /** Whether to filter by unanswered questions. */
   unanswered: string;
+}
+
+export interface IReqPhoto extends IPhoto {}
+export interface IReqPhotoQuery extends IReqQueryPaginate {
+  /** Field to sort the results by. */
+  sort: string;
+  /** Sort order. */
+  order: string;
+  /** Photo ID for filtering. */
+  id: string;
 }
 
 export interface IReqQuestion extends IQuestion {

@@ -42,9 +42,9 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
 
     // Delete the associated main image file if it exists
     if (post.mainImage) {
-      const imagePath = path.join(config.mount, post.mainImage);
+      const imagePath = path.join(config.storageDir, post.mainImage as string);
       if (fs.existsSync(imagePath)) {
-        fs.rmSync(imagePath);
+        deleteFile(post.mainImage as string);
       }
     }
 
