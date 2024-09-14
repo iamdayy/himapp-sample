@@ -59,13 +59,12 @@ const imageDimensions = computed(() => ({
             <div class="front" :style="{ height: cardDimensions.height }">
                 <slot name="front" />
             </div>
-            <div class="right" :style="{ height: cardDimensions.height }">
+            <div class="right" v-if="slots.back" :style="{ height: cardDimensions.height }">
                 <slot name="back" />
             </div>
         </div>
         <div class="img-wrapper" :style="imageDimensions">
-            <NuxtImg :src='img' alt='' class="object-cover aspect-square" :width="imageDimensions.width"
-                :height="imageDimensions.height" />
+            <NuxtImg :src='img' alt='' class="object-cover rounded-full aspect-square" provider="localProvider" />
         </div>
     </div>
 </template>

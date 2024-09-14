@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import imageCompression from 'browser-image-compression';
 import type { IOrganizer } from '~/types';
 import type { IConfigResponse, IOrganizerResponse, IProfileResponse } from '~/types/IResponse';
 
 const modal = useModal();
 const { $api } = useNuxtApp();
 const toast = useToast();
+const { convert } = useImageToBase64();
 const items = [
     {
         slot: 'dailyManager',
@@ -17,7 +19,7 @@ const items = [
 ]
 
 const { data } = await useAsyncData<IConfigResponse>(() => $fetch<IConfigResponse>("/api/config"));
-const { data: profileData } = await useAsyncData(() => $fetch<IProfileResponse>("/api/profile"));
+const { data: profileData } = await useAsyncData(() => $api<IProfileResponse>("/api/profile"));
 const { organizer: org } = useOrganizer();
 
 const emits = defineEmits<{
@@ -46,6 +48,39 @@ const departements = computed(() => {
 });
 
 const organizer = ref<IOrganizer>({
+    council: [{
+        position: '',
+        name: '',
+        image: {
+            name: '',
+            content: '',
+            size: '',
+            type: '',
+            lastModified: '',
+        },
+    }, {
+        position: '',
+        name: '',
+        image: {
+            name: '',
+            content: '',
+            size: '',
+            type: '',
+            lastModified: '',
+        },
+    }],
+    advisor: {
+        position: '',
+        name: '',
+        image: {
+            name: '',
+            content: '',
+            size: '',
+            type: '',
+            lastModified: '',
+        },
+    },
+    considerationBoard: [0, 0],
     dailyManagement: dailyManagements.value,
     department: departements.value,
     period: {
@@ -71,14 +106,80 @@ const deleteMember = (i: number) => {
     organizer.value.department[i].members.splice(i, 1);
 }
 
+
+const files = ref<File[]>([]);
+const filesToCropped = ref<{ blob: string, name: string }[]>([{ blob: '', name: '' }, { blob: '', name: '' }, { blob: '', name: '' }]);
+const loadingCompress = ref<boolean>(false);
+const openModals = ref<boolean[]>([false, false, false]);
+
+const onChangeImages = async (f: File, i: number) => {
+    loadingCompress.value = true;
+    const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+        alwaysKeepResolution: true
+    }
+    const compressedFile = await imageCompression(f, options);
+    const blob = URL.createObjectURL(compressedFile);
+    openModals.value[i] = true;
+    if (filesToCropped.value[i]) {
+        filesToCropped.value[i].blob = blob;
+        filesToCropped.value[i].name = f.name;
+    } else {
+        filesToCropped.value.push({ blob: blob, name: f.name });
+    }
+    loadingCompress.value = false;
+}
+
+const onCropped = async (f: File, i: number) => {
+    try {
+        openModals.value[i] = false;
+        if (files.value[i]) {
+            files.value[i] = f;
+        } else {
+            files.value.push(f);
+        }
+        const blob = URL.createObjectURL(f);
+        filesToCropped.value[i].blob = blob;
+    } catch (error) {
+        console.log(error);
+        toast.add({ title: "Failed to compress image" });
+    }
+}
 const addOrganizer = async () => {
+    const body: IOrganizer = {
+        ...organizer.value,
+        council: await Promise.all(organizer.value.council.map(async (council, i) => {
+            return {
+                ...council,
+                image: {
+                    name: files.value[i].name,
+                    content: await convert(files.value[i]),
+                    size: files.value[i].size.toString(),
+                    type: files.value[i].type,
+                    lastModified: files.value[i].lastModified.toString(),
+                }
+            }
+        })),
+        advisor: {
+            ...organizer.value.advisor,
+            image: {
+                name: files.value[organizer.value.council.length].name,
+                content: await convert(files.value[organizer.value.council.length]),
+                size: files.value[organizer.value.council.length].size.toString(),
+                type: files.value[organizer.value.council.length].type,
+                lastModified: files.value[organizer.value.council.length].lastModified.toString(),
+            }
+        }
+    }
     const added = await $api<IOrganizerResponse>('/api/organizer', {
         method: 'POST',
-        body: organizer.value,
+        body,
     });
     toast.add({
         title: 'Organizer added',
-        description: 'Organizer has been added',
+        description: added.statusMessage,
         color: 'green',
     });
     modal.close();
@@ -101,8 +202,8 @@ watch(() => organizer.value.period.start, (newVal) => {
 
 </script>
 <template>
-    <UModal>
-        <UCard>
+    <UModal :fullscreen="true">
+        <UCard :ui="{ background: 'bg-gray-100 dark:bg-gray-900' }">
             <template #header>
                 <div class="flex justify-between w-full">
                     <h2 class="text-xl font-semibold dark:text-gray-200">Add Organizer</h2>
@@ -124,6 +225,92 @@ watch(() => organizer.value.period.start, (newVal) => {
                         </UButton>
                     </template>
                 </VDatePicker>
+            </div>
+            <div class="my-4">
+                <label for="council"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Council</label>
+                <div class="grid grid-cols-12 gap-2" id="council">
+                    <div class="grid grid-cols-12 col-span-6 gap-2" v-for="(council, i) in organizer.council" :key="i">
+                        <div class="col-span-12">
+                            <label for="Name"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+                            <UInput type="text" name="Name" id="Name" placeholder="Insert name here..." required
+                                v-model="organizer.council[i].name" class="w-full" />
+                        </div>
+                        <div class="col-span-12">
+                            <label for="Position"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Position</label>
+                            <UInput type="text" name="Position" id="Position" placeholder="Rector, etc." required
+                                v-model="organizer.council[i].position" class="w-full" />
+                        </div>
+                        <div class="col-span-12">
+                            <label for="Image"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Image</label>
+                            <DropFile :identifier="i" @change="v => onChangeImages(v, i)" accept="image/*">
+                                <div v-if="filesToCropped[i].blob">
+                                    <NuxtImg :src="filesToCropped[i].blob" :alt="filesToCropped[i].name"
+                                        class="mx-auto" />
+                                </div>
+                            </DropFile>
+                            <ModalsCropImage v-model="openModals[i]" :img="filesToCropped[i].blob" :stencil="{
+                                movable: true,
+                                resizable: true,
+                                aspectRatio: 1 / 1,
+                            }" :title="filesToCropped[i].name" @cropped="v => onCropped(v, i)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="my-4">
+                <label for="advisor"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Advisor</label>
+                <div class="grid grid-cols-12 gap-2" id="advisor">
+                    <div class="col-span-12">
+                        <label for="Name"
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+                        <UInput type="text" name="Name" id="Name" placeholder="Insert name here..." required
+                            v-model="organizer.advisor.name" class="w-full" />
+                    </div>
+                    <div class="col-span-12">
+                        <label for="Position"
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Position</label>
+                        <UInput type="text" name="Position" id="Position" placeholder="Advisor, etc." required
+                            v-model="organizer.advisor.position" class="w-full" />
+                    </div>
+                    <div class="col-span-12">
+                        <label for="Image"
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Image</label>
+                        <DropFile :identifier="organizer.council.length"
+                            @change="v => onChangeImages(v, organizer.council.length)" accept="image/*">
+                            <div v-if="filesToCropped[organizer.council.length].blob">
+                                <NuxtImg :src="filesToCropped[organizer.council.length].blob"
+                                    :alt="filesToCropped[organizer.council.length].name" class="mx-auto" />
+                            </div>
+                        </DropFile>
+                        <ModalsCropImage v-model="openModals[organizer.council.length]"
+                            :img="filesToCropped[organizer.council.length].blob" :stencil="{
+                                movable: true,
+                                resizable: true,
+                                aspectRatio: 1 / 1,
+                            }" :title="filesToCropped[organizer.council.length].name"
+                            @cropped="v => onCropped(v, organizer.council.length)" />
+                    </div>
+                </div>
+            </div>
+            <div class="my-4">
+                <label for="ConsiderationBoard"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Consideration
+                    Board</label>
+                <div class="grid grid-cols-12 gap-2">
+                    <div class="col-span-6" v-for="(consideration, i) in organizer.considerationBoard" :key="i">
+                        <UInput type="text" name="ConsiderationBoard" id="ConsiderationBoard" placeholder="21060202001"
+                            required v-model="organizer.considerationBoard[i]" class="w-full" />
+                        <label :for="`${organizer.considerationBoard[i]}-profile`"
+                            class="block mt-1 text-sm font-medium text-gray-900 dark:text-white">{{
+                                getNameFromNIM(organizer.considerationBoard[i] as number)
+                            }}</label>
+                    </div>
+                </div>
             </div>
             <UTabs :items="items">
                 <template #dailyManager="{ item }">

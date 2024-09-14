@@ -120,6 +120,17 @@ export interface IDepartment {
 
 export interface IOrganizer {
   _id?: string;
+  council: {
+    name: string;
+    image: string | IFile;
+    position: string;
+  }[];
+  advisor: {
+    name: string;
+    image: string | IFile;
+    position: string;
+  };
+  considerationBoard: IProfile[] | number[] | Types.ObjectId[];
   dailyManagement: IDailyManagement[];
   department: IDepartment[];
   period: IPeriod;

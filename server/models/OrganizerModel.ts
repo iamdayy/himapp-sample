@@ -60,6 +60,50 @@ const DepartmentSchema = new Schema<IDepartmentSchema>({
 });
 
 const OrganizerSchema = new Schema<IOrganizerSchema>({
+  council: [
+    {
+      name: {
+        type: String,
+        required: true,
+      },
+      image: {
+        type: String,
+        required: true,
+      },
+      position: {
+        type: String,
+        required: true,
+      },
+    },
+  ],
+  advisor: {
+    name: {
+      type: String,
+      required: true,
+    },
+    image: {
+      type: String,
+      required: true,
+    },
+    position: {
+      type: String,
+      required: true,
+    },
+  },
+  considerationBoard: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Profile",
+      required: true,
+      autopopulate: {
+        model: ProfileModel,
+        select: "NIM avatar fullName email class semester createdAt",
+        match: {
+          status: "active",
+        },
+      },
+    },
+  ],
   dailyManagement: [DailyManagementSchema],
   department: [DepartmentSchema],
   period: {
