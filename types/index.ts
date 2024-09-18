@@ -190,21 +190,22 @@ export interface IProject {
 }
 
 /**
- * Represents a blog post with content, author, and publishing information.
+ * Represents a blog news with content, author, and publishing information.
  */
-export interface IPost {
+export interface INews {
   title: string;
   mainImage: string | IFile; // URL of the main image
   body: string;
   slug?: string;
-  categories: {
+  category: {
     title: string;
     description: string;
-  }[];
+  };
   author?: Types.ObjectId | IProfile | number;
   published?: boolean;
   publishedAt?: Date;
-  related?: IPost[]; // Virtual field for related posts
+  tags?: string[];
+  related?: INews[]; // Virtual field for related newss
 }
 
 export interface IPhoto {

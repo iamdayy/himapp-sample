@@ -102,7 +102,7 @@ const responsiveUISizes = computed(() => ({
  */
 const responsiveClasses = computed(() => ({
     label: isMobile.value ? 'text-xs' : isTablet.value ? 'text-sm' : 'text-base',
-    input: isMobile.value ? 'text-sm' : isTablet.value ? 'text-base' : 'text-lg',
+    input: isMobile.value ? 'text-xs' : isTablet.value ? 'text-sm' : 'text-base',
     gridCols: isMobile.value ? 'grid-cols-1' : isTablet.value ? 'grid-cols-2' : 'grid-cols-6',
 }))
 
@@ -139,8 +139,7 @@ const responsiveClasses = computed(() => ({
                                             @click="togglePopover" />
                                     </template>
                                 </VDatePicker>
-                                <span
-                                    :class="[responsiveClasses.input, 'font-semibold text-gray-900 dark:text-gray-300']">
+                                <span :class="[responsiveClasses.input, 'text-gray-900 dark:text-gray-300']">
                                     {{ new Date(newAgenda.date).toLocaleDateString() }}
                                 </span>
                             </div>
@@ -173,7 +172,7 @@ const responsiveClasses = computed(() => ({
                         </div>
                         <div class="col-span-full">
                             <label for="committee"
-                                :class="[responsiveClasses.label, 'block mb-2 font-medium text-gray-900 dark:text-white']">Contributors</label>
+                                :class="[responsiveClasses.label, 'block mb-2 font-medium text-gray-900 dark:text-white']">Committee</label>
                             <div id="committee" class="ms-2">
                                 <div v-for="committee, i in newAgenda.committee" :key="i" class="mb-2">
                                     <div class="flex flex-col items-end gap-2 sm:flex-row">
@@ -188,8 +187,8 @@ const responsiveClasses = computed(() => ({
                                             <div class="w-full sm:w-1/4">
                                                 <label :for="`${committee.job}-profile`"
                                                     :class="[responsiveClasses.label, 'block mb-2 font-medium text-gray-900 dark:text-white']">NIM</label>
-                                                <UInput :type="`${committee.job}-profile`"
-                                                    :name="`${committee.job}-profile`" :id="`${committee.job}-profile`"
+                                                <UInput type="number" :name="`${committee.job}-profile`"
+                                                    :id="`${committee.job}-profile`"
                                                     v-model="newAgenda.committee![i].user"
                                                     :size="responsiveUISizes.input" required />
                                             </div>

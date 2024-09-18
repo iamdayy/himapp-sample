@@ -106,13 +106,17 @@ const responsiveUISizes = computed(() => ({
                         <div class="col-span-full md:col-span-3">
                             <label for="date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date
                                 & Time</label>
-                            <VDatePicker id="date" v-model="Agenda.date" mode="dateTime">
-                                <template #default="{ togglePopover }">
-                                    <UButton :size="responsiveUISizes.button" @click="togglePopover">
-                                        Select date
-                                    </UButton>
-                                </template>
-                            </VDatePicker>
+                            <div class="flex items-center justify-between w-full gap-2">
+                                <VDatePicker id="date" v-model="Agenda.date" mode="dateTime">
+                                    <template #default="{ togglePopover }">
+                                        <UButton icon="i-heroicons-calendar" :size="responsiveUISizes.button"
+                                            @click="togglePopover" />
+                                    </template>
+                                </VDatePicker>
+                                <span class="text-gray-900 dark:text-gray-300">
+                                    {{ new Date(Agenda.date).toLocaleDateString() }}
+                                </span>
+                            </div>
                         </div>
                         <div class="col-span-full md:col-span-3">
                             <label for="at"

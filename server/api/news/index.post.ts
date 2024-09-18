@@ -1,13 +1,13 @@
 import { Types } from "mongoose";
-import { PostModel } from "~/server/models/PostModel";
+import { NewsModel } from "~/server/models/NewsModel";
 import { ProfileModel } from "~/server/models/ProfileModel";
 import { IFile } from "~/types";
-import { IReqPost } from "~/types/IRequestPost";
+import { IReqNews } from "~/types/IRequestPost";
 import type { IResponse } from "~/types/IResponse";
 const config = useRuntimeConfig();
 
 /**
- * Handles POST requests for creating a new post.
+ * Handles NEWS requests for creating a new news.
  * @param {H3Event} event - The H3 event object.
  * @returns {Promise<Object>} An object containing the status code and message of the operation.
  * @throws {H3Error} If the user is not authorized, file upload fails, or if a system error occurs.
@@ -29,10 +29,10 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
       });
     }
 
-    const BASE_MAINIMAGE_FOLDER = "/uploads/img/posts";
+    const BASE_MAINIMAGE_FOLDER = "/uploads/img/newss";
     let imageUrl = "";
 
-    const body = await readBody<IReqPost>(event);
+    const body = await readBody<IReqNews>(event);
     const mainImage = body.mainImage as IFile;
     if (mainImage.type?.startsWith("image/")) {
       const hashedName = await storeFileLocally(
@@ -47,10 +47,10 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
       });
     }
 
-    // Prepare post data
-    const newPost = {
+    // Prepare news data
+    const newNews = {
       ...body,
-      categories: body.categories,
+      category: body.category,
       slug: body.title
         .toLowerCase()
         .replace(/ /g, "-")
@@ -59,25 +59,25 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
       author: (await getIdByNim(user.profile.NIM)) as Types.ObjectId,
     };
 
-    // Create and save the new post
-    const post = new PostModel(newPost);
-    const saved = await post.save();
+    // Create and save the new news
+    const news = new NewsModel(newNews);
+    const saved = await news.save();
     if (!saved) {
       throw createError({
         statusCode: 500,
-        statusMessage: `Failed to add new Post ${post.title}`,
+        statusMessage: `Failed to add new News ${news.title}`,
       });
     }
 
     return {
       statusCode: 200,
-      statusMessage: `Success to add new Post ${post.title}`,
+      statusMessage: `Success to add new News ${news.title}`,
     };
   } catch (error: any) {
     return {
       statusCode: error.statusCode || 500,
       statusMessage:
-        error.message || "An unexpected error occurred while creating the post",
+        error.message || "An unexpected error occurred while creating the news",
     };
   }
 });

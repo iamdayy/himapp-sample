@@ -12,14 +12,13 @@ const { isOrganizer } = useOrganizer();
  */
 const { data: user } = useAuth();
 const toast = useToast();
+const { $api } = useNuxtApp();
 
 /**
  * Modal and project management
  */
 const Modal = useModal();
-const { page, perPage, projects, totalProjects, refreshProjects } = useProjects()
-page.value = 1;
-perPage.value = 10;
+const { page, perPage, projects, totalProjects, refreshProjects, sort, order, showMissed } = useProjects();
 
 /**
  * Utility composable
@@ -84,7 +83,7 @@ const pickDetail = (id: string) => {
  * @param {IProject} project - The project to check
  * @returns {boolean} - True if user is registered, false otherwise
  */
-const isMeRegistered = (project: IProject) => {
+const isMeRegistered = (project: IProject): boolean => {
     const nim = user.value?.profile.NIM;
     const found = project.registered?.find((registered) => (registered.profile as IProfile).NIM == nim);
     return !!found;
@@ -97,7 +96,7 @@ const isMeRegistered = (project: IProject) => {
 const register = async (id: string) => {
     registerForm.value.id = id;
     try {
-        const response = await $fetch("/api/project/register", {
+        const response = await $api("/api/project/register", {
             method: "post",
             body: registerForm.value
         });
@@ -172,14 +171,21 @@ useHead({
 });
 
 /**
- * Watchers for pagination
+ * Computed properties for pagination
  */
-watch(page, () => {
-    refreshProjects();
-})
-watch(perPage, () => {
-    refreshProjects();
-})
+const pageTotal = computed(() => projects.value?.length || 0);
+const pageFrom = computed(() => (page.value - 1) * perPage.value + 1);
+const pageTo = computed(() => Math.min(page.value * perPage.value, pageTotal.value));
+const pageCountOptions = computed(() => {
+    const baseOptions = [5, 10, 20, 50, 100];
+    const filteredOptions = baseOptions.filter((option) => option <= pageTotal.value);
+
+    if (isMobile.value && filteredOptions.length > 3) {
+        return filteredOptions.slice(0, 3);
+    }
+
+    return filteredOptions;
+});
 
 /**
  * Page meta for layout and middleware
@@ -212,32 +218,45 @@ const responsiveUISizes = computed(() => ({
 const visiblePages = computed(() => isMobile.value ? 3 : 5)
 </script>
 <template>
-    <div class="items-center justify-center">
-        <div class="mx-auto text-center">
-            <h2 class="text-3xl font-extrabold leading-tight tracking-tight text-gray-600 md:text-4xl dark:text-white">
-                Project
-            </h2>
-        </div>
-        <UCard class="mt-6">
-            <div class="flex flex-col items-center justify-between gap-4 px-4 md:flex-row-reverse md:gap-8 md:px-8">
-                <UButton label="Add Project" block class="w-full text-base font-bold md:text-xl md:w-auto"
-                    @click="AddModal" v-if="isOrganizer" icon="i-heroicons-plus" trailing color="blue" />
-            </div>
+    <div class="items-center justify-center mb-24">
+        <UCard class="px-8 mt-6">
+            <template #header>
+                <div class="flex justify-between">
+                    <h1 class="text-2xl font-bold text-gray-600 dark:text-white">Project</h1>
+                    <UButton label="New" :size="responsiveUISizes.button" :ui="{ rounded: 'rounded-full' }"
+                        @click="AddModal" v-if="isOrganizer" />
+                </div>
+
+            </template>
             <div class="flex flex-col w-full gap-3 px-4 py-6 md:px-8 md:py-12 md:flex-row">
                 <div
-                    class="mx-auto shadow-lg rounded-lg w-full md:w-2/5 px-3 max-h-[60vh] overflow-y-auto bg-gray-100/15 py-4 dark:bg-gray-800/15 backdrop-blur-sm">
-                    <UInput icon="i-heroicons-magnifying-glass-20-solid" color="white" :size="responsiveUISizes.input"
-                        class="w-full" placeholder="Search..." />
-                    <UButton v-for="project, i in projects" :key="i" @click="pickDetail(project._id as string)"
-                        variant="link" color="gray"
-                        class="relative inline-flex items-center w-full px-2 py-2 text-sm font-semibold truncate md:text-lg md:px-4">
-                        {{ project.title }} | <span class="text-xs font-light md:text-md ms-2">{{ new
-                            Date(project.deadline).toLocaleDateString('id-Id', { dateStyle: 'full' }) }}</span>
-                    </UButton>
+                    class="w-full px-3 py-4 mx-auto rounded-lg shadow-lg md:w-2/5 bg-gray-100/15 dark:bg-gray-800/15 backdrop-blur-sm">
+                    <div class="flex justify-between">
+                        <UInput icon="i-heroicons-magnifying-glass-20-solid" color="white"
+                            :size="responsiveUISizes.input" class="w-full" placeholder="Search..." />
+                        <UButton :icon="order === 'asc' ? 'i-heroicons-arrow-down' : 'i-heroicons-arrow-up'"
+                            variant="link" :size="responsiveUISizes.button"
+                            @click="order = order === 'asc' ? 'desc' : 'asc'" />
+                        <div class="flex flex-col items-center gap-2">
+                            <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Missed</span>
+                            <UToggle v-model="showMissed" />
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2 max-h-[60vh] overflow-y-auto">
+                        <UButton v-for="project, i in projects" :key="i" @click="pickDetail(project._id as string)"
+                            variant="link" color="gray"
+                            class="relative inline-flex items-center w-full px-2 py-2 text-sm font-semibold truncate md:text-lg md:px-4">
+                            {{ project.title }} | <span class="text-xs font-light md:text-md ms-2">{{ new
+                                Date(project.deadline).toLocaleDateString('id-Id', { dateStyle: 'full' }) }}</span>
+                        </UButton>
+                    </div>
                     <!-- Responsive pagination controls for navigating through the projects list -->
-                    <div class="flex justify-between gap-2 my-2 md:gap-0">
-                        <USelect label="per Page" :options="[5, 10, 20]" v-model="perPage"
+                    <div class="flex items-center justify-between gap-2 my-2 md:gap-0">
+                        <USelect label="per Page" :options="pageCountOptions" v-model="perPage"
                             :size="responsiveUISizes.button" />
+                        <span class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                            {{ pageFrom }} - {{ pageTo }} of {{ totalProjects }}
+                        </span>
                         <UPagination :size="responsiveUISizes.button" color="gray" v-model="page" :total="totalProjects"
                             :max="visiblePages" :show-last="!isMobile" :show-first="!isMobile" />
                     </div>
@@ -329,17 +348,18 @@ const visiblePages = computed(() => isMobile.value ? 3 : 5)
                                         Register
                                     </UButton>
                                     <template #panel>
-                                        <div class="flex flex-col gap-2 p-4 md:gap-4 md:p-6">
-                                            <USelect color=" gray" variant="outline" :options="project.tasks" />
+                                        <div class="flex flex-col gap-2 p-2 md:gap-4 md:p-4">
+                                            <USelect color="gray" variant="outline" size="sm"
+                                                :options="project.tasks" />
                                             <UButton type="submit" variant="outline" block
                                                 @click="register(project?._id as string)" label="Accept"
-                                                tralling-icon="i-heroicons-check" :size="responsiveUISizes.button" />
+                                                tralling-icon="i-heroicons-check" size="sm" />
                                         </div>
                                     </template>
                                 </UPopover>
                                 <UButton color="gray" variant="solid" :size="responsiveUISizes.button"
                                     icon="i-heroicons-users"
-                                    :disabled="!canMeRegister(project.canRegister, project.deadline) || !isMeRegistered(project) || isOrganizer"
+                                    :disabled="!canMeRegister(project.canRegister, project.deadline) && !isMeRegistered(project) && !isOrganizer"
                                     @click="registeredModal">
                                     Registered
                                 </UButton>

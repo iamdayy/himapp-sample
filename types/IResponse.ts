@@ -1,9 +1,9 @@
 import type {
   IAgenda,
   IConfig,
+  INews,
   IOrganizer,
   IPhoto,
-  IPost,
   IProfile,
   IProject,
   IQuestion,
@@ -90,14 +90,23 @@ export interface IProfileResponse extends IResponse {
 }
 
 /**
- * Interface representing the response for a post query.
+ * Interface representing the response for a news query.
  * Extends IPaginateResponse to include pagination information.
  */
-export interface IPostResponse extends IResponse {
-  /** An array of posts matching the query. */
+export interface INewsResponse extends IResponse {
+  /** An array of newss matching the query. */
   data?: {
-    post?: IPost;
-    posts?: IPost[];
+    news?: INews | INews[];
+    length: number;
+  };
+}
+
+export interface ICategoriesResponse extends IResponse {
+  data?: {
+    categories: {
+      title: string;
+      description: string;
+    }[];
     length: number;
   };
 }
@@ -111,7 +120,10 @@ export interface IQuestionResponse extends IResponse {
 }
 
 export interface ITagsResponse extends IResponse {
-  data: string[];
+  data?: {
+    tags: string[];
+    length: number;
+  };
 }
 
 export interface IQuestionDetailResponse extends IResponse {

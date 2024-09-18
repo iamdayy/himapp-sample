@@ -352,6 +352,8 @@ const colorbadge = (status: "active" | "inactive" | "free" | "deleted") => {
 
                 <!-- Table -->
                 <div class="overflow-x-auto">
+
+
                     <UTable v-model="selectedRows" v-model:sort="sort" :rows="data.data.profiles"
                         :columns="columnsTable" :loading="pending" sort-asc-icon="i-heroicons-arrow-up"
                         sort-desc-icon="i-heroicons-arrow-down" sort-mode="manual" class="w-full"

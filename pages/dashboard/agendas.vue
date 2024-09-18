@@ -205,24 +205,24 @@ const responsiveClasses = computed(() => ({
 }));
 
 /**
- * Computed property for responsive UI sizes
+ * Responsive UI sizes for components
  */
 const responsiveUISizes = computed(() => ({
-    button: isMobile.value ? 'sm' : 'xl',
-    input: isMobile.value ? 'sm' : 'md',
-}));
+    button: isMobile.value ? 'sm' : 'md',
+    input: isMobile.value ? 'sm' : 'lg',
+}))
 </script>
 <template>
-    <div class="items-center justify-center mb-24 ">
-        <div class="mx-auto text-center">
-            <h2 class="text-4xl font-extrabold leading-tight tracking-tight text-gray-600 dark:text-white">
-                Agenda
-            </h2>
-        </div>
+    <div class="items-center justify-center mb-24">
         <UCard class="px-8 mt-6">
-            <UButton label="New" :size="responsiveUISizes.button"
-                class="my-3 text-lg font-bold text-gray-700 md:text-2xl dark:text-gray-700"
-                :ui="{ rounded: 'rounded-full' }" @click="AddModal" v-if="isOrganizer" block />
+            <template #header>
+                <div class="flex justify-between">
+                    <h1 class="text-2xl font-bold text-gray-600 dark:text-white">Agenda</h1>
+                    <UButton label="New" :size="responsiveUISizes.button" :ui="{ rounded: 'rounded-full' }"
+                        @click="AddModal" v-if="isOrganizer" />
+                </div>
+
+            </template>
             <div class="flex flex-col w-full gap-3 py-4 md:py-12 md:flex-row">
                 <ClientOnly>
                     <VCalendar :attributes="attributes" class="mx-auto shadow-lg md:max-w-sm" v-if="agendas"
@@ -316,7 +316,7 @@ const responsiveUISizes = computed(() => ({
                                 </UButton>
                                 <UButton class="flex-1" color="gray" block variant="solid"
                                     :size="responsiveUISizes.button" icon="i-heroicons-users"
-                                    :disabled="!canMeRegister(agenda.canRegister, agenda.date) || !isMeRegistered(agenda) || isOrganizer"
+                                    :disabled="!canMeRegister(agenda.canRegister, agenda.date) && !isMeRegistered(agenda) && !isOrganizer"
                                     @click="registeredModal">
                                     Registered
                                 </UButton>

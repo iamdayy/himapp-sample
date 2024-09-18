@@ -1,5 +1,5 @@
 import type { SortOrder } from "mongoose";
-import type { IAgenda, IFile, IPhoto, IPost, IProfile, IQuestion } from ".";
+import type { IAgenda, IFile, INews, IPhoto, IProfile, IQuestion } from ".";
 
 /**
  * Interface for pagination query parameters.
@@ -86,24 +86,37 @@ export interface IReqAgenda extends IAgenda {}
 export interface IReqProjectQuery extends IReqQueryPaginate {
   /** Project ID for filtering. */
   id: string;
+
+  /** Show missed project */
+  showMissed: string;
+  /** Field to sort the results by. */
+  sort: string;
+  /** Sort order. */
+  order: SortOrder;
 }
 
 /**
- * Interface for post query parameters, extending pagination.
+ * Interface for news query parameters, extending pagination.
  */
-export interface IReqPostQuery extends IReqQueryPaginate {
+export interface IReqNewsQuery extends IReqQueryPaginate {
   /** Field to sort the results by. */
   sort: string;
   /** Sort order. */
   order: string;
-  /** Post slug for filtering. */
+  /** News slug for filtering. */
   slug: string;
+  /** Category for filtering. */
+  category: string;
+  /** Tags for filtering. */
+  tags: string;
+  /** Search term for filtering news. */
+  search: string;
 }
 
 /**
- * Interface for post request, extending IPost.
+ * Interface for news request, extending INews.
  */
-export interface IReqPost extends IPost {}
+export interface IReqNews extends INews {}
 
 export interface IReqQuestionQuery extends IReqQueryPaginate {
   /** Field to sort the results by. */

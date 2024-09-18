@@ -40,11 +40,6 @@ useHead({
         <About />
     </section>
 
-    <!-- Post Section -->
-    <section class="py-8 overflow-x-hidden sm:py-12 about" id="about">
-        <Post />
-    </section>
-
     <!-- Events Section -->
     <section class="py-8 sm:py-12" id="events" data-aos="fade-right">
         <Agenda />

@@ -1,23 +1,23 @@
 import fs from "fs";
 import { Types } from "mongoose";
 import path from "path";
-import { PostModel } from "~/server/models/PostModel";
+import { NewsModel } from "~/server/models/NewsModel";
 import { ProfileModel } from "~/server/models/ProfileModel";
 import { IFile } from "~/types";
-import { IReqPost } from "~/types/IRequestPost";
+import { IReqNews } from "~/types/IRequestPost";
 import type { IResponse } from "~/types/IResponse";
 const config = useRuntimeConfig();
 
 /**
- * Handles PUT requests for updating an existing post.
+ * Handles PUT requests for updating an existing news.
  * @param {H3Event} event - The H3 event object.
  * @returns {Promise<Object>} An object containing the status code and message of the operation.
- * @throws {H3Error} If the user is not authorized, the post is not found, or if a system error occurs.
+ * @throws {H3Error} If the user is not authorized, the news is not found, or if a system error occurs.
  */
 export default defineEventHandler(async (event): Promise<IResponse> => {
   try {
     const { slug } = getQuery(event);
-    const BASE_MAINIMAGE_FOLDER = "/uploads/img/posts";
+    const BASE_MAINIMAGE_FOLDER = "/uploads/img/newss";
     let imageUrl = "";
 
     // Check user authorization
@@ -35,28 +35,28 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
       });
     }
 
-    // Find the post by slug
-    const post = await PostModel.findOne({ slug });
-    if (!post) {
+    // Find the news by slug
+    const news = await NewsModel.findOne({ slug });
+    if (!news) {
       throw createError({
         statusCode: 404,
-        message: "Post not found",
+        message: "News not found",
       });
     }
 
-    const body = await readBody<IReqPost>(event);
+    const body = await readBody<IReqNews>(event);
     const mainImage = body.mainImage as IFile;
     // Handle main image upload
-    if (mainImage) {
+    if (typeof mainImage === "object") {
       if (mainImage.type?.startsWith("image/")) {
         // Remove old image if it exists
-        if (post.mainImage) {
+        if (news.mainImage) {
           const imagePath = path.join(
             config.storageDir,
-            post.mainImage as string
+            news.mainImage as string
           );
           if (fs.existsSync(imagePath)) {
-            deleteFile(post.mainImage as string);
+            deleteFile(news.mainImage as string);
           }
         }
         // Save new image
@@ -72,38 +72,39 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
         });
       }
     } else {
-      imageUrl = post.mainImage as string;
+      imageUrl = news.mainImage as string;
     }
 
-    // Update post properties
-    post.title = body.title;
-    post.mainImage = imageUrl;
-    post.slug = body.title
+    // Update news properties
+    news.title = body.title;
+    news.mainImage = imageUrl;
+    news.slug = body.title
       .toLowerCase()
       .replace(/ /g, "-")
       .replace(/[^\w-]+/g, "");
-    post.categories = body.categories;
-    post.body = body.body;
+    news.category = body.category;
+    news.tags = body.tags;
+    news.body = body.body;
 
-    // Save the updated post
-    const saved = await post.save();
+    // Save the updated news
+    const saved = await news.save();
 
     if (!saved) {
       return {
         statusCode: 400,
-        statusMessage: `Failed to save post ${post.title}`,
+        statusMessage: `Failed to save news ${news.title}`,
       };
     }
 
     return {
       statusCode: 200,
-      statusMessage: `Success to save post ${post.title}`,
+      statusMessage: `Success to save news ${news.title}`,
     };
   } catch (error: any) {
     return {
       statusCode: error.statusCode || 500,
       statusMessage:
-        error.message || "An unexpected error occurred while updating the post",
+        error.message || "An unexpected error occurred while updating the news",
     };
   }
 });

@@ -10,9 +10,9 @@ import type {
   IDailyManagement,
   IDepartment,
   IForm,
+  INews,
   IOrganizer,
   IPhoto,
-  IPost,
   IProfile,
   IProject,
   IQuestion,
@@ -100,9 +100,11 @@ export interface IProjectSchema extends Omit<IProject, "_id">, Document {
 }
 
 /**
- * Extends the IPost interface with Document.
+ * Extends the INews interface with Document.
  */
-export interface IPostSchema extends IPost, Document {}
+export interface INewsSchema extends INews, Document {
+  findRelated: (limit?: number) => Promise<INews[]>;
+}
 
 export interface IPhotoSchema extends Omit<IPhoto, "_id">, Document {
   createdAt: Date;

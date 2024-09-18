@@ -1,7 +1,12 @@
+import { SortOrder } from "mongoose";
 import { ProfileModel } from "~/server/models/ProfileModel";
 import { ProjectModel } from "~/server/models/ProjectModel";
 import { IReqProjectQuery } from "~/types/IRequestPost";
 import { IProjectsResponse } from "~/types/IResponse";
+
+type ISortable = {
+  [key: string]: SortOrder;
+};
 
 /**
  * Retrieves the NIM (Student ID) from a given profile ID.
@@ -30,7 +35,8 @@ const getNimFromID = async (id: string): Promise<number> => {
  */
 export default defineEventHandler(async (event): Promise<IProjectsResponse> => {
   try {
-    const { perPage, page, id } = getQuery<IReqProjectQuery>(event);
+    const { perPage, page, id, showMissed, sort, order } =
+      getQuery<IReqProjectQuery>(event);
 
     // If an ID is provided, return a single project
     if (id) {
@@ -80,15 +86,26 @@ export default defineEventHandler(async (event): Promise<IProjectsResponse> => {
         }
       }
     }
-    const projectsLength = await ProjectModel.countDocuments({
-      canSee: { $in: roles },
-    });
 
-    const projects = await ProjectModel.find({
+    let query: any = {
       canSee: { $in: roles },
-    })
+      deadline: { $gte: new Date() },
+    };
+    let sortOpt: ISortable = {};
+    if (sort && order) {
+      sortOpt = { deadline: order };
+    }
+
+    if (showMissed === "true") {
+      query.deadline = { $lt: new Date() };
+    }
+
+    const projectsLength = await ProjectModel.countDocuments(query);
+
+    const projects = await ProjectModel.find(query)
       .skip((Number(page) - 1) * Number(perPage))
-      .limit(Number(perPage));
+      .limit(Number(perPage))
+      .sort(sortOpt);
 
     return {
       statusCode: 200,

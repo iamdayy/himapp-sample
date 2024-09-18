@@ -1,15 +1,15 @@
 import fs from "fs";
 import path from "path";
-import { PostModel } from "~/server/models/PostModel";
+import { NewsModel } from "~/server/models/NewsModel";
 import { IResponse } from "~/types/IResponse";
 
 const config = useRuntimeConfig();
 
 /**
- * Handles DELETE requests for removing a post.
+ * Handles DELETE requests for removing a news.
  * @param {H3Event} event - The H3 event object.
  * @returns {Promise<Object>} An object containing the status code and message of the operation.
- * @throws {H3Error} If the user is not authorized, the post is not found, or if a system error occurs.
+ * @throws {H3Error} If the user is not authorized, the news is not found, or if a system error occurs.
  */
 export default defineEventHandler(async (event): Promise<IResponse> => {
   try {
@@ -28,40 +28,40 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
       });
     }
 
-    // Get the post slug from the query parameters
+    // Get the news slug from the query parameters
     const { slug } = getQuery(event);
 
-    // Find the post by slug
-    const post = await PostModel.findOne({ slug });
-    if (!post) {
+    // Find the news by slug
+    const news = await NewsModel.findOne({ slug });
+    if (!news) {
       throw createError({
         statusCode: 404,
-        message: "Post not found",
+        message: "News not found",
       });
     }
 
     // Delete the associated main image file if it exists
-    if (post.mainImage) {
-      const imagePath = path.join(config.storageDir, post.mainImage as string);
+    if (news.mainImage) {
+      const imagePath = path.join(config.storageDir, news.mainImage as string);
       if (fs.existsSync(imagePath)) {
-        deleteFile(post.mainImage as string);
+        deleteFile(news.mainImage as string);
       }
     }
 
-    // Delete the post from the database
-    await PostModel.findOneAndDelete({ slug });
+    // Delete the news from the database
+    await NewsModel.findOneAndDelete({ slug });
 
     // Return success response
     return {
       statusCode: 200,
-      statusMessage: `Post "${post.title}" successfully deleted`,
+      statusMessage: `News "${news.title}" successfully deleted`,
     };
   } catch (error: any) {
     // Handle any errors that occur during the process
     return {
       statusCode: error.statusCode || 500,
       statusMessage:
-        error.message || "An unexpected error occurred while deleting the post",
+        error.message || "An unexpected error occurred while deleting the news",
     };
   }
 });

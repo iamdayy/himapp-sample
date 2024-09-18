@@ -33,11 +33,10 @@ const changeMode = () => {
 
 // Navigation links
 const navigation: ILink[] = [
-    { name: 'Home', href: '/', current: true },
-    { name: 'About', href: '#about', current: false },
-    { name: 'Agendas', href: '#agendas', current: false },
-    { name: 'Projects', href: '#projects', current: false },
-    { name: 'Forum', href: '/forum', current: false },
+    { name: 'Home', href: '/' },
+    { name: 'About', href: '#about' },
+    { name: 'News', href: '/news' },
+    { name: 'Forum', href: '/forum' },
 ] as ILink[]
 
 /**
@@ -178,9 +177,10 @@ const items = computed(() => isLoggedIn.value ? itemsIsLogged(user.value) : item
                         <ul
                             class="flex flex-col p-4 mt-4 font-medium border border-gray-300 rounded-lg shadow-md md:p-0 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-transparent md:shadow-none">
                             <li v-for="nav, i in navigation" :key="i">
-                                <a :href="nav.href"
-                                    class="block px-3 py-2 font-sans font-semibold text-gray-700 bg-transparent rounded md:p-0 dark:text-gray-200">{{
-                                        nav.name }}</a>
+                                <NuxtLink :to="nav.href"
+                                    class="block px-3 py-2 font-sans font-semibold text-gray-700 bg-transparent rounded md:p-0 dark:text-gray-200">
+                                    {{
+                                        nav.name }}</NuxtLink>
                             </li>
                         </ul>
                     </div>

@@ -19,7 +19,9 @@ const page = ref(1)
 /**
  * Number of items per page
  */
-const pageCount = ref(5)
+const pageCount = ref(5);
+
+
 
 /**
  * Window size composable for responsive design
@@ -152,12 +154,30 @@ const generateXlsx = async () => {
     }
 }
 
-/**
- * Computed property to get the current page of rows
- */
-const rows = computed(() => {
-    return props.registered?.slice((page.value - 1) * pageCount.value, (page.value) * pageCount.value)
+const members = computed(() => {
+    const flattenedMembers = props.registered?.map(v => flattenData(v)) || [];
+    const startIndex = (page.value - 1) * pageCount.value;
+    const endIndex = startIndex + pageCount.value;
+    return flattenedMembers.slice(startIndex, endIndex);
 })
+
+/**
+ * Computed properties for pagination
+ */
+const pageTotal = computed(() => props.registered?.length || 0);
+const pageFrom = computed(() => (page.value - 1) * pageCount.value + 1);
+const pageTo = computed(() => Math.min(page.value * pageCount.value, pageTotal.value));
+const pageCountOptions = computed(() => {
+    const baseOptions = [5, 10, 20, 50, 100];
+    const filteredOptions = baseOptions.filter((option) => option <= pageTotal.value);
+
+    if (isMobile.value && filteredOptions.length > 3) {
+        return filteredOptions.slice(0, 3);
+    }
+
+    return filteredOptions;
+});
+
 
 /**
  * Computed property for responsive UI sizes
@@ -170,7 +190,7 @@ const responsiveUISizes = computed(() => ({
 </script>
 <template>
     <UModal :ui="{ width: 'sm:max-w-4xl' }" :fullscreen="isMobile">
-        <UCard>
+        <UCard :ui="{ background: 'bg-gray-200 dark:bg-gray-800' }">
             <template #header>
                 <div class="flex items-center justify-between w-full">
                     <h2 class="text-xl font-semibold dark:text-gray-200">Registered</h2>
@@ -179,8 +199,7 @@ const responsiveUISizes = computed(() => ({
                 </div>
             </template>
             <div class="space-y-4">
-                <UTable v-model="selectedRegistered" :columns="columns" :rows="rows?.map(v => flattenData(v))"
-                    responsive>
+                <UTable v-model="selectedRegistered" :columns="columns" :rows="members" responsive>
                     <template #createdAt-data="{ row }">
                         <span>{{ new Date(row.createdAt).getFullYear() }}</span>
                     </template>
@@ -189,11 +208,15 @@ const responsiveUISizes = computed(() => ({
                     </template>
                 </UTable>
                 <div class="flex flex-col items-center justify-between w-full gap-4 sm:flex-row">
-                    <USelect label="per Page" :options="[5, 10, 20]" v-model="pageCount"
+                    <USelect label="per Page" :options="pageCountOptions" v-model="pageCount"
                         :size="responsiveUISizes.select" />
+                    <div>
+                        <span>
+                            {{ pageFrom }} - {{ pageTo }} of {{ pageTotal }}
+                        </span>
+                    </div>
                     <UPagination :size="responsiveUISizes.pagination" color="gray" v-model="page"
-                        :page-count="Math.ceil((props.registered?.length || 0) / pageCount)"
-                        :total="props.registered?.length" show-last show-first />
+                        :page-count="Math.ceil(pageTotal / pageCount)" :total="pageTotal" show-last show-first />
                 </div>
                 <UButton label="Export" block @click="generateXlsx" :size="responsiveUISizes.button" />
             </div>

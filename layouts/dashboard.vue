@@ -151,9 +151,9 @@ const links = [
             to: '/dashboard/projects'
         },
         {
-            label: 'Post',
+            label: 'News',
             icon: 'i-heroicons-clipboard-document-list',
-            to: '/dashboard/posts'
+            to: '/dashboard/news'
         },
     ],
     [
