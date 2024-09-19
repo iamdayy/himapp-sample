@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
+import { MemberModel } from "~/server/models/MemberModel";
 import { NewsModel } from "~/server/models/NewsModel";
-import { ProfileModel } from "~/server/models/ProfileModel";
 import { IFile } from "~/types";
 import { IReqNews } from "~/types/IRequestPost";
 import type { IResponse } from "~/types/IResponse";
@@ -56,7 +56,7 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
         .replace(/ /g, "-")
         .replace(/[^\w-]+/g, ""),
       mainImage: imageUrl,
-      author: (await getIdByNim(user.profile.NIM)) as Types.ObjectId,
+      author: (await getIdByNim(user.member.NIM)) as Types.ObjectId,
     };
 
     // Create and save the new news
@@ -90,8 +90,8 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
  */
 const getIdByNim = async (NIM: number): Promise<Types.ObjectId | undefined> => {
   try {
-    const profile = await ProfileModel.findOne({ NIM });
-    return profile?._id as Types.ObjectId;
+    const member = await MemberModel.findOne({ NIM });
+    return member?._id as Types.ObjectId;
   } catch (error: any) {
     throw createError({
       statusCode: error.statusCode || 500,

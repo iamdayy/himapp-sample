@@ -1,11 +1,11 @@
-import { ProfileModel } from "~/server/models/ProfileModel";
+import { MemberModel } from "~/server/models/MemberModel";
 import { IResponse } from "~/types/IResponse";
 
 /**
- * Handles DELETE requests for marking a user profile as deleted.
+ * Handles DELETE requests for marking a user member as deleted.
  * @param {H3Event} event - The H3 event object.
  * @returns {Promise<Object>} An object containing the status code and message of the operation.
- * @throws {H3Error} If the user is not authorized, the profile is not found, or if a system error occurs.
+ * @throws {H3Error} If the user is not authorized, the member is not found, or if a system error occurs.
  */
 export default defineEventHandler(async (event): Promise<IResponse> => {
   try {
@@ -19,31 +19,31 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
       });
     }
 
-    // Check if the user has permission to delete the profile
-    if (user.profile.NIM != NIM && !event.context.organizer) {
+    // Check if the user has permission to delete the member
+    if (user.member.NIM != NIM && !event.context.organizer) {
       throw createError({
         statusCode: 403,
         statusMessage:
-          "Unauthorized: You can only delete your own profile or must be an administrator/department.",
+          "Unauthorized: You can only delete your own member or must be an administrator/department.",
       });
     }
 
-    // Find the profile by NIM
-    const profile = await ProfileModel.findOne({ NIM });
-    if (!profile) {
+    // Find the member by NIM
+    const member = await MemberModel.findOne({ NIM });
+    if (!member) {
       throw createError({
         statusCode: 404,
-        statusMessage: "Profile not found",
+        statusMessage: "Member not found",
       });
     }
 
-    // Mark the profile as deleted
-    profile.status = "deleted";
-    await profile.save();
+    // Mark the member as deleted
+    member.status = "deleted";
+    await member.save();
 
     return {
       statusCode: 200,
-      statusMessage: `Profile ${profile.NIM} has been marked as deleted`,
+      statusMessage: `Member ${member.NIM} has been marked as deleted`,
     };
   } catch (error: any) {
     // Handle any errors that occur during the process
@@ -51,7 +51,7 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
       statusCode: error.statusCode || 500,
       statusMessage:
         error.message ||
-        "An unexpected error occurred while deleting the profile",
+        "An unexpected error occurred while deleting the member",
     };
   }
 });

@@ -1,5 +1,5 @@
+import { MemberModel } from "~/server/models/MemberModel";
 import OrganizerModel from "~/server/models/OrganizerModel";
-import { ProfileModel } from "~/server/models/ProfileModel";
 import type { IOrganizerResponse } from "~/types/IResponse";
 
 export default defineEventHandler(
@@ -10,9 +10,9 @@ export default defineEventHandler(
         const id = await getIdByNim(query.NIM as number);
         const organizer = await OrganizerModel.findOne({
           $or: [
-            { "dailyManagement.profile": id },
+            { "dailyManagement.member": id },
             { "department.coordinator": id },
-            { "department.members.profile": id },
+            { "department.members.member": id },
           ],
         });
         return {
@@ -38,20 +38,20 @@ export default defineEventHandler(
 
 const getIdByNim = async (NIM: number): Promise<unknown> => {
   try {
-    const profile = await ProfileModel.findOne({ NIM });
-    if (!profile) {
+    const member = await MemberModel.findOne({ NIM });
+    if (!member) {
       throw createError({
         statusCode: 404,
-        message: `Profile not found for NIM: ${NIM}`,
+        message: `Member not found for NIM: ${NIM}`,
       });
     }
-    return profile._id;
+    return member._id;
   } catch (error: any) {
     throw createError({
       statusCode: error.statusCode || 500,
       message:
         error.message ||
-        `An error occurred while fetching profile for NIM: ${NIM}`,
+        `An error occurred while fetching member for NIM: ${NIM}`,
     });
   }
 };

@@ -5,19 +5,19 @@ import {
   IDepartmentSchema,
   IOrganizerSchema,
 } from "~/types/ISchemas";
-import { ProfileModel } from "./ProfileModel";
+import { MemberModel } from "./MemberModel";
 
 const DailyManagementSchema = new Schema<IDailyManagementSchema>({
   position: {
     type: String,
     required: true,
   },
-  profile: {
+  member: {
     type: Schema.Types.ObjectId,
-    ref: "Profile",
+    ref: "Member",
     required: true,
     autopopulate: {
-      model: ProfileModel,
+      model: MemberModel,
       select: "NIM avatar fullName email class semester createdAt",
       match: {
         status: "active",
@@ -33,10 +33,10 @@ const DepartmentSchema = new Schema<IDepartmentSchema>({
   },
   coordinator: {
     type: Schema.Types.ObjectId,
-    ref: "Profile",
+    ref: "Member",
     required: true,
     autopopulate: {
-      model: ProfileModel,
+      model: MemberModel,
       select: "NIM avatar fullName email class semester createdAt",
       match: {
         status: "active",
@@ -46,10 +46,10 @@ const DepartmentSchema = new Schema<IDepartmentSchema>({
   members: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Profile",
+      ref: "Member",
       required: true,
       autopopulate: {
-        model: ProfileModel,
+        model: MemberModel,
         select: "NIM avatar fullName email class semester createdAt",
         match: {
           status: "active",
@@ -93,10 +93,10 @@ const OrganizerSchema = new Schema<IOrganizerSchema>({
   considerationBoard: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Profile",
+      ref: "Member",
       required: true,
       autopopulate: {
-        model: ProfileModel,
+        model: MemberModel,
         select: "NIM avatar fullName email class semester createdAt",
         match: {
           status: "active",

@@ -2,12 +2,12 @@
 import { useWindowSize } from '@vueuse/core';
 import type { PropType } from 'vue';
 import { computed } from 'vue';
-import type { IProfile } from '~/types';
+import type { IMember } from '~/types';
 
 /**
- * ProfileCard component
+ * MemberCard component
  * 
- * This component displays a flip card with a user's profile information.
+ * This component displays a flip card with a user's member information.
  * The front side shows the user's avatar, name, and NIM (student ID).
  * The back side displays more detailed information such as email, class, semester, and entered year.
  * The component is responsive and adjusts its layout based on screen size.
@@ -15,10 +15,10 @@ import type { IProfile } from '~/types';
 
 const props = defineProps({
     /**
-     * The profile object containing user information
+     * The member object containing user information
      */
-    profile: {
-        type: Object as PropType<IProfile>,
+    member: {
+        type: Object as PropType<IMember>,
     },
     /**
      * A subtitle to be displayed on the front of the card
@@ -44,15 +44,15 @@ const responsiveClasses = computed(() => ({
 </script>
 
 <template>
-    <FlipCard :img="profile?.avatar || '/img/profile-blank.png'">
+    <FlipCard :img="member?.avatar || '/img/member-blank.png'">
         <!-- Front side of the card -->
         <template #front>
             <h2 :class="['font-semibold text-gray-200', responsiveClasses.subtitle]">{{ subtitle }}</h2>
             <div class="absolute bottom-16">
                 <h1 :class="['mb-2 font-semibold text-white -translate-x-14', responsiveClasses.title]">
-                    {{ profile?.fullName }}
+                    {{ member?.fullName }}
                 </h1>
-                <h1 :class="['mb-2 font-medium text-white', responsiveClasses.subtitle]">{{ profile?.NIM }}</h1>
+                <h1 :class="['mb-2 font-medium text-white', responsiveClasses.subtitle]">{{ member?.NIM }}</h1>
             </div>
             <div></div>
         </template>
@@ -60,32 +60,32 @@ const responsiveClasses = computed(() => ({
         <template #back>
             <div>
                 <h1 :class="['mb-2 font-semibold text-white -translate-x-14', responsiveClasses.name]">
-                    {{ profile?.fullName }}
+                    {{ member?.fullName }}
                 </h1>
                 <dl class="max-w-md text-gray-200 dark:text-white">
                     <!-- Email address -->
                     <div class="flex flex-col pb-2">
                         <dt class="text-gray-400 dark:text-gray-300">Email address</dt>
                         <hr class="mb-1 w-[105px] h-[1px] bg-gray-100 border-0 rounded dark:bg-gray-200">
-                        <dd :class="['font-semibold', responsiveClasses.info]">{{ profile?.email }}</dd>
+                        <dd :class="['font-semibold', responsiveClasses.info]">{{ member?.email }}</dd>
                     </div>
                     <!-- Class -->
                     <div class="flex flex-col py-2">
                         <dt class="text-gray-400 dark:text-gray-300">Class</dt>
                         <hr class="mb-1 w-[45px] h-[1px] bg-gray-100 border-0 rounded dark:bg-gray-200">
-                        <dd :class="['font-semibold', responsiveClasses.info]">{{ profile?.class }}</dd>
+                        <dd :class="['font-semibold', responsiveClasses.info]">{{ member?.class }}</dd>
                     </div>
                     <!-- Semester -->
                     <div class="flex flex-col py-2">
                         <dt class="text-gray-400 dark:text-gray-300">Semester</dt>
                         <hr class="mb-1 w-[75px] h-[1px] bg-gray-100 border-0 rounded dark:bg-gray-200">
-                        <dd :class="['font-semibold', responsiveClasses.info]">{{ profile?.semester }}</dd>
+                        <dd :class="['font-semibold', responsiveClasses.info]">{{ member?.semester }}</dd>
                     </div>
                     <!-- Entered year -->
                     <div class="flex flex-col pt-2">
                         <dt class="text-gray-400 dark:text-gray-300">Entered year</dt>
                         <hr class="mb-1 w-[98px] h-[1px] bg-gray-100 border-0 rounded dark:bg-gray-200">
-                        <dd :class="['font-semibold', responsiveClasses.info]">{{ profile?.enteredYear }}</dd>
+                        <dd :class="['font-semibold', responsiveClasses.info]">{{ member?.enteredYear }}</dd>
                     </div>
                 </dl>
             </div>

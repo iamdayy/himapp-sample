@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { ModalsAddNews, ModalsConfirmation, ModalsEditNews } from '#components';
-import type { INews, IProfile } from '~/types';
+import type { IMember, INews } from '~/types';
 import type { ICategoriesResponse, INewsResponse, ITagsResponse } from '~/types/IResponse';
 
 /**
@@ -242,7 +242,7 @@ const responsiveClasses = computed(() => ({
                         <NuxtLink :to="`/news/${news.slug}`">
                             <h2 class="text-xl font-semibold sm:text-3xl">{{
                                 news.title
-                            }}</h2>
+                                }}</h2>
                         </NuxtLink>
                     </div>
                     <template #footer>
@@ -250,9 +250,9 @@ const responsiveClasses = computed(() => ({
                             <div class="flex flex-row justify-between">
                                 <div>
                                     <div class="flex flex-row items-center gap-2">
-                                        <UAvatar :src="(news.author as IProfile)?.avatar" size="xs" />
+                                        <UAvatar :src="(news.author as IMember)?.avatar" size="xs" />
                                         <h2>
-                                            {{ (news.author as IProfile).fullName }}
+                                            {{ (news.author as IMember).fullName }}
                                         </h2>
                                     </div>
                                     <div v-if="news.published" class="text-sm font-light ms-3">

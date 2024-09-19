@@ -17,9 +17,9 @@ export const useOrganizer = () => {
   const fetchData = () => {
     organizer.value = null;
     if (status.value == "authenticated") {
-      if (user.value?.profile.organizer) {
+      if (user.value?.member.organizer) {
         isOrganizer.value = true;
-        organizer.value = user.value?.profile.organizer;
+        organizer.value = user.value?.member.organizer;
       }
     }
   };

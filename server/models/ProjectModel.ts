@@ -10,10 +10,10 @@ import {
  * Schema for representing a contributor to a project.
  */
 const contributorSchema = new Schema<IContributorSchema>({
-  profile: {
+  member: {
     type: Types.ObjectId,
     required: true,
-    ref: "Profile",
+    ref: "Member",
     autopopulate: {
       select: "NIM avatar fullName email class semester createdAt",
       match: {
@@ -31,10 +31,10 @@ const contributorSchema = new Schema<IContributorSchema>({
  * Schema for representing a registered participant in a project.
  */
 const registeredSchema = new Schema<IRegisteredSchema>({
-  profile: {
+  member: {
     type: Types.ObjectId,
     required: true,
-    ref: "Profile",
+    ref: "Member",
     autopopulate: {
       select: "NIM avatar fullName email class semester createdAt",
       match: {

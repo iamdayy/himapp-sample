@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { ModalsAddProject, ModalsEditProject, ModalsRegisteredUsers, UButton, UCard, UInput, UPagination, UPopover, USelect, UTable } from '#components';
-import type { IProfile, IProject } from '~/types';
+import type { IMember, IProject } from '~/types';
 
 /**
  * Composables for role and department checks
@@ -64,7 +64,7 @@ const project = computed<IProject | undefined>({
  * Form data for project registration
  */
 const registerForm = ref({
-    NIM: user.value?.profile.NIM,
+    NIM: user.value?.member.NIM,
     task: "",
     id: ""
 });
@@ -84,8 +84,8 @@ const pickDetail = (id: string) => {
  * @returns {boolean} - True if user is registered, false otherwise
  */
 const isMeRegistered = (project: IProject): boolean => {
-    const nim = user.value?.profile.NIM;
-    const found = project.registered?.find((registered) => (registered.profile as IProfile).NIM == nim);
+    const nim = user.value?.member.NIM;
+    const found = project.registered?.find((registered) => (registered.member as IMember).NIM == nim);
     return !!found;
 }
 
@@ -258,7 +258,8 @@ const visiblePages = computed(() => isMobile.value ? 3 : 5)
                             {{ pageFrom }} - {{ pageTo }} of {{ totalProjects }}
                         </span>
                         <UPagination :size="responsiveUISizes.button" color="gray" v-model="page" :total="totalProjects"
-                            :max="visiblePages" :show-last="!isMobile" :show-first="!isMobile" />
+                            :max="visiblePages" :show-last="!isMobile" :show-first="!isMobile"
+                            :ui="{ wrapper: 'flex items-center gap-1', rounded: '!rounded-full min-w-[32px] justify-center', default: { activeButton: { variant: 'outline' } } }" />
                     </div>
                 </div>
                 <div
@@ -334,7 +335,7 @@ const visiblePages = computed(() => isMobile.value ? 3 : 5)
                                     <UTable :columns="contributorHeaders" :rows="project?.contributors"
                                         :ui="{ td: { base: responsiveClasses.listItem } }">
                                         <template #name-data="{ row }">
-                                            {{ row.profile.fullName }}
+                                            {{ row.member.fullName }}
                                         </template>
                                     </UTable>
                                 </div>

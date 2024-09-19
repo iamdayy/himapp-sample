@@ -7,7 +7,7 @@ const answerSchema = new Schema<IAnswerSchema>(
     body: { type: String, required: true },
     author: {
       type: Schema.Types.ObjectId,
-      ref: "Profile",
+      ref: "Member",
       required: false,
       autopopulate: true,
     },
@@ -15,7 +15,7 @@ const answerSchema = new Schema<IAnswerSchema>(
       {
         user: {
           type: Schema.Types.ObjectId,
-          ref: "Profile",
+          ref: "Member",
           required: false,
           autopopulate: true,
         },

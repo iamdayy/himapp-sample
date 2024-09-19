@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { IAddressSchema, IProfileSchema } from "~/types/ISchemas";
+import { IAddressSchema, IMemberSchema } from "~/types/ISchemas";
 import { AgendaModel } from "./AgendaModel";
 import { ProjectModel } from "./ProjectModel";
 import { UserModel } from "./UserModel";
@@ -18,9 +18,9 @@ const AddressSchema = new Schema<IAddressSchema>({
 });
 
 /**
- * Schema for representing a user profile.
+ * Schema for representing a user member.
  */
-const profileSchema = new Schema<IProfileSchema>(
+const memberSchema = new Schema<IMemberSchema>(
   {
     NIM: {
       type: Number,
@@ -93,41 +93,41 @@ const profileSchema = new Schema<IProfileSchema>(
 );
 
 /**
- * Virtual field to get the year when the profile was created.
+ * Virtual field to get the year when the member was created.
  */
-profileSchema.virtual("enteredYear").get(function (this: IProfileSchema) {
+memberSchema.virtual("enteredYear").get(function (this: IMemberSchema) {
   return new Date(this.createdAt).getFullYear();
 });
 
 /**
- * Virtual field to get the projects associated with the profile.
+ * Virtual field to get the projects associated with the member.
  */
-profileSchema.virtual("projects", {
+memberSchema.virtual("projects", {
   ref: "Project",
   localField: "_id",
-  foreignField: "registered.profile",
+  foreignField: "registered.member",
   match: {
     deadline: { $gte: new Date() },
   },
 });
 
 /**
- * Virtual field to get the agendas associated with the profile.
+ * Virtual field to get the agendas associated with the member.
  */
-profileSchema.virtual("agendas", {
+memberSchema.virtual("agendas", {
   ref: "Agenda",
   localField: "_id",
-  foreignField: "registered.profile",
+  foreignField: "registered.member",
   match: {
     date: { $gte: new Date() },
   },
 });
 
 // Virtual for dailyManagement
-profileSchema.virtual("organizersDailyManagement", {
+memberSchema.virtual("organizersDailyManagement", {
   ref: "Organizer",
   localField: "_id",
-  foreignField: "dailyManagement.profile",
+  foreignField: "dailyManagement.member",
   justOne: true,
   match: {
     "period.end": { $gte: new Date() },
@@ -135,7 +135,7 @@ profileSchema.virtual("organizersDailyManagement", {
 });
 
 // Virtual for department coordinator
-profileSchema.virtual("organizersDepartmentCoordinator", {
+memberSchema.virtual("organizersDepartmentCoordinator", {
   ref: "Organizer",
   localField: "_id",
   foreignField: "department.coordinator",
@@ -147,7 +147,7 @@ profileSchema.virtual("organizersDepartmentCoordinator", {
 });
 
 // Virtual for department members
-profileSchema.virtual("organizersDepartmentMembers", {
+memberSchema.virtual("organizersDepartmentMembers", {
   ref: "Organizer",
   localField: "_id",
   foreignField: "department.members",
@@ -158,7 +158,7 @@ profileSchema.virtual("organizersDepartmentMembers", {
 });
 
 // Combine all organizers
-profileSchema.virtual("organizer").get(function () {
+memberSchema.virtual("organizer").get(function () {
   return (
     this.organizersDailyManagement ||
     this.organizersDepartmentCoordinator ||
@@ -166,53 +166,53 @@ profileSchema.virtual("organizer").get(function () {
   );
 });
 
-// Create a text index for searching profiles
-profileSchema.index({ NIM: "text", fullName: "text", email: "text" });
+// Create a text index for searching members
+memberSchema.index({ NIM: "text", fullName: "text", email: "text" });
 
 /**
- * Post-save middleware to handle profile deletion.
- * Removes the profile from associated projects, events, and deletes the user.
+ * Post-save middleware to handle member deletion.
+ * Removes the member from associated projects, events, and deletes the user.
  */
-profileSchema.post("save", async function (next) {
-  const profile = this;
-  const profileId = this._id;
-  if (profile.status == "deleted") {
+memberSchema.post("save", async function (next) {
+  const member = this;
+  const memberId = this._id;
+  if (member.status == "deleted") {
     await ProjectModel.updateMany(
       {
         $or: [
-          { "contributors.profile": profileId },
-          { "registered.profile": profileId },
+          { "contributors.member": memberId },
+          { "registered.member": memberId },
         ],
       },
       {
         $pull: {
-          contributors: { profile: profileId },
-          registered: { profile: profileId },
+          contributors: { member: memberId },
+          registered: { member: memberId },
         },
       }
     );
     await AgendaModel.updateMany(
       {
         $or: [
-          { "committee.user": profileId },
-          { "registered.profile": profileId },
+          { "committee.user": memberId },
+          { "registered.member": memberId },
         ],
       },
       {
         $pull: {
-          committee: { user: profileId },
-          registered: { profile: profileId },
+          committee: { user: memberId },
+          registered: { member: memberId },
         },
       }
     );
-    await UserModel.findOneAndDelete({ profile: profileId });
+    await UserModel.findOneAndDelete({ member: memberId });
   }
 });
 
 /**
- * Mongoose model for the Profile collection.
+ * Mongoose model for the Member collection.
  */
-export const ProfileModel = mongoose.model<IProfileSchema>(
-  "Profile",
-  profileSchema
+export const MemberModel = mongoose.model<IMemberSchema>(
+  "Member",
+  memberSchema
 );

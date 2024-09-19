@@ -10,10 +10,10 @@ import type {
   IDailyManagement,
   IDepartment,
   IForm,
+  IMember,
   INews,
   IOrganizer,
   IPhoto,
-  IProfile,
   IProject,
   IQuestion,
   IRegistered,
@@ -45,9 +45,9 @@ export interface IConfigSchema extends IConfig, Document {
 }
 
 /**
- * Extends the IProfile interface with Document and adds timestamp fields.
+ * Extends the IMember interface with Document and adds timestamp fields.
  */
-export interface IProfileSchema extends Omit<IProfile, "id">, Document {
+export interface IMemberSchema extends Omit<IMember, "id">, Document {
   createdAt: Date;
   updatedAt: Date;
 }

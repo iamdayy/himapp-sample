@@ -1,8 +1,8 @@
 <script setup lang='ts'>
 import { ModalsCropImage } from "#components";
 import imageCompression from "browser-image-compression";
-import type { IProfile } from "~/types";
-import type { IReqProfileAvatar } from "~/types/IRequestPost";
+import type { IMember } from "~/types";
+import type { IReqMemberAvatar } from "~/types/IRequestPost";
 
 // Define page metadata
 definePageMeta({
@@ -12,7 +12,7 @@ definePageMeta({
 
 // Set page title
 useHead({
-    title: "My Profile"
+    title: "My Member"
 });
 
 const config = useRuntimeConfig();
@@ -53,7 +53,7 @@ const onFileChange = async ($event: Event) => {
             img: blob,
             title: file.value.name,
             async onCropped(file) {
-                const body: IReqProfileAvatar = {
+                const body: IReqMemberAvatar = {
                     avatar: {
                         name: file.name,
                         content: await convert(file),
@@ -62,10 +62,10 @@ const onFileChange = async ($event: Event) => {
                         lastModified: file.lastModified
                     }
                 }
-                await $api("/api/profile/avatar", {
+                await $api("/api/member/avatar", {
                     method: "put",
                     query: {
-                        NIM: user.value.profile.NIM
+                        NIM: user.value.member.NIM
                     },
                     body
                 });
@@ -174,7 +174,7 @@ const getActivinessLetter = () => {
                                 width: 5
                             },
                             {
-                                text: (organizer?.dailyManagement.find((dm) => dm.position.includes('Ketua') || dm.position.includes('Chairman'))?.profile as IProfile).fullName
+                                text: (organizer?.dailyManagement.find((dm) => dm.position.includes('Ketua') || dm.position.includes('Chairman'))?.member as IMember).fullName
                             },
                         ],
                     },
@@ -190,7 +190,7 @@ const getActivinessLetter = () => {
                                 width: 5
                             },
                             {
-                                text: (organizer?.dailyManagement.find((dm) => dm.position.includes('Ketua') || dm.position.includes('Chairman'))?.profile as IProfile).NIM
+                                text: (organizer?.dailyManagement.find((dm) => dm.position.includes('Ketua') || dm.position.includes('Chairman'))?.member as IMember).NIM
                             },
                         ],
                     },
@@ -226,7 +226,7 @@ const getActivinessLetter = () => {
                                 width: 5
                             },
                             {
-                                text: user.value.profile.fullName
+                                text: user.value.member.fullName
                             },
                         ],
                     },
@@ -242,7 +242,7 @@ const getActivinessLetter = () => {
                                 width: 5
                             },
                             {
-                                text: user.value.profile.NIM
+                                text: user.value.member.NIM
                             },
                         ],
                     },
@@ -258,7 +258,7 @@ const getActivinessLetter = () => {
                                 width: 5
                             },
                             {
-                                text: user.value.profile.class
+                                text: user.value.member.class
                             },
                         ],
                     },
@@ -310,11 +310,11 @@ const getActivinessLetter = () => {
                                         margin: [0, 80, 0, 0],
                                         stack: [
                                             {
-                                                text: (organizer?.dailyManagement.find((dm) => dm.position.includes('Ketua') || dm.position.includes('Chairman'))?.profile as IProfile).fullName,
+                                                text: (organizer?.dailyManagement.find((dm) => dm.position.includes('Ketua') || dm.position.includes('Chairman'))?.member as IMember).fullName,
                                                 decoration: 'underline'
                                             },
                                             {
-                                                text: (organizer?.dailyManagement.find((dm) => dm.position.includes('Ketua') || dm.position.includes('Chairman'))?.profile as IProfile).NIM,
+                                                text: (organizer?.dailyManagement.find((dm) => dm.position.includes('Ketua') || dm.position.includes('Chairman'))?.member as IMember).NIM,
                                                 bold: false
                                             }
                                         ]
@@ -330,11 +330,11 @@ const getActivinessLetter = () => {
                                         margin: [0, 80, 0, 0],
                                         stack: [
                                             {
-                                                text: (organizer?.dailyManagement.find((dm) => dm.position.includes('Sekretaris') || dm.position.includes('Secretary'))?.profile as IProfile).fullName,
+                                                text: (organizer?.dailyManagement.find((dm) => dm.position.includes('Sekretaris') || dm.position.includes('Secretary'))?.member as IMember).fullName,
                                                 decoration: 'underline'
                                             },
                                             {
-                                                text: (organizer?.dailyManagement.find((dm) => dm.position.includes('Sekretaris') || dm.position.includes('Secretary'))?.profile as IProfile).NIM,
+                                                text: (organizer?.dailyManagement.find((dm) => dm.position.includes('Sekretaris') || dm.position.includes('Secretary'))?.member as IMember).NIM,
                                                 bold: false
                                             }
                                         ]
@@ -356,7 +356,7 @@ const getActivinessLetter = () => {
             fontSize: 12,
             font: "Times"
         }
-    }).download(`${user.value.profile.fullName}-Surat-Keatifan`);
+    }).download(`${user.value.member.fullName}-Surat-Keatifan`);
 }
 
 // Compute if the user has access to download the activeness letter
@@ -383,15 +383,15 @@ const accessGetActivinessLetter = computed(() => ((all.value / allCanMeRegister.
                             <!-- User details -->
                             <div class="flex flex-col pb-3">
                                 <dt class="mb-1 text-sm text-gray-500 sm:text-base dark:text-gray-400">Full Name</dt>
-                                <dd class="text-base font-semibold sm:text-lg">{{ user.profile.fullName }}</dd>
+                                <dd class="text-base font-semibold sm:text-lg">{{ user.member.fullName }}</dd>
                             </div>
                             <div class="flex flex-col py-3">
                                 <dt class="mb-1 text-sm text-gray-500 sm:text-base dark:text-gray-400">Birth</dt>
                                 <div class="flex flex-wrap" v-if="editMode">
                                     <UInput type="text" name="birth" id="birth" placeholder="Jakarta"
-                                        v-model="user.profile.birth.place" required
+                                        v-model="user.member.birth.place" required
                                         :class="isMobile ? 'w-full mb-2' : 'w-1/2 mb-0 mr-2'" />
-                                    <VDatePicker id="date" v-model="user.profile.birth.date" mode="date">
+                                    <VDatePicker id="date" v-model="user.member.birth.date" mode="date">
                                         <template #default="{ togglePopover }">
                                             <button @click="togglePopover" :class="isMobile ? 'w-full mb-2' : 'w-auto'">
                                                 <Icon name="solar:calendar-date-outline"
@@ -401,38 +401,38 @@ const accessGetActivinessLetter = computed(() => ((all.value / allCanMeRegister.
                                     </VDatePicker>
                                     <label :class="isMobile ? 'w-full text-center' : 'w-auto text-left'"
                                         class="block my-auto text-sm font-medium text-gray-900 dark:text-white">
-                                        {{ new Date(user.profile.birth.date).toLocaleDateString('id-ID', {
+                                        {{ new Date(user.member.birth.date).toLocaleDateString('id-ID', {
                                             year: 'numeric', month: 'long', day: 'numeric'
                                         }) }}
                                     </label>
                                 </div>
-                                <dd v-else class="text-base font-semibold sm:text-lg">{{ `${user.profile.birth.place},
+                                <dd v-else class="text-base font-semibold sm:text-lg">{{ `${user.member.birth.place},
                                     ${new
-                                        Date(user.profile.birth.date).toLocaleDateString('id-ID', {
+                                        Date(user.member.birth.date).toLocaleDateString('id-ID', {
                                             year: 'numeric', month:
                                                 'long', day: 'numeric'
                                         })}` }}</dd>
                             </div>
                             <div class="flex flex-col py-3">
                                 <dt class="mb-1 text-sm text-gray-500 sm:text-base dark:text-gray-400">Sex</dt>
-                                <UInput v-model="user.profile.sex" v-if="editMode" />
-                                <dd v-else class="text-base font-semibold sm:text-lg">{{ user.profile.sex }}</dd>
+                                <UInput v-model="user.member.sex" v-if="editMode" />
+                                <dd v-else class="text-base font-semibold sm:text-lg">{{ user.member.sex }}</dd>
                             </div>
                             <div class="flex flex-col py-3">
                                 <dt class="mb-1 text-sm text-gray-500 sm:text-base dark:text-gray-400">Religion</dt>
                                 <dt class="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Religion</dt>
-                                <UInput v-model="user.profile.religion" v-if="editMode" />
-                                <dd v-else class="text-lg font-semibold">{{ user.profile.religion }}</dd>
+                                <UInput v-model="user.member.religion" v-if="editMode" />
+                                <dd v-else class="text-lg font-semibold">{{ user.member.religion }}</dd>
                             </div>
                             <div class="flex flex-col py-3">
                                 <dt class="mb-1 text-gray-500 md:text-lg dark:text-gray-400">citizen</dt>
-                                <UInput v-model="user.profile.citizen" v-if="editMode" />
-                                <dd v-else class="text-lg font-semibold">{{ user.profile.citizen }}</dd>
+                                <UInput v-model="user.member.citizen" v-if="editMode" />
+                                <dd v-else class="text-lg font-semibold">{{ user.member.citizen }}</dd>
                             </div>
                             <div class="flex flex-col pt-3">
                                 <dt class="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Phone number</dt>
-                                <UInput v-model="user.profile.phone" v-if="editMode" />
-                                <dd v-else class="text-lg font-semibold">{{ user.profile.phone }}</dd>
+                                <UInput v-model="user.member.phone" v-if="editMode" />
+                                <dd v-else class="text-lg font-semibold">{{ user.member.phone }}</dd>
                             </div>
                         </dl>
                     </div>
@@ -446,29 +446,29 @@ const accessGetActivinessLetter = computed(() => ((all.value / allCanMeRegister.
                             <div class="flex flex-col pb-6">
                                 <dt class="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Position</dt>
                                 <dd class="text-lg font-semibold">
-                                    {{ user.profile.organizer.role || 'Member' }}
+                                    {{ user.member.organizer.role || 'Member' }}
                                 </dd>
                                 <dd class="text-sm font-light text-gray-500 dark:text-gray-400">
-                                    {{ `${new Date(user.profile.organizer.period.start).getFullYear()} - ${new
-                                        Date(user.profile.organizer.period.end).getFullYear()}` }}
+                                    {{ `${new Date(user.member.organizer.period.start).getFullYear()} - ${new
+                                        Date(user.member.organizer.period.end).getFullYear()}` }}
                                 </dd>
                             </div>
                             <div class="flex flex-col pb-6">
                                 <dt class="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Agendas</dt>
-                                <dd class="text-lg font-semibold">{{ user.profile.agendas.length }}</dd>
+                                <dd class="text-lg font-semibold">{{ user.member.agendas.length }}</dd>
                             </div>
                             <div class="flex flex-col pt-3">
                                 <dt class="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Projects</dt>
-                                <dd class="text-lg font-semibold">{{ user.profile.projects.length }}</dd>
+                                <dd class="text-lg font-semibold">{{ user.member.projects.length }}</dd>
                             </div>
                         </dl>
                     </div>
                 </div>
                 <div class="w-full pt-12 md:w-1/3">
                     <UCard class="mx-2 md:mx-8">
-                        <!-- User avatar and profile summary -->
+                        <!-- User avatar and member summary -->
                         <div class="relative w-56 h-56 mx-auto -mt-32 overflow-hidden rounded-full group">
-                            <NuxtImg provider="localProvider" :src="user.profile.avatar || '/img/profile-blank.png'"
+                            <NuxtImg provider="localProvider" :src="user.member.avatar || '/img/member-blank.png'"
                                 class="object-cover rounded-full max-w-56 aspect-square" />
                             <div
                                 class="absolute top-0 left-0 flex items-center justify-center w-full h-0 gap-2 duration-500 bg-orange-400 rounded-full opacity-0 bg-opacity-95 group-hover:h-full group-hover:opacity-100">
@@ -488,26 +488,26 @@ const accessGetActivinessLetter = computed(() => ((all.value / allCanMeRegister.
                                 {{ user.username }}
                             </h2>
                             <dl class="w-full text-gray-900 dark:text-white">
-                                <!-- User profile summary -->
+                                <!-- User member summary -->
                                 <div class="flex flex-col pb-6">
-                                    <dd class="text-lg font-semibold">{{ user.profile.email }}</dd>
+                                    <dd class="text-lg font-semibold">{{ user.member.email }}</dd>
                                 </div>
                                 <div class="flex flex-col py-3">
                                     <dt class="text-sm text-gray-500 dark:text-gray-400">NIM</dt>
-                                    <dd class="text-lg font-semibold">{{ user.profile.NIM }}
+                                    <dd class="text-lg font-semibold">{{ user.member.NIM }}
                                     </dd>
                                 </div>
                                 <div class="flex flex-col py-3">
                                     <dt class="text-sm text-gray-500 dark:text-gray-400">Class</dt>
-                                    <dd class="text-lg font-semibold">{{ user.profile.class }}</dd>
+                                    <dd class="text-lg font-semibold">{{ user.member.class }}</dd>
                                 </div>
                                 <div class="flex flex-col py-3">
                                     <dt class="text-sm text-gray-500 dark:text-gray-400">Semester</dt>
-                                    <dd class="text-lg font-semibold">{{ user.profile.semester }}</dd>
+                                    <dd class="text-lg font-semibold">{{ user.member.semester }}</dd>
                                 </div>
                                 <div class="flex flex-col py-3">
                                     <dt class="text-sm text-gray-500 dark:text-gray-400">Entered Year</dt>
-                                    <dd class="text-lg font-semibold">{{ user.profile.enteredYear }}</dd>
+                                    <dd class="text-lg font-semibold">{{ user.member.enteredYear }}</dd>
                                 </div>
                                 <div class="flex flex-col pt-3">
                                     <UButton block label="Download Activiness Letter" class="mb-1"

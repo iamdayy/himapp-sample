@@ -1,6 +1,6 @@
 <script setup lang='ts'>
-import { ModalsEditProfile } from '#components';
-import type { IProfile } from '~/types';
+import { ModalsEditMember } from '#components';
+import type { IMember } from '~/types';
 
 // Define page metadata
 definePageMeta({
@@ -74,9 +74,9 @@ const toast = useToast();
 const modal = useModal();
 
 // Reactive variables
-const selectedCollegers = ref<IProfile[]>([]);
+const selectedCollegers = ref<IMember[]>([]);
 const loading = ref<boolean>(false);
-const DataFromCSV = ref<IProfile[]>([]);
+const DataFromCSV = ref<IMember[]>([]);
 
 /**
  * Handle file upload and parse CSV data
@@ -91,7 +91,7 @@ const onChangeXlsx = async (file: File) => {
             method: "POST",
             body: form,
         });
-        DataFromCSV.value = uploaded as IProfile[];
+        DataFromCSV.value = uploaded as IMember[];
         loading.value = false;
     } catch (error) {
         toast.add({ title: "Failed to read Data" })
@@ -105,7 +105,7 @@ const onChangeXlsx = async (file: File) => {
 const addCollegers = async () => {
     loading.value = true;
     try {
-        const added = await $fetch("/api/profile/batch", {
+        const added = await $fetch("/api/member/batch", {
             method: "post",
             body: selectedCollegers.value
         });
@@ -121,12 +121,12 @@ const addCollegers = async () => {
  * Download template for CSV import
  */
 const downloadTemplate = async () => {
-    const profile: IProfile = {
+    const member: IMember = {
         fullName: "",
         NIM: 0,
         email: "",
         phone: "",
-        avatar: "/profile-blank.png",
+        avatar: "/member-blank.png",
         religion: "",
         sex: "male",
         birth: {
@@ -152,7 +152,7 @@ const downloadTemplate = async () => {
             'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         },
         body: {
-            data: [profile]
+            data: [member]
         }
     })
     const blob = response;
@@ -172,10 +172,10 @@ const downloadTemplate = async () => {
 
 /**
  * Open edit modal for a specific member
- * @param {IProfile} Member - The member to edit
+ * @param {IMember} Member - The member to edit
  */
-const editModal = (Member: IProfile) => {
-    modal.open(ModalsEditProfile, {
+const editModal = (Member: IMember) => {
+    modal.open(ModalsEditMember, {
         Member,
         onReturnObject(value) {
             const index = DataFromCSV.value.findIndex((val) => val.NIM == value.NIM);

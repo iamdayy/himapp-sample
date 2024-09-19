@@ -1,6 +1,6 @@
+import { MemberModel } from "~/server/models/MemberModel";
 import OrganizerModel from "~/server/models/OrganizerModel";
-import { ProfileModel } from "~/server/models/ProfileModel";
-import { IFile, IOrganizer, IProfile } from "~/types";
+import { IFile, IMember, IOrganizer } from "~/types";
 import { IResponse } from "~/types/IResponse";
 
 export default defineEventHandler(async (event): Promise<IResponse> => {
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
       event.context.organizer as IOrganizer
     ).dailyManagement.some(
       (daily) =>
-        (daily.profile as IProfile).NIM === user.profile.NIM &&
+        (daily.member as IMember).NIM === user.member.NIM &&
         ["Ketua", "Chairman", "Leader"].includes(daily.position)
     );
 
@@ -82,30 +82,28 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
     };
 
     const considerationBoardPromises = body.considerationBoard.map(
-      async (profile) => {
-        return await getProfileIdByNim(profile as number);
+      async (member) => {
+        return await getMemberIdByNim(member as number);
       }
     );
 
     const dailyManagementPromises = body.dailyManagement.map(async (daily) => {
-      const profileId = await getProfileIdByNim(daily.profile as number);
+      const memberId = await getMemberIdByNim(daily.member as number);
       return {
         position: daily.position,
-        profile: profileId,
+        member: memberId,
       };
     });
 
     const departmentPromises = body.department.map(async (department) => {
-      const profileId = await getProfileIdByNim(
-        department.coordinator as number
-      );
+      const memberId = await getMemberIdByNim(department.coordinator as number);
       const memberPromises = department.members.map(async (member) => {
-        return await getProfileIdByNim(member as number);
+        return await getMemberIdByNim(member as number);
       });
 
       return {
         name: department.name,
-        coordinator: profileId,
+        coordinator: memberId,
         members: await Promise.all(memberPromises),
       };
     });
@@ -144,10 +142,10 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
   }
 });
 
-const getProfileIdByNim = async (NIM: number) => {
+const getMemberIdByNim = async (NIM: number) => {
   console.log(NIM);
 
-  const profile = await ProfileModel.findOne({ NIM });
-  console.log(profile);
-  return profile?._id || null;
+  const member = await MemberModel.findOne({ NIM });
+  console.log(member);
+  return member?._id || null;
 };

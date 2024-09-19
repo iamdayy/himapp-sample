@@ -1,6 +1,6 @@
 import { AnswerModel } from "~/server/models/AnswerModel";
-import { ProfileModel } from "~/server/models/ProfileModel";
-import { IProfile } from "~/types";
+import { MemberModel } from "~/server/models/MemberModel";
+import { IMember } from "~/types";
 import { IVoteResponse } from "~/types/IResponse";
 
 export default defineEventHandler(async (event): Promise<IVoteResponse> => {
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event): Promise<IVoteResponse> => {
 
     // Check if user has already voted
     const existingVoteIndex = answer.votes.findIndex(
-      (vote) => (vote.user as IProfile).NIM === user.profile.NIM
+      (vote) => (vote.user as IMember).NIM === user.member.NIM
     );
 
     if (existingVoteIndex !== -1) {
@@ -62,9 +62,9 @@ export default defineEventHandler(async (event): Promise<IVoteResponse> => {
         existingVote.voteType = voteType;
       }
     } else {
-      const profile = await ProfileModel.findOne({ NIM: user.profile.NIM });
+      const member = await MemberModel.findOne({ NIM: user.member.NIM });
       // Add new vote
-      answer.votes.push({ user: profile?._id as any, voteType });
+      answer.votes.push({ user: member?._id as any, voteType });
     }
 
     // Recalculate total votes

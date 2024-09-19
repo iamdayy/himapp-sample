@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { ModalsAddAgenda, ModalsEditAgenda, ModalsRegisteredUsers } from "#components";
-import type { IAgenda, IProfile } from "~/types";
+import type { IAgenda, IMember } from "~/types";
 import type { IResponse } from "~/types/IResponse";
 /**
  * Define page metadata
@@ -42,7 +42,7 @@ const selectedRegistered = ref<Array<any>>([]);
  * Form data for event registration
  */
 const registerForm = ref({
-    NIM: user.value?.profile.NIM,
+    NIM: user.value?.member.NIM,
     id: ""
 })
 
@@ -114,8 +114,8 @@ const attributes = computed(() => [
  * @returns {boolean} - True if the user is registered, false otherwise
  */
 const isMeRegistered = (agenda: IAgenda): boolean => {
-    const nim = user.value?.profile.NIM;
-    const found = agenda.registered?.find((registered) => (registered.profile as IProfile).NIM == nim);
+    const nim = user.value?.member.NIM;
+    const found = agenda.registered?.find((registered) => (registered.member as IMember).NIM == nim);
     return !!found;
 }
 

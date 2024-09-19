@@ -58,7 +58,7 @@ const responsiveUISizes = computed(() => ({
 const schema = object({
     dailyManagements: array().of(object({
         position: string().required(),
-        profile: string().required()
+        member: string().required()
     })),
     departments: array().of(object({
         name: string().required(),

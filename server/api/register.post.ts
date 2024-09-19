@@ -1,10 +1,10 @@
 import { UserModel } from "~/server/models/UserModel";
+import {
+  findMemberAndMarkRegister,
+  findMemberByNim,
+} from "~/server/utils/findMember";
 import { IReqRegister } from "~/types/IRequestPost";
 import { IRegisterResponse } from "~/types/IResponse";
-import {
-  findProfileAndMarkRegister,
-  findProfileByNim,
-} from "../utils/findProfile";
 
 /**
  * Handles POST requests for user registration.
@@ -17,9 +17,9 @@ export default defineEventHandler(async (event): Promise<IRegisterResponse> => {
     // Read the request body
     const body = await readBody<IReqRegister>(event);
 
-    // Find the profile ID associated with the given NIM
-    const profileId = await findProfileByNim(body.NIM);
-    if (!profileId) {
+    // Find the member ID associated with the given NIM
+    const memberId = await findMemberByNim(body.NIM);
+    if (!memberId) {
       throw createError({
         statusCode: 400,
         statusMessage: "Error: Your NIM was not found in our records.",
@@ -29,11 +29,11 @@ export default defineEventHandler(async (event): Promise<IRegisterResponse> => {
     // Prepare the user registration form
     const form = {
       ...body,
-      profile: profileId,
+      member: memberId,
     };
 
-    // Mark the profile as registered
-    await findProfileAndMarkRegister(profileId);
+    // Mark the member as registered
+    await findMemberAndMarkRegister(memberId);
 
     // Create a new user instance and save it
     const user = new UserModel(form);

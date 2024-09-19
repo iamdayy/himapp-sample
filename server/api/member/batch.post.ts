@@ -1,8 +1,8 @@
-import { ProfileModel } from "~/server/models/ProfileModel";
-import { IProfile } from "~/types";
+import { MemberModel } from "~/server/models/MemberModel";
+import { IMember } from "~/types";
 import { IResponse } from "~/types/IResponse";
 /**
- * Handles POST requests for batch creation of user profiles.
+ * Handles POST requests for batch creation of user members.
  * @param {H3Event} event - The H3 event object.
  * @returns {Promise<Object>} An object containing the status code and message of the operation.
  * @throws {H3Error} If the user is not authorized, no data is saved, or if a system error occurs.
@@ -25,13 +25,13 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
       });
     }
 
-    // Read the request body containing an array of profile data
-    const body = await readBody<IProfile[]>(event);
+    // Read the request body containing an array of member data
+    const body = await readBody<IMember[]>(event);
 
-    // Attempt to insert multiple profiles into the database
-    const saved = await ProfileModel.collection.insertMany(body);
+    // Attempt to insert multiple members into the database
+    const saved = await MemberModel.collection.insertMany(body);
 
-    // Check if any profiles were actually inserted
+    // Check if any members were actually inserted
     if (saved.insertedCount === 0) {
       throw createError({
         statusCode: 500,
@@ -39,17 +39,17 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
       });
     }
 
-    // Return success message with the number of inserted profiles
+    // Return success message with the number of inserted members
     return {
       statusCode: 200,
-      statusMessage: `Successfully saved ${saved.insertedCount} new college profiles`,
+      statusMessage: `Successfully saved ${saved.insertedCount} new college members`,
     };
   } catch (error: any) {
     // Handle any errors that occur during the process
     return {
       statusCode: error.statusCode || 500,
       statusMessage:
-        error.message || "An unexpected error occurred while saving profiles",
+        error.message || "An unexpected error occurred while saving members",
     };
   }
 });

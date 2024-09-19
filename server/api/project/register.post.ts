@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { ProfileModel } from "~/server/models/ProfileModel";
+import { MemberModel } from "~/server/models/MemberModel";
 import { ProjectModel } from "~/server/models/ProjectModel";
 import type { IResponse } from "~/types/IResponse";
 /**
@@ -31,18 +31,18 @@ export default defineEventHandler(async (ev): Promise<IResponse> => {
       });
     }
 
-    // Find the user profile by NIM
-    const me = await ProfileModel.findOne({ NIM });
+    // Find the user member by NIM
+    const me = await MemberModel.findOne({ NIM });
     if (!me) {
       throw createError({
         statusCode: 404,
-        statusMessage: "User profile not found",
+        statusMessage: "User member not found",
       });
     }
 
     // Add the user to the project's registered list
     project.registered?.push({
-      profile: me._id as Types.ObjectId,
+      member: me._id as Types.ObjectId,
       task,
     });
 

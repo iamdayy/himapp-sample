@@ -31,7 +31,7 @@ export const useProjects = () => {
     return data.value?.data?.length;
   });
   const projectsMe = computed<IProject[]>(() => {
-    return user.value?.profile.projects;
+    return user.value?.member.projects;
   });
   const ProjectsCanMeRegistered = computed<IProject[] | undefined>(() => {
     return data.value?.data?.projects?.filter((Project) =>

@@ -39,7 +39,7 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
     if (!news.published) {
       // Ensure the user is authenticated and has the necessary permissions
       const user = await ensureAuth(event);
-      if (!user.profile.organizer) {
+      if (!user.member.organizer) {
         throw createError({
           statusCode: 403,
           statusMessage: "You must be admin / departement to use this endpoint",

@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import type { IProfile, IProject } from "~/types";
+import type { IMember, IProject } from "~/types";
 
 /**
  * Set page metadata
@@ -122,26 +122,26 @@ const itemsNotLogged = [
 const links = computed(() => [
     [
         {
-            label: user.value.profile.fullName,
+            label: user.value.member.fullName,
             disabled: true
         },
         {
-            label: user.value.profile.email,
+            label: user.value.member.email,
             icon: 'i-heroicons-envelope',
             disabled: true
         },
         {
-            label: user.value.profile.phone,
+            label: user.value.member.phone,
             icon: 'i-heroicons-phone',
             disabled: true
         },
         {
-            label: user.value.profile.class,
+            label: user.value.member.class,
             icon: 'i-heroicons-building-library',
             disabled: true
         },
         {
-            label: user.value.profile.semester,
+            label: user.value.member.semester,
             icon: 'i-heroicons-chevron-double-up',
             disabled: true
         },
@@ -170,9 +170,9 @@ const links = computed(() => [
     ],
     [
         {
-            label: 'Users',
+            label: 'Members',
             icon: 'i-heroicons-users',
-            to: '/administrators/users'
+            to: '/administrators/members'
         },
         {
             label: 'Organizers',
@@ -234,7 +234,7 @@ onMounted(() => {
                         <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
                             :popper="{ placement: 'bottom-start' }">
                             <NuxtImg provider="localProvider" v-if="isLoggedIn"
-                                :src="user.profile.avatar || '/img/profile-blank.png'"
+                                :src="user.member.avatar || '/img/member-blank.png'"
                                 class="object-cover rounded-full max-w-8 aspect-square" />
                             <UAvatar v-else icon="i-heroicons-arrow-right-end-on-rectangle" />
 
@@ -277,15 +277,15 @@ onMounted(() => {
                             <NuxtLink to="/dashboard/profile">
                                 <div class="flex items-center w-full gap-6">
                                     <NuxtImg provider="localProvider"
-                                        :src="user.profile.avatar || '/img/profile-blank.png'"
+                                        :src="user.member.avatar || '/img/profile-blank.png'"
                                         class="object-cover rounded-full max-w-36 aspect-square" />
                                     <div>
                                         <h2 class="text-2xl font-bold text-gray-800 dark:text-white">{{
                                             user.username
-                                            }}
+                                        }}
                                         </h2>
                                         <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">{{
-                                            user.profile.NIM }}
+                                            user.member.NIM }}
                                         </h2>
                                     </div>
                                 </div>
@@ -318,7 +318,7 @@ onMounted(() => {
                                 <div class="flex items-center justify-between w-full mb-2">
                                     <h2 class="text-3xl text-gray-700 text-bold dark:text-gray-400">{{
                                         agendasMe.length
-                                    }}</h2>
+                                        }}</h2>
                                     <UIcon name="i-heroicons-calendar" class="text-6xl" />
                                 </div>
                                 <ClientOnly>
@@ -332,7 +332,7 @@ onMounted(() => {
                                 <div class="flex items-center justify-between w-full mb-2">
                                     <h2 class="text-3xl text-gray-700 text-bold dark:text-gray-400">{{
                                         projectsMe.length
-                                    }}</h2>
+                                        }}</h2>
                                     <UIcon name="i-heroicons-code-bracket" class="text-6xl" />
                                 </div>
                                 <ClientOnly>
@@ -419,11 +419,11 @@ onMounted(() => {
                                         :key="i" class="-mx-1">
                                         <img :data-tooltip-target="`tooltip-${i}`"
                                             class="object-cover w-6 h-6 border rounded-full shadow-md border-white/30"
-                                            :src="(contributor.profile as IProfile).avatar || '/img/profile-blank.png'"
+                                            :src="(contributor.member as IMember).avatar || '/img/member-blank.png'"
                                             alt="">
                                         <div :id="`tooltip-${i}`" role="tooltip"
                                             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
-                                            {{ `${(contributor.profile as IProfile).fullName}` }}
+                                            {{ `${(contributor.member as IMember).fullName}` }}
                                             <div class="tooltip-arrow" data-popper-arrow></div>
                                         </div>
                                     </div>
@@ -445,16 +445,16 @@ onMounted(() => {
                     <UButton color="gray" variant="ghost" size="sm" icon="i-heroicons-x-mark-20-solid"
                         class="absolute z-10 flex sm:hidden end-5 top-5" square padded @click="openSlideOver = false" />
                     <div class="mt-8">
-                        <NuxtLink to="/dashboard/profile">
+                        <NuxtLink to="/dashboard/member">
                             <div class="flex w-full gap-2">
-                                <UAvatar :src="user.profile.avatar" size="lg" />
+                                <UAvatar :src="user.member.avatar" size="lg" />
                                 <div>
                                     <h2 class="text-xl font-extrabold text-gray-800 dark:text-white">{{
                                         user.username
-                                        }}
+                                    }}
                                     </h2>
                                     <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">{{
-                                        user.profile.NIM }}
+                                        user.member.NIM }}
                                     </h2>
                                 </div>
                             </div>

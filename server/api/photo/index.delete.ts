@@ -28,9 +28,9 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
     const photo = await PhotoModel.findById(id);
     // Delete the associated main image file if it exists
     if (photo && photo.image) {
-      const imagePath = path.join(config.storageDir, photo.image);
+      const imagePath = path.join(config.storageDir, photo.image as string);
       if (fs.existsSync(imagePath)) {
-        deleteFile(photo.image);
+        deleteFile(photo.image as string);
       }
     }
     if (!photo) {

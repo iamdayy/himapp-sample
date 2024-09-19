@@ -1,11 +1,11 @@
-import { ProfileModel } from "~/server/models/ProfileModel";
-import type { IReqProfile } from "~/types/IRequestPost";
+import { MemberModel } from "~/server/models/MemberModel";
+import type { IReqMember } from "~/types/IRequestPost";
 import { IResponse } from "~/types/IResponse";
 /**
- * Handles POST requests for creating a new user profile.
+ * Handles POST requests for creating a new user member.
  * @param {H3Event} event - The H3 event object.
  * @returns {Promise<Object>} An object containing the status code and message of the operation.
- * @throws {H3Error} If the user is not authorized, the profile is not saved, or if a system error occurs.
+ * @throws {H3Error} If the user is not authorized, the member is not saved, or if a system error occurs.
  */
 export default defineEventHandler(async (event): Promise<IResponse> => {
   try {
@@ -24,33 +24,32 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
       });
     }
 
-    // Read the request body containing the profile data
-    const body = await readBody<IReqProfile>(event);
+    // Read the request body containing the member data
+    const body = await readBody<IReqMember>(event);
 
-    // Create a new profile instance and save it to the database
-    const profile = new ProfileModel(body);
-    const saved = await profile.save();
+    // Create a new member instance and save it to the database
+    const member = new MemberModel(body);
+    const saved = await member.save();
 
-    // Check if the profile was successfully saved
+    // Check if the member was successfully saved
     if (!saved) {
       throw createError({
         statusCode: 500,
-        statusMessage: "Failed to save the profile data",
+        statusMessage: "Failed to save the member data",
       });
     }
 
-    // Return success message with the saved profile's NIM
+    // Return success message with the saved member's NIM
     return {
       statusCode: 200,
-      statusMessage: `Profile ${profile.NIM} successfully saved!`,
+      statusMessage: `Member ${member.NIM} successfully saved!`,
     };
   } catch (error: any) {
     // Handle any errors that occur during the process
     return {
       statusCode: error.statusCode || 500,
       statusMessage:
-        error.message ||
-        "An unexpected error occurred while saving the profile",
+        error.message || "An unexpected error occurred while saving the member",
     };
   }
 });

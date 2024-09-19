@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { IAnswer, IProfile } from '~/types';
+import type { IAnswer, IMember } from '~/types';
 import type { IQuestionDetailResponse, IResponse, IVoteResponse } from '~/types/IResponse';
 
 definePageMeta({
@@ -123,9 +123,9 @@ const sortedAnswers = computed(() => {
                     <h1 class="text-2xl font-bold">{{ data?.data?.title }}</h1>
                     <div class="flex items-center mt-2 text-sm text-gray-500">
                         <NuxtImg class="w-6 h-6 mr-2 rounded-full"
-                            :src="data?.data?.author ? (data?.data?.author as IProfile).avatar : '/img/profile-blank.png'"
-                            :alt="data?.data?.author ? (data?.data?.author as IProfile).fullName : 'Anonymous'" />
-                        <span>{{ data?.data?.author ? (data?.data?.author as IProfile).fullName : 'Anonymous' }}</span>
+                            :src="data?.data?.author ? (data?.data?.author as IMember).avatar : '/img/member-blank.png'"
+                            :alt="data?.data?.author ? (data?.data?.author as IMember).fullName : 'Anonymous'" />
+                        <span>{{ data?.data?.author ? (data?.data?.author as IMember).fullName : 'Anonymous' }}</span>
                         <span class="mx-2">•</span>
                         <span>asked {{ formatDate(data?.data?.createdAt as Date) }}</span>
 
@@ -168,9 +168,9 @@ const sortedAnswers = computed(() => {
                         <TiptapShow :content="answer.body" />
                         <div class="flex items-center mt-4 text-sm text-gray-500">
                             <NuxtImg class="w-6 h-6 mr-2 rounded-full"
-                                :src="answer.author ? (answer.author as IProfile).avatar : '/img/profile-blank.png'"
-                                :alt="answer.author ? (answer.author as IProfile).fullName : 'Anonymous'" />
-                            <span>{{ answer.author ? (answer.author as IProfile).fullName : 'Anonymous' }}</span>
+                                :src="answer.author ? (answer.author as IMember).avatar : '/img/member-blank.png'"
+                                :alt="answer.author ? (answer.author as IMember).fullName : 'Anonymous'" />
+                            <span>{{ answer.author ? (answer.author as IMember).fullName : 'Anonymous' }}</span>
                             <span class="mx-2">•</span>
                             <span>answered {{ formatDate(answer.createdAt) }}</span>
                         </div>

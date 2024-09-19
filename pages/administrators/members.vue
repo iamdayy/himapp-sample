@@ -1,6 +1,6 @@
 <script setup lang='ts'>
-import { ModalsAddProfile, ModalsConfirmation, ModalsEditProfile } from '#components';
-import type { IProfileResponse } from '~/types/IResponse';
+import { ModalsAddMember, ModalsConfirmation, ModalsEditMember } from '#components';
+import type { IMemberResponse } from '~/types/IResponse';
 
 /**
  * Page metadata configuration
@@ -42,7 +42,7 @@ const isTablet = computed(() => width.value >= 640 && width.value < 1024);
  */
 const responsiveUISizes = computed(() => ({
     input: isMobile.value ? 'sm' : 'md',
-    button: isMobile.value ? 'sm' : isTablet.value ? 'md' : 'lg',
+    button: isMobile.value ? 'sm' : 'md',
     select: isMobile.value ? 'sm' : 'md',
 }));
 
@@ -120,7 +120,7 @@ const pageCount = ref(10);
 /**
  * Fetch data from API
  */
-const { data, pending, refresh } = await useLazyAsyncData('users', () => $api<IProfileResponse>('/api/profile', {
+const { data, pending, refresh } = await useLazyAsyncData('users', () => $api<IMemberResponse>('/api/member', {
     query: {
         search: search.value,
         page: page.value,
@@ -134,7 +134,7 @@ const { data, pending, refresh } = await useLazyAsyncData('users', () => $api<IP
 }), {
     default: () => ({
         data: {
-            profiles: [],
+            members: [],
             filters: [],
             length: 0
         }
@@ -165,7 +165,7 @@ const pageCountOptions = computed(() => {
  */
 const deleteMember = async (NIM: number) => {
     try {
-        const deleted = await $api('/api/profile', {
+        const deleted = await $api('/api/member', {
             method: 'delete',
             query: { NIM }
         });
@@ -182,7 +182,7 @@ const generateXlsx = async () => {
     try {
         let toExcel = selectedRows.value;
         if (selectedRows.value.length == 0) {
-            toExcel = (await $api<IProfileResponse>('/api/profile')).data.profiles;
+            toExcel = (await $api<IMemberResponse>('/api/member')).data.members;
         }
         const response = await $fetch<Blob>('/api/sheet/export', {
             method: "post",
@@ -220,7 +220,7 @@ watch([search, filter], () => {
  * Open add modal
  */
 const addModal = () => {
-    modal.open(ModalsAddProfile, {
+    modal.open(ModalsAddMember, {
         onTriggerRefresh() {
             refresh();
         }
@@ -232,7 +232,7 @@ const addModal = () => {
  * @param {number} NIM - The NIM of the member to edit
  */
 const editModal = (NIM: number) => {
-    modal.open(ModalsEditProfile, { NIM });
+    modal.open(ModalsEditMember, { NIM });
 };
 
 /**
@@ -284,17 +284,17 @@ const colorbadge = (status: "active" | "inactive" | "free" | "deleted") => {
 </script>
 <template>
     <div class="items-center justify-center mb-24">
-        <div class="mx-auto text-center">
-            <h2 class="text-2xl font-extrabold leading-tight tracking-tight text-gray-600 md:text-4xl dark:text-white">
-                Users
-            </h2>
-        </div>
-        <UCard class="px-4 mt-6 md:px-8">
+        <UCard class="px-8 mt-6">
             <template #header>
-                <UButton label="New" :size="responsiveUISizes.button" :ui="{ rounded: 'rounded-full' }"
-                    v-if="isOrganizer" block @click="addModal" />
-                <UButton label="Import" :size="responsiveUISizes.button" :ui="{ rounded: 'rounded-full' }"
-                    class="mx-auto my-3" v-if="isOrganizer" to="/administrators/import" />
+                <div class="flex justify-between w-full">
+                    <h2 class="text-2xl font-semibold sm:text-4xl dark:text-gray-200">Users</h2>
+                    <div class="flex flex-row gap-2">
+                        <UButton label="New" :size="responsiveUISizes.button" :ui="{ rounded: 'rounded-full' }"
+                            v-if="isOrganizer" class="mx-auto my-3" @click="addModal" />
+                        <UButton label="Import" :size="responsiveUISizes.button" :ui="{ rounded: 'rounded-full' }"
+                            class="mx-auto my-3" v-if="isOrganizer" to="/administrators/import" />
+                    </div>
+                </div>
             </template>
             <div class="w-full py-3">
                 <!-- Filters -->
@@ -354,16 +354,16 @@ const colorbadge = (status: "active" | "inactive" | "free" | "deleted") => {
                 <div class="overflow-x-auto">
 
 
-                    <UTable v-model="selectedRows" v-model:sort="sort" :rows="data.data.profiles"
-                        :columns="columnsTable" :loading="pending" sort-asc-icon="i-heroicons-arrow-up"
-                        sort-desc-icon="i-heroicons-arrow-down" sort-mode="manual" class="w-full"
-                        :ui="{ default: { checkbox: { color: 'gray' } } }" @select="select">
+                    <UTable v-model="selectedRows" v-model:sort="sort" :rows="data.data.members" :columns="columnsTable"
+                        :loading="pending" sort-asc-icon="i-heroicons-arrow-up" sort-desc-icon="i-heroicons-arrow-down"
+                        sort-mode="manual" class="w-full" :ui="{ default: { checkbox: { color: 'gray' } } }"
+                        @select="select">
                         <template #id-data="{ index }">
                             <span>{{ index + 1 }}</span>
                         </template>
 
                         <template #avatar-data="{ row }">
-                            <NuxtImg :src="row.avatar || '/img/profile-blank.png'" width="24" height="24"
+                            <NuxtImg provider="localProvider" :src="row.avatar || '/img/profile-blank.png'"
                                 class="object-cover rounded-full max-w-8 aspect-square" />
                         </template>
 

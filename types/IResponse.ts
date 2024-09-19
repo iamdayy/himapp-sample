@@ -1,10 +1,10 @@
 import type {
   IAgenda,
   IConfig,
+  IMember,
   INews,
   IOrganizer,
   IPhoto,
-  IProfile,
   IProject,
   IQuestion,
   IUser,
@@ -76,15 +76,15 @@ export interface IProjectsResponse extends IResponse {
 }
 
 /**
- * Interface representing the response for a profile query.
+ * Interface representing the response for a member query.
  * Extends IPaginateResponse to include pagination information.
  */
-export interface IProfileResponse extends IResponse {
+export interface IMemberResponse extends IResponse {
   data: {
     /** An array of available filter options. */
     filters: string[];
-    /** An array of profiles matching the query. */
-    profiles: IProfile[];
+    /** An array of members matching the query. */
+    members: IMember[];
     length: number;
   };
 }

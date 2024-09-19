@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import type { INews, IProfile } from '~/types';
+import type { IMember, INews } from '~/types';
 import type { INewsResponse } from '~/types/IResponse';
 
 const { $api } = useNuxtApp();
@@ -30,7 +30,7 @@ watch(data, () => {
                     <div v-if="news?.publishedAt" class="mt-2">
                         <span v-if="news?.publishedAt" class="text-gray-500 dark:text-gray-400">
                             Published at {{ new Date(news?.publishedAt!).toLocaleDateString() }} by {{
-                                (news?.author as IProfile).fullName }}
+                                (news?.author as IMember).fullName }}
                         </span>
                         <span v-else class="text-gray-500 dark:text-gray-400">
                             Draft

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { IProfile } from "~/types";
+import type { IMember } from "~/types";
 import type { IQuestionResponse } from "~/types/IResponse";
 
 definePageMeta({
@@ -40,7 +40,7 @@ const tagsOpt = computed(() => {
     if (pending.value) return [];
     if (error.value) return [];
     if (!tags.value?.data) return [];
-    return tags.value.data.map((tag, i) => ({ label: tag, id: i }));
+    return tags.value.data.tags.map((tag, i) => ({ label: tag, id: i }));
 });
 const tagSelected = ref<string[]>([]);
 const answered = ref(false);
@@ -142,9 +142,9 @@ const formatDate = (date: Date) => {
                                 <TiptapShow :content="item.body" />
                                 <div class="flex items-center mt-2 text-sm text-gray-500">
                                     <NuxtImg class="w-5 h-5 mr-2 rounded-full"
-                                        :src="item.author ? (item.author as IProfile).avatar : '/img/profile-blank.png'"
-                                        :alt="item.author ? (item.author as IProfile).fullName : 'Anonymous'" />
-                                    <span>{{ item.author ? (item.author as IProfile).fullName : 'Anonymous' }}</span>
+                                        :src="item.author ? (item.author as IMember).avatar : '/img/member-blank.png'"
+                                        :alt="item.author ? (item.author as IMember).fullName : 'Anonymous'" />
+                                    <span>{{ item.author ? (item.author as IMember).fullName : 'Anonymous' }}</span>
                                     <span class="mx-2">•</span>
                                     <span>asked {{ formatDate(item.createdAt) }}</span>
                                 </div>

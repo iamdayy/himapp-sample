@@ -1,31 +1,31 @@
 import { SortOrder } from "mongoose";
+import { MemberModel } from "~/server/models/MemberModel";
 import OrganizerModel from "~/server/models/OrganizerModel";
-import { ProfileModel } from "~/server/models/ProfileModel";
-import { IAgenda, IOrganizer, IProfile, IProject } from "~/types";
-import { IReqProfileQuery } from "~/types/IRequestPost";
+import { IAgenda, IMember, IOrganizer, IProject } from "~/types";
+import { IReqMemberQuery } from "~/types/IRequestPost";
 
 type ISortable = {
   [key: string]: SortOrder;
 };
 
 /**
- * Handles GET requests for retrieving user profiles.
+ * Handles GET requests for retrieving user members.
  * @param {H3Event} event - The H3 event object.
- * @returns {Promise<Object>} An object containing profiles, total count, and filters.
+ * @returns {Promise<Object>} An object containing members, total count, and filters.
  * @throws {H3Error} If the user is not authorized or if a system error occurs.
  */
 export default defineEventHandler(async (event) => {
   try {
     let { NIM, perPage, page, order, sort, search, filter, filterBy, deleted } =
-      getQuery<IReqProfileQuery>(event);
+      getQuery<IReqMemberQuery>(event);
 
-    // If NIM is provided without pagination, return a single profile
+    // If NIM is provided without pagination, return a single member
     if (NIM && !perPage && !page) {
-      const profile = await ProfileModel.findOne({ NIM });
+      const member = await MemberModel.findOne({ NIM });
       return {
         statusCode: 200,
-        statusMessage: "Profile fetched",
-        data: profile,
+        statusMessage: "Member fetched",
+        data: member,
       };
     }
 
@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    if (!user.profile.organizer) {
+    if (!user.member.organizer) {
       throw createError({
         statusCode: 403,
         statusMessage: "You must be admin / departement to access this",
@@ -63,19 +63,17 @@ export default defineEventHandler(async (event) => {
     }
 
     // Count total documents matching the query
-    const length = await ProfileModel.countDocuments(query);
+    const length = await MemberModel.countDocuments(query);
 
     // Get unique filter values if filterBy is provided
     let filters = null;
     if (filterBy) {
-      const profiles = await ProfileModel.find();
-      filters = [
-        ...new Set(profiles.map((v) => v[filterBy as keyof IProfile])),
-      ];
+      const members = await MemberModel.find();
+      filters = [...new Set(members.map((v) => v[filterBy as keyof IMember]))];
     }
 
-    // Fetch profiles with populated fields
-    const profiles = await ProfileModel.find(query)
+    // Fetch members with populated fields
+    const members = await MemberModel.find(query)
       .populate({
         path: "agendas",
         select: "title date at description -_id",
@@ -102,7 +100,7 @@ export default defineEventHandler(async (event) => {
           if (doc) {
             return {
               role: doc.dailyManagement.find(
-                (daily) => (daily.profile as IProfile).id == id
+                (daily) => (daily.member as IMember).id == id
               )?.position,
               period: doc.period,
             };
@@ -145,22 +143,22 @@ export default defineEventHandler(async (event) => {
 
     return {
       statusCode: 200,
-      statusMessage: "Profiles fetched",
+      statusMessage: "Members fetched",
       data: {
-        profiles: profiles.map((profile) => {
+        members: members.map((member) => {
           return {
-            NIM: profile.NIM,
-            fullName: profile.fullName,
-            email: profile.email,
-            avatar: profile.avatar,
-            class: profile.class,
-            semester: profile.semester,
-            enteredYear: profile.enteredYear,
-            createdAt: profile.createdAt,
-            status: profile.status,
-            agendas: profile.agendas,
-            projects: profile.projects,
-            organizers: profile.organizer,
+            NIM: member.NIM,
+            fullName: member.fullName,
+            email: member.email,
+            avatar: member.avatar,
+            class: member.class,
+            semester: member.semester,
+            enteredYear: member.enteredYear,
+            createdAt: member.createdAt,
+            status: member.status,
+            agendas: member.agendas,
+            projects: member.projects,
+            organizers: member.organizer,
           };
         }),
         length,
@@ -171,7 +169,7 @@ export default defineEventHandler(async (event) => {
     return createError({
       statusCode: error.statusCode || 500,
       statusMessage:
-        error.message || "An unexpected error occurred while fetching profiles",
+        error.message || "An unexpected error occurred while fetching members",
     });
   }
 });

@@ -3,6 +3,6 @@ export default defineEventHandler(async (event) => {
 
   if (isAuthenticated) {
     event.context.user = await ensureAuth(event);
-    event.context.organizer = event.context.user.profile.organizer;
+    event.context.organizer = event.context.user.member.organizer;
   }
 });

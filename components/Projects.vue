@@ -148,7 +148,7 @@ const projectsListClass = computed(() => `px-2 md:px-3 py-4 md:py-8 overflow-aut
                                     class="relative my-2 mt-4 overflow-auto md:my-3 md:mt-6 sm:rounded-lg ms-6 md:ms-8 max-h-36 md:max-h-48 no-scrollbar">
                                     <UTable :rows="item.contributors" :columns="contributorHeaders">
                                         <template #name-data="{ row }">
-                                            {{ row.profile.fullName }}
+                                            {{ row.member.fullName }}
                                         </template>
                                     </UTable>
                                 </div>
@@ -162,7 +162,8 @@ const projectsListClass = computed(() => `px-2 md:px-3 py-4 md:py-8 overflow-aut
         <div class="flex justify-between w-full gap-2 my-2 md:gap-0">
             <USelect label="per Page" :options="[5, 10, 20]" v-model="perPage" :size="uiSize" />
             <UPagination :size="uiSize" color="gray" v-model="page" :total="totalProjects"
-                :max-visible-pages="visiblePages" show-last show-first />
+                :max-visible-pages="visiblePages" :show-last="!isMobile" :show-first="!isMobile"
+                :ui="{ wrapper: 'flex items-center gap-1', rounded: '!rounded-full min-w-[32px] justify-center', default: { activeButton: { variant: 'outline' } } }" />
         </div>
     </UCard>
 </template>

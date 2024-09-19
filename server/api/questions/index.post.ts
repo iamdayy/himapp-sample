@@ -1,4 +1,4 @@
-import { ProfileModel } from "~/server/models/ProfileModel";
+import { MemberModel } from "~/server/models/MemberModel";
 import { QuestionModel } from "~/server/models/QuestionModel";
 import { IReqQuestion } from "~/types/IRequestPost";
 import type { IResponse } from "~/types/IResponse";
@@ -9,7 +9,7 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
       event
     );
     const user = event.context.user;
-    const author = await ProfileModel.findOne({ NIM: user.profile.NIM });
+    const author = await MemberModel.findOne({ NIM: user.member.NIM });
     if (!user) {
       throw createError({
         statusCode: 401,

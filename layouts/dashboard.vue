@@ -110,26 +110,26 @@ const openSlideOver = ref<boolean>(false)
 const links = [
     [
         {
-            label: user.value.profile.fullName,
+            label: user.value.member.fullName,
             disabled: true
         },
         {
-            label: user.value.profile.email,
+            label: user.value.member.email,
             icon: 'i-heroicons-envelope',
             disabled: true
         },
         {
-            label: user.value.profile.phone,
+            label: user.value.member.phone,
             icon: 'i-heroicons-phone',
             disabled: true
         },
         {
-            label: user.value.profile.class,
+            label: user.value.member.class,
             icon: 'i-heroicons-building-library',
             disabled: true
         },
         {
-            label: user.value.profile.semester,
+            label: user.value.member.semester,
             icon: 'i-heroicons-chevron-double-up',
             disabled: true
         },
@@ -158,9 +158,9 @@ const links = [
     ],
     [
         {
-            label: 'Users',
+            label: 'Members',
             icon: 'i-heroicons-users',
-            to: '/administrators/users'
+            to: '/administrators/members'
         },
         {
             label: 'Organizers',
@@ -200,7 +200,7 @@ const links = [
                         <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
                             :popper="{ placement: 'bottom-start' }">
                             <NuxtImg v-if="isLoggedIn" provider="localProvider"
-                                :src="user.profile.avatar || '/img/profile-blank.png'"
+                                :src="user.member.avatar || '/img/member-blank.png'"
                                 class="object-cover rounded-full max-w-8 aspect-square" />
                             <UAvatar v-else icon="i-heroicons-arrow-right-end-on-rectangle" />
 
@@ -251,12 +251,12 @@ const links = [
                 <div class="mt-8">
                     <NuxtLink to="/dashboard/profile">
                         <div class="flex w-full gap-2">
-                            <UAvatar :src="user.profile.avatar" size="lg" />
+                            <UAvatar :src="user.member.avatar" size="lg" />
                             <div>
                                 <h2 class="text-xl font-extrabold text-gray-800 dark:text-white">{{
                                     user.username }}
                                 </h2>
-                                <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">{{ user.profile.NIM
+                                <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">{{ user.member.NIM
                                     }}</h2>
                             </div>
                         </div>

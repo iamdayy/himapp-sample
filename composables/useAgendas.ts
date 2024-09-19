@@ -11,7 +11,7 @@ export const useAgendas = () => {
   } = useLazyAsyncData("agendas", () => $api<IAgendaResponse>("/api/agenda"));
   const { data: user } = useAuth();
   const agendasMe = computed<IAgenda[]>(() => {
-    return user.value?.profile.agendas;
+    return user.value?.member.agendas;
   });
   const agendasCanMeRegistered = computed<IAgenda[] | undefined>(() => {
     return data.value?.data.filter((agenda) =>

@@ -1,5 +1,5 @@
 import type { SortOrder } from "mongoose";
-import type { IAgenda, IFile, INews, IPhoto, IProfile, IQuestion } from ".";
+import type { IAgenda, IFile, IMember, INews, IPhoto, IQuestion } from ".";
 
 /**
  * Interface for pagination query parameters.
@@ -42,12 +42,12 @@ export interface IReqAuth extends IReqRegister, IReqLogin {
 }
 
 /**
- * Interface for profile query parameters, extending pagination.
+ * Interface for member query parameters, extending pagination.
  */
-export interface IReqProfileQuery extends IReqQueryPaginate {
+export interface IReqMemberQuery extends IReqQueryPaginate {
   /** User's NIM for filtering. */
   NIM: number;
-  /** Search term for filtering profiles. */
+  /** Search term for filtering members. */
   search: string;
   /** Field to sort the results by. */
   sort: "enteredYear" | "class" | "semester" | "fullName" | "createdAt";
@@ -59,19 +59,19 @@ export interface IReqProfileQuery extends IReqQueryPaginate {
   filterBy: "enteredYear" | "class" | "semester";
   /** Value to filter by. */
   filter: string;
-  /** Whether to include deleted profiles. */
+  /** Whether to include deleted members. */
   deleted: "false" | "true";
 }
 
 /**
- * Interface for profile request, extending IProfile.
+ * Interface for member request, extending IMember.
  */
-export interface IReqProfile extends IProfile {}
+export interface IReqMember extends IMember {}
 
 /**
- * Interface for profile avatar request, extending IProfile.
+ * Interface for member avatar request, extending IMember.
  */
-export interface IReqProfileAvatar {
+export interface IReqMemberAvatar {
   avatar: IFile;
 }
 

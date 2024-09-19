@@ -20,7 +20,7 @@ const questionSchema = new Schema<IQuestionSchema>(
     ],
     author: {
       type: Schema.Types.ObjectId,
-      ref: "Profile",
+      ref: "Member",
       required: false,
       autopopulate: {
         select: "NIM fullName avatar class semester enteredYear",
@@ -30,7 +30,7 @@ const questionSchema = new Schema<IQuestionSchema>(
       {
         user: {
           type: Schema.Types.ObjectId,
-          ref: "Profile",
+          ref: "Member",
           required: false,
           autopopulate: true,
         },

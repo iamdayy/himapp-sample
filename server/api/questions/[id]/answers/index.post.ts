@@ -1,5 +1,5 @@
 import { AnswerModel } from "~/server/models/AnswerModel";
-import { ProfileModel } from "~/server/models/ProfileModel";
+import { MemberModel } from "~/server/models/MemberModel";
 import { QuestionModel } from "~/server/models/QuestionModel";
 import type { IResponse } from "~/types/IResponse";
 
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
         statusMessage: "You must be logged in to use this endpoint",
       });
     }
-    const author = await ProfileModel.findOne({ NIM: user.profile.NIM });
+    const author = await MemberModel.findOne({ NIM: user.member.NIM });
     if (!questionId) {
       throw createError({
         statusCode: 400,

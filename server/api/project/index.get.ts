@@ -1,5 +1,5 @@
 import { SortOrder } from "mongoose";
-import { ProfileModel } from "~/server/models/ProfileModel";
+import { MemberModel } from "~/server/models/MemberModel";
 import { ProjectModel } from "~/server/models/ProjectModel";
 import { IReqProjectQuery } from "~/types/IRequestPost";
 import { IProjectsResponse } from "~/types/IResponse";
@@ -9,22 +9,22 @@ type ISortable = {
 };
 
 /**
- * Retrieves the NIM (Student ID) from a given profile ID.
- * @param {string} id - The profile ID.
- * @returns {Promise<number>} The NIM of the profile.
- * @throws {H3Error} If the profile is not found or NIM is missing.
+ * Retrieves the NIM (Student ID) from a given member ID.
+ * @param {string} id - The member ID.
+ * @returns {Promise<number>} The NIM of the member.
+ * @throws {H3Error} If the member is not found or NIM is missing.
  */
 const getNimFromID = async (id: string): Promise<number> => {
-  const profile = await ProfileModel.findById(id);
+  const member = await MemberModel.findById(id);
 
-  if (!profile?.NIM) {
+  if (!member?.NIM) {
     throw createError({
       statusCode: 404,
-      statusMessage: "Profile not found or NIM is missing",
+      statusMessage: "Member not found or NIM is missing",
     });
   }
 
-  return profile.NIM;
+  return member.NIM;
 };
 
 /**
@@ -53,7 +53,7 @@ export default defineEventHandler(async (event): Promise<IProjectsResponse> => {
       }
       const contributors = await Promise.all(
         project?.contributors?.map(async (contributor) => ({
-          profile: await getNimFromID(contributor.profile as string),
+          member: await getNimFromID(contributor.member as string),
           job: contributor.job,
         }))!
       );

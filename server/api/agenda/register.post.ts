@@ -1,12 +1,12 @@
 import { Types } from "mongoose";
 import { AgendaModel } from "~/server/models/AgendaModel";
-import { ProfileModel } from "~/server/models/ProfileModel";
+import { MemberModel } from "~/server/models/MemberModel";
 import { IError, IResponse } from "~/types/IResponse";
 /**
  * Handles POST requests for registering a user to an event.
  * @param {H3Event} ev - The H3 event object.
  * @returns {Promise<Object>} The result of the registration operation.
- * @throws {H3Error} If an error occurs during the process.
+ * @throws {H3Error} If an error occurs during the process.s
  */
 export default defineEventHandler(async (ev): Promise<IResponse | IError> => {
   const { NIM, id } = await readBody(ev);
@@ -28,18 +28,18 @@ export default defineEventHandler(async (ev): Promise<IResponse | IError> => {
       });
     }
 
-    // Find the user profile by NIM
-    const me = await ProfileModel.findOne({ NIM });
+    // Find the user member by NIM
+    const me = await MemberModel.findOne({ NIM });
     if (!me) {
       throw createError({
         statusCode: 404,
-        statusMessage: "User profile not found",
+        statusMessage: "User member not found",
       });
     }
 
     // Add the user to the agenda's registered list
     agenda.registered?.push({
-      profile: me._id as Types.ObjectId,
+      member: me._id as Types.ObjectId,
     });
 
     // Save the updated agenda

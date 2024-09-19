@@ -45,12 +45,12 @@ const NewsSchema = new Schema<INewsSchema>(
     },
 
     /**
-     * Reference to the author's profile.
+     * Reference to the author's member.
      */
     author: {
       type: Types.ObjectId,
       required: true,
-      ref: "Profile",
+      ref: "Member",
       autopopulate: {
         select: "fullName avatar",
       },

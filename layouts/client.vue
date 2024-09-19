@@ -34,7 +34,6 @@ const changeMode = () => {
 // Navigation links
 const navigation: ILink[] = [
     { name: 'Home', href: '/' },
-    { name: 'About', href: '#about' },
     { name: 'News', href: '/news' },
     { name: 'Forum', href: '/forum' },
 ] as ILink[]
@@ -139,7 +138,7 @@ const items = computed(() => isLoggedIn.value ? itemsIsLogged(user.value) : item
                             :ui="{ width: 'max-w-36', item: { disabled: 'cursor-text select-text' } }"
                             :popper="{ placement: 'bottom-start' }">
                             <NuxtImg v-if="isLoggedIn" provider="localProvider"
-                                :src="user.profile.avatar || '/img/profile-blank.png'"
+                                :src="user.member.avatar || '/img/member-blank.png'"
                                 class="object-cover rounded-full max-w-8 aspect-square" />
                             <UButton v-else icon="i-heroicons-arrow-right-end-on-rectangle" variant="link"
                                 color="gray" />

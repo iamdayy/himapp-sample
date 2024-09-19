@@ -1,8 +1,8 @@
 import fs from "fs";
 import path from "path";
-import { ProfileModel } from "~/server/models/ProfileModel";
+import { MemberModel } from "~/server/models/MemberModel";
 import { IFile } from "~/types";
-import { IReqProfileAvatar } from "~/types/IRequestPost";
+import { IReqMemberAvatar } from "~/types/IRequestPost";
 import { IResponse } from "~/types/IResponse";
 
 const config = useRuntimeConfig();
@@ -11,12 +11,12 @@ const config = useRuntimeConfig();
  * Handles PUT requests for updating a user's avatar.
  * @param {H3Event} event - The H3 event object.
  * @returns {Promise<Object>} An object containing the status code, message, and updated avatar URL.
- * @throws {H3Error} If the user is not authorized, the profile is not found, or if a system error occurs.
+ * @throws {H3Error} If the user is not authorized, the member is not found, or if a system error occurs.
  */
 export default defineEventHandler(async (event): Promise<IResponse> => {
   try {
     const { NIM } = getQuery(event);
-    const body = await readBody<IReqProfileAvatar>(event);
+    const body = await readBody<IReqMemberAvatar>(event);
     const avatarFile = body.avatar as IFile;
     const BASE_AVATAR_FOLDER = "/uploads/img/avatars";
     let imageUrl = "";
@@ -29,28 +29,28 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
         statusMessage: "You must be logged in to use this endpoint",
       });
     }
-    if (user.profile.NIM != NIM) {
+    if (user.member.NIM != NIM) {
       throw createError({
         statusCode: 403,
         statusMessage:
-          "Unauthorized: You can only update your own profile avatar",
+          "Unauthorized: You can only update your own member avatar",
       });
     }
 
-    // Find the user's profile
-    const profile = await ProfileModel.findOne({ NIM });
-    if (!profile) {
+    // Find the user's member
+    const member = await MemberModel.findOne({ NIM });
+    if (!member) {
       throw createError({
         statusCode: 404,
-        statusMessage: "Profile not found",
+        statusMessage: "Member not found",
       });
     }
 
     // Remove old avatar if it exists
-    if (profile.avatar) {
-      const oldAvatarPath = path.join(config.storageDir, profile.avatar);
+    if (member.avatar) {
+      const oldAvatarPath = path.join(config.storageDir, member.avatar);
       if (fs.existsSync(oldAvatarPath)) {
-        deleteFile(profile.avatar);
+        deleteFile(member.avatar);
       }
     }
 
@@ -69,13 +69,13 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
       });
     }
 
-    // Update the profile with the new avatar URL
-    profile.avatar = imageUrl;
-    await profile.save();
+    // Update the member with the new avatar URL
+    member.avatar = imageUrl;
+    await member.save();
 
     return {
       statusCode: 200,
-      statusMessage: `Avatar for user ${profile.NIM} updated successfully`,
+      statusMessage: `Avatar for user ${member.NIM} updated successfully`,
     };
   } catch (error: any) {
     return {

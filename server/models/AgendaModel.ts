@@ -17,7 +17,7 @@ const CommitteeSchema = new Schema<ICommitteeSchema>({
   user: {
     type: Types.ObjectId,
     required: true,
-    ref: "Profile",
+    ref: "Member",
     autopopulate: {
       select: "NIM avatar fullName email class semester createdAt",
       match: {
@@ -31,10 +31,10 @@ const CommitteeSchema = new Schema<ICommitteeSchema>({
  * Schema for representing a registered participant.
  */
 const registeredSchema = new Schema<IRegisteredSchema>({
-  profile: {
+  member: {
     type: Types.ObjectId,
     required: true,
-    ref: "Profile",
+    ref: "Member",
     autopopulate: {
       select: "NIM avatar fullName email class semester createdAt",
       match: {

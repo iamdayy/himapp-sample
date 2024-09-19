@@ -1,6 +1,6 @@
 import { AnswerModel } from "~/server/models/AnswerModel";
 import { QuestionModel } from "~/server/models/QuestionModel";
-import { IProfile } from "~/types";
+import { IMember } from "~/types";
 import type { IResponse } from "~/types/IResponse";
 
 export default defineEventHandler(async (event): Promise<IResponse> => {
@@ -39,10 +39,7 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
       });
     }
 
-    if (
-      !answer.author ||
-      (answer.author as IProfile).NIM !== user.profile.NIM
-    ) {
+    if (!answer.author || (answer.author as IMember).NIM !== user.member.NIM) {
       throw createError({
         statusCode: 403,
         statusMessage: "You are not authorized to delete this answer",

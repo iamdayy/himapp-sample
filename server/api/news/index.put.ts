@@ -1,8 +1,8 @@
 import fs from "fs";
 import { Types } from "mongoose";
 import path from "path";
+import { MemberModel } from "~/server/models/MemberModel";
 import { NewsModel } from "~/server/models/NewsModel";
-import { ProfileModel } from "~/server/models/ProfileModel";
 import { IFile } from "~/types";
 import { IReqNews } from "~/types/IRequestPost";
 import type { IResponse } from "~/types/IResponse";
@@ -65,7 +65,7 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
           12,
           BASE_MAINIMAGE_FOLDER
         );
-        imageUrl = `/${BASE_MAINIMAGE_FOLDER}/${hasedImage}`;
+        imageUrl = `${BASE_MAINIMAGE_FOLDER}/${hasedImage}`;
       } else {
         throw createError({
           statusMessage: "Please upload nothing but images.",
@@ -117,8 +117,8 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
  */
 const getIdByNim = async (NIM: number): Promise<Types.ObjectId | undefined> => {
   try {
-    const profile = await ProfileModel.findOne({ NIM });
-    return profile?._id as Types.ObjectId;
+    const member = await MemberModel.findOne({ NIM });
+    return member?._id as Types.ObjectId;
   } catch (error: any) {
     throw createError({
       statusCode: error.statusCode || 500,

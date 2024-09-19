@@ -1,4 +1,4 @@
-import { ProfileModel } from "~/server/models/ProfileModel";
+import { MemberModel } from "~/server/models/MemberModel";
 import { ProjectModel } from "~/server/models/ProjectModel";
 import { IContributor, IProject } from "~/types";
 import type { IResponse } from "~/types/IResponse";
@@ -48,7 +48,7 @@ export default defineEventHandler(async (ev): Promise<IResponse> => {
     project.canRegister = body.canRegister;
     project.contributors = (await Promise.all(
       body.contributors?.map(async (contributor) => ({
-        profile: await getIdByNim(contributor.profile as number),
+        member: await getIdByNim(contributor.member as number),
         job: contributor.job,
       }))!
     )) as IContributor[];
@@ -71,15 +71,15 @@ export default defineEventHandler(async (ev): Promise<IResponse> => {
 });
 
 /**
- * Retrieves the profile ID associated with a given NIM (Student ID).
+ * Retrieves the member ID associated with a given NIM (Student ID).
  * @param {number} NIM - The Student ID (NIM).
- * @returns {Promise<unknown>} The profile ID associated with the given NIM.
- * @throws {H3Error} If the profile is not found or if a system error occurs.
+ * @returns {Promise<unknown>} The member ID associated with the given NIM.
+ * @throws {H3Error} If the member is not found or if a system error occurs.
  */
 const getIdByNim = async (NIM: number): Promise<unknown> => {
   try {
-    const profile = await ProfileModel.findOne({ NIM });
-    return profile?._id;
+    const member = await MemberModel.findOne({ NIM });
+    return member?._id;
   } catch (error: any) {
     throw createError({
       statusCode: error.statusCode,

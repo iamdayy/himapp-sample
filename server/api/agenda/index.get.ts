@@ -1,24 +1,24 @@
 import { AgendaModel } from "~/server/models/AgendaModel";
-import { ProfileModel } from "~/server/models/ProfileModel";
+import { MemberModel } from "~/server/models/MemberModel";
 import { IAgendaResponse, IError } from "~/types/IResponse";
 
 /**
  * Retrieves the NIM (Student Identification Number) associated with a given user ID.
  * @param {string} id - The user ID.
  * @returns {Promise<number>} The NIM associated with the user ID.
- * @throws {H3Error} If the profile is not found or NIM is missing.
+ * @throws {H3Error} If the member is not found or NIM is missing.
  */
 const getNimFromID = async (id: string): Promise<number> => {
-  const profile = await ProfileModel.findById(id);
+  const member = await MemberModel.findById(id);
 
-  if (!profile?.NIM) {
+  if (!member?.NIM) {
     throw createError({
       statusCode: 404,
-      statusMessage: "Profile not found or NIM is missing",
+      statusMessage: "Member not found or NIM is missing",
     });
   }
 
-  return profile.NIM;
+  return member.NIM;
 };
 
 /**

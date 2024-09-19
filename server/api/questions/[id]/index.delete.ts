@@ -1,5 +1,5 @@
 import { QuestionModel } from "~/server/models/QuestionModel";
-import { IProfile } from "~/types";
+import { IMember } from "~/types";
 import type { IResponse } from "~/types/IResponse";
 
 export default defineEventHandler(async (event): Promise<IResponse> => {
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event): Promise<IResponse> => {
     }
     if (
       !question.author ||
-      (question.author as IProfile).NIM !== user.profile.NIM
+      (question.author as IMember).NIM !== user.member.NIM
     ) {
       throw createError({
         statusCode: 403,

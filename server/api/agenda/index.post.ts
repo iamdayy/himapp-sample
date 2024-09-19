@@ -1,5 +1,5 @@
 import { AgendaModel } from "~/server/models/AgendaModel";
-import { ProfileModel } from "~/server/models/ProfileModel";
+import { MemberModel } from "~/server/models/MemberModel";
 import { IReqAgenda } from "~/types/IRequestPost";
 import { IError, IResponse } from "~/types/IResponse";
 /**
@@ -32,8 +32,8 @@ export default defineEventHandler(
       // Process committee members
       const committees = body.committee?.map(async (committee) => {
         try {
-          const profile = await ProfileModel.findOne({ NIM: committee.user });
-          if (!profile) {
+          const member = await MemberModel.findOne({ NIM: committee.user });
+          if (!member) {
             throw createError({
               statusCode: 400,
               message: "User not found in the committee",
@@ -41,7 +41,7 @@ export default defineEventHandler(
           }
           return {
             job: committee.job,
-            user: profile._id,
+            user: member._id,
           };
         } catch (error: any) {
           throw createError({

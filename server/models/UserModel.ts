@@ -1,11 +1,11 @@
 import bcrypt from "bcrypt";
 import mongoose, { Model, Schema, Types } from "mongoose";
 import mongooseAutoPopulate from "mongoose-autopopulate";
-import { IOrganizer, IProfile, IUser } from "~/types";
+import { IMember, IOrganizer, IUser } from "~/types";
 import { IUserSchema } from "~/types/ISchemas";
 import { AgendaModel } from "./AgendaModel";
+import { MemberModel } from "./MemberModel";
 import OrganizerModel from "./OrganizerModel";
-import { ProfileModel } from "./ProfileModel";
 import { ProjectModel } from "./ProjectModel";
 
 /**
@@ -45,14 +45,14 @@ const userSchema = new Schema<IUserSchema, IUserModel, IUserMethods>({
   key: {
     type: String,
   },
-  profile: {
+  member: {
     type: Types.ObjectId,
-    ref: "Profile",
+    ref: "Member",
     autopopulate: {
       match: {
         status: "active",
       },
-      model: ProfileModel,
+      model: MemberModel,
       select: "-_id",
       populate: [
         {
@@ -82,7 +82,7 @@ const userSchema = new Schema<IUserSchema, IUserModel, IUserMethods>({
             if (doc) {
               return {
                 role: doc.dailyManagement.find(
-                  (daily) => (daily.profile as IProfile).id == id
+                  (daily) => (daily.member as IMember).id == id
                 )?.position,
                 period: doc.period,
               };

@@ -47,9 +47,9 @@ export interface IAddress {
 }
 
 /**
- * Represents a user profile with personal and academic information.
+ * Represents a user member with personal and academic information.
  */
-export interface IProfile {
+export interface IMember {
   id?: string;
   NIM: number;
   fullName: string;
@@ -80,7 +80,7 @@ export interface IProfile {
  * Represents a user account with authentication information.
  */
 export interface IUser {
-  profile: IProfile;
+  member: IMember;
   username: string;
   key?: string;
   token?: string;
@@ -109,13 +109,13 @@ export interface IPeriod {
 
 export interface IDailyManagement {
   position: string;
-  profile: Types.ObjectId | IProfile | number;
+  member: Types.ObjectId | IMember | number;
 }
 
 export interface IDepartment {
   name: string;
-  coordinator: Types.ObjectId | IProfile | number;
-  members: Types.ObjectId[] | IProfile[] | number[];
+  coordinator: Types.ObjectId | IMember | number;
+  members: Types.ObjectId[] | IMember[] | number[];
 }
 
 export interface IOrganizer {
@@ -130,7 +130,7 @@ export interface IOrganizer {
     image: string | IFile;
     position: string;
   };
-  considerationBoard: IProfile[] | number[] | Types.ObjectId[];
+  considerationBoard: IMember[] | number[] | Types.ObjectId[];
   dailyManagement: IDailyManagement[];
   department: IDepartment[];
   period: IPeriod;
@@ -140,14 +140,14 @@ export interface IOrganizer {
  */
 export interface ICommittee {
   job: string;
-  user: IProfile | string | number;
+  user: IMember | string | number;
 }
 
 /**
  * Represents a contributor to a project.
  */
 export interface IContributor {
-  profile: IProfile | Types.ObjectId | number | string;
+  member: IMember | Types.ObjectId | number | string;
   job: string;
 }
 
@@ -155,7 +155,7 @@ export interface IContributor {
  * Represents a registered participant for an event or project.
  */
 export interface IRegistered {
-  profile: Types.ObjectId | IProfile | number;
+  member: Types.ObjectId | IMember | number;
   task?: string;
 }
 
@@ -201,7 +201,7 @@ export interface INews {
     title: string;
     description: string;
   };
-  author?: Types.ObjectId | IProfile | number;
+  author?: Types.ObjectId | IMember | number;
   published?: boolean;
   publishedAt?: Date;
   tags?: string[];
@@ -215,7 +215,7 @@ export interface IPhoto {
 }
 
 export interface IVote {
-  user: Types.ObjectId | IProfile;
+  user: Types.ObjectId | IMember;
   voteType: "upvote" | "downvote";
 }
 
@@ -224,7 +224,7 @@ export interface IQuestion {
   title: string;
   body: string;
   tags: string[];
-  author: Types.ObjectId | IProfile;
+  author: Types.ObjectId | IMember;
   createdAt: Date;
   updatedAt: Date;
   votes: IVote[];
@@ -235,7 +235,7 @@ export interface IQuestion {
 export interface IAnswer {
   _id?: string;
   body: string;
-  author: Types.ObjectId | IProfile;
+  author: Types.ObjectId | IMember;
   createdAt: Date;
   updatedAt: Date;
   votes: IVote[];
@@ -246,7 +246,7 @@ export interface IAnswer {
 export interface IComment {
   _id?: string;
   body: string;
-  author: Types.ObjectId | IProfile;
+  author: Types.ObjectId | IMember;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -254,9 +254,9 @@ export interface IComment {
 export interface IForm {
   title: string;
   description: string;
-  by: IProfile | Types.ObjectId | number;
+  by: IMember | Types.ObjectId | number;
   questions: IQuestion[];
-  invites: IProfile[] | number[] | Types.ObjectId;
+  invites: IMember[] | number[] | Types.ObjectId;
   public: boolean;
   answers: IAnswer[];
 }
