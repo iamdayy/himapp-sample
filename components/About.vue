@@ -240,14 +240,14 @@ const imageDimensions = computed(() => ({
                                 </h1>
                                 <div
                                     :class="`grid w-full grid-cols-1 gap-4 py-3 md:grid-cols-${organizer?.considerationBoard.length}`">
-                                    <MemberCard v-for="considerationBoard in organizer?.considerationBoard"
+                                    <ProfileCard v-for="considerationBoard in organizer?.considerationBoard"
                                         :member="(considerationBoard as IMember)" subtitle="Consideration Board" />
                                 </div>
                             </div>
                             <UTabs :items="items">
                                 <template #dailyManager="{ item, index }">
                                     <div class="grid w-full grid-cols-1 gap-4 py-3 md:grid-cols-3">
-                                        <MemberCard v-for="dailyManager in organizer?.dailyManagement"
+                                        <ProfileCard v-for="dailyManager in organizer?.dailyManagement"
                                             :member="(dailyManager.member as IMember)"
                                             :subtitle="dailyManager.position" />
                                     </div>
@@ -255,11 +255,11 @@ const imageDimensions = computed(() => ({
                                 <template #departments="{ item }">
                                     <UTabs :items="departementsTabs">
                                         <template #department="{ item, index }">
-                                            <MemberCard v-if="organizer?.department[index].coordinator"
+                                            <ProfileCard v-if="organizer?.department[index].coordinator"
                                                 :member="(organizer?.department[index].coordinator as IMember)"
                                                 subtitle="Coordinator" class="mt-8" />
                                             <div class="grid w-full grid-cols-1 gap-4 py-3 mt-8 md:grid-cols-3">
-                                                <MemberCard v-for="member in organizer?.department[index].members"
+                                                <ProfileCard v-for="member in organizer?.department[index].members"
                                                     :member="(member as IMember)" subtitle="Member" />
                                             </div>
                                         </template>

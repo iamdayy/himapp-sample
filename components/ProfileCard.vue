@@ -44,7 +44,7 @@ const responsiveClasses = computed(() => ({
 </script>
 
 <template>
-    <FlipCard :img="member?.avatar || '/img/member-blank.png'">
+    <FlipCard :img="member?.avatar || '/img/profile-blank.png'">
         <!-- Front side of the card -->
         <template #front>
             <h2 :class="['font-semibold text-gray-200', responsiveClasses.subtitle]">{{ subtitle }}</h2>
