@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import type { IProfile } from '~/types';
+import type { IMember } from '~/types';
 import type { IResponse } from '~/types/IResponse';
 
 /**
@@ -31,19 +31,19 @@ const loading = ref<boolean>(false);
  * Props definition for component
  */
 const props = defineProps({
-    Member: Object as PropType<IProfile>,
+    Member: Object as PropType<IMember>,
     NIM: Number
 });
 
 /**
- * Default member profile structure
+ * Default member member structure
  */
-const Member = ref<IProfile>({
+const Member = ref<IMember>({
     fullName: "",
     NIM: 0,
     email: "",
     phone: "",
-    avatar: "/profile-blank.png",
+    avatar: "/member-blank.png",
     religion: "",
     sex: "male",
     birth: {
@@ -81,13 +81,13 @@ const member = computed({
 })
 
 /**
- * Save member profile data
- * Makes an API call to update the profile
+ * Save member member data
+ * Makes an API call to update the member
  */
 const Save = async () => {
     loading.value = true;
     try {
-        const added = await $api<IResponse>("/api/profile", {
+        const added = await $api<IResponse>("/api/member", {
             method: "put",
             query: {
                 NIM: props.NIM
@@ -111,7 +111,7 @@ const Save = async () => {
  */
 onMounted(async () => {
     if (props.NIM) {
-        member.value = await $api<IProfile>('/api/profile', {
+        member.value = await $api<IMember>('/api/member', {
             query: {
                 NIM: props.NIM
             }

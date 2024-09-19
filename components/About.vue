@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { useWindowSize } from '@vueuse/core';
-import type { IProfile } from '~/types';
+import type { IMember } from '~/types';
 import type { IPhotoResponse } from '~/types/IResponse';
 
 const { organizers } = useOrganizer();
@@ -240,27 +240,27 @@ const imageDimensions = computed(() => ({
                                 </h1>
                                 <div
                                     :class="`grid w-full grid-cols-1 gap-4 py-3 md:grid-cols-${organizer?.considerationBoard.length}`">
-                                    <ProfileCard v-for="considerationBoard in organizer?.considerationBoard"
-                                        :profile="(considerationBoard as IProfile)" subtitle="Consideration Board" />
+                                    <MemberCard v-for="considerationBoard in organizer?.considerationBoard"
+                                        :member="(considerationBoard as IMember)" subtitle="Consideration Board" />
                                 </div>
                             </div>
                             <UTabs :items="items">
                                 <template #dailyManager="{ item, index }">
                                     <div class="grid w-full grid-cols-1 gap-4 py-3 md:grid-cols-3">
-                                        <ProfileCard v-for="dailyManager in organizer?.dailyManagement"
-                                            :profile="(dailyManager.profile as IProfile)"
+                                        <MemberCard v-for="dailyManager in organizer?.dailyManagement"
+                                            :member="(dailyManager.member as IMember)"
                                             :subtitle="dailyManager.position" />
                                     </div>
                                 </template>
                                 <template #departments="{ item }">
                                     <UTabs :items="departementsTabs">
                                         <template #department="{ item, index }">
-                                            <ProfileCard v-if="organizer?.department[index].coordinator"
-                                                :profile="(organizer?.department[index].coordinator as IProfile)"
+                                            <MemberCard v-if="organizer?.department[index].coordinator"
+                                                :member="(organizer?.department[index].coordinator as IMember)"
                                                 subtitle="Coordinator" class="mt-8" />
                                             <div class="grid w-full grid-cols-1 gap-4 py-3 mt-8 md:grid-cols-3">
-                                                <ProfileCard v-for="member in organizer?.department[index].members"
-                                                    :profile="(member as IProfile)" subtitle="Member" />
+                                                <MemberCard v-for="member in organizer?.department[index].members"
+                                                    :member="(member as IMember)" subtitle="Member" />
                                             </div>
                                         </template>
                                     </UTabs>

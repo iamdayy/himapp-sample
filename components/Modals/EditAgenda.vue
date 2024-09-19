@@ -1,10 +1,10 @@
 <script setup lang='ts'>
 import type { PropType } from 'vue';
-import type { IAgenda, IProfile } from '~/types';
-import type { IProfileResponse, IResponse } from '~/types/IResponse';
+import type { IAgenda, IMember } from '~/types';
+import type { IMemberResponse, IResponse } from '~/types/IResponse';
 
-// Fetch user profile data
-const { data: profile } = await useAsyncData(() => $api<IProfileResponse>("/api/profile"));
+// Fetch user member data
+const { data: member } = await useAsyncData(() => $api<IMemberResponse>("/api/member"));
 
 const { $api } = useNuxtApp();
 const toast = useToast();
@@ -67,7 +67,7 @@ const addAgenda = async () => {
  * @returns {string | undefined} The full name of the user
  */
 const getNameFromNIM = (NIM?: number) => {
-    return profile.value?.data?.profiles.find((profile) => profile.NIM == NIM)?.fullName;
+    return member.value?.data?.members.find((member) => member.NIM == NIM)?.fullName;
 };
 
 // Responsive design setup
@@ -157,18 +157,18 @@ const responsiveUISizes = computed(() => ({
                                                 :size="responsiveUISizes.input" />
                                         </div>
                                         <div class="w-full md:w-1/4">
-                                            <label :for="`${committee.job}-profile`"
+                                            <label :for="`${committee.job}-member`"
                                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIM</label>
-                                            <UInput type="number" :name="`${committee.job}-profile`"
-                                                :id="`${committee.job}-profile`" v-model="Agenda.committee![i].user"
-                                                :value="(Agenda.committee![i].user as IProfile).NIM" required
+                                            <UInput type="number" :name="`${committee.job}-member`"
+                                                :id="`${committee.job}-member`" v-model="Agenda.committee![i].user"
+                                                :value="(Agenda.committee![i].user as IMember).NIM" required
                                                 :size="responsiveUISizes.input" />
                                         </div>
                                         <UButton @click="deleteCommittee(i)" icon="i-heroicons-trash"
                                             class="text-red-500 dark:text-red-500 hover:text-red-400 dark:hover:text-red-400"
                                             variant="link" :size="responsiveUISizes.button" />
                                     </div>
-                                    <label :for="`${committee.job}-profile`"
+                                    <label :for="`${committee.job}-member`"
                                         class="block text-sm font-medium text-gray-900 dark:text-white">{{
                                             getNameFromNIM(Agenda.committee![i].user as number) }}</label>
                                 </div>

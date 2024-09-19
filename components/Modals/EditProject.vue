@@ -1,13 +1,13 @@
 <script setup lang='ts'>
-import type { IProfile, IProject } from '~/types';
-import type { IProfileResponse, IResponse } from '~/types/IResponse';
+import type { IMember, IProject } from '~/types';
+import type { IMemberResponse, IResponse } from '~/types/IResponse';
 
 const toast = useToast();
 const modal = useModal();
 const { $api } = useNuxtApp();
 
-// Fetch user profile data
-const { data } = await useAsyncData(() => $api<IProfileResponse>("/api/profile"));
+// Fetch user member data
+const { data } = await useAsyncData(() => $api<IMemberResponse>("/api/member"));
 
 // UI state
 const AddTaskPopover = ref<boolean>(false);
@@ -40,7 +40,7 @@ const project = computed<IProject>(() => {
             tasks: [],
             contributors: [
                 {
-                    profile: 0,
+                    member: 0,
                     job: ""
                 }
             ]
@@ -55,7 +55,7 @@ const project = computed<IProject>(() => {
  * @returns {string | undefined} The full name of the user, or undefined if not found
  */
 const getNameFromNIM = (NIM?: number): string | undefined => {
-    return data.value?.data?.profiles.find((profile) => profile.NIM == NIM)?.fullName;
+    return data.value?.data?.members.find((member) => member.NIM == NIM)?.fullName;
 }
 
 /**
@@ -88,13 +88,13 @@ const addContributors = (): void => {
         project.value.contributors = [
             {
                 job: "",
-                profile: 0
+                member: 0
             }
         ]
     } else {
         project.value.contributors?.push({
             job: "",
-            profile: 0
+            member: 0
         });
     }
 }
@@ -204,13 +204,12 @@ const layoutClass = computed(() => {
                                                 required :size="inputSize" />
                                         </div>
                                         <div class="w-full sm:w-1/2">
-                                            <label :for="`${contributors.job}-profile`"
+                                            <label :for="`${contributors.job}-member`"
                                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIM</label>
-                                            <UInput :type="`${contributors.job}-profile`"
-                                                :name="`${contributors.job}-profile`"
-                                                :id="`${contributors.job}-profile`"
-                                                v-model="project.contributors![i].profile"
-                                                :value="(project.contributors![i].profile as IProfile).NIM" required
+                                            <UInput :type="`${contributors.job}-member`"
+                                                :name="`${contributors.job}-member`" :id="`${contributors.job}-member`"
+                                                v-model="project.contributors![i].member"
+                                                :value="(project.contributors![i].member as IMember).NIM" required
                                                 :size="inputSize" />
                                         </div>
                                     </div>
@@ -218,9 +217,9 @@ const layoutClass = computed(() => {
                                         class="mt-2 text-red-500 dark:text-red-500 hover:text-red-400 dark:hover:text-red-400 sm:mt-0"
                                         variant="link" :size="buttonSize" />
                                 </div>
-                                <label :for="`${contributors.job}-profile`"
+                                <label :for="`${contributors.job}-member`"
                                     class="block mt-1 text-sm font-medium text-gray-900 dark:text-white">{{
-                                        getNameFromNIM(project.contributors![i].profile as number) }}</label>
+                                        getNameFromNIM(project.contributors![i].member as number) }}</label>
                             </div>
                             <UButton @click="addContributors" label="Add Contributor" icon="i-heroicons-plus" block
                                 trailing :size="buttonSize" />

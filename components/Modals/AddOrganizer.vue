@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import imageCompression from 'browser-image-compression';
 import type { IOrganizer } from '~/types';
-import type { IConfigResponse, IOrganizerResponse, IProfileResponse } from '~/types/IResponse';
+import type { IConfigResponse, IMemberResponse, IOrganizerResponse } from '~/types/IResponse';
 
 const modal = useModal();
 const { $api } = useNuxtApp();
@@ -19,7 +19,7 @@ const items = [
 ]
 
 const { data } = await useAsyncData<IConfigResponse>(() => $fetch<IConfigResponse>("/api/config"));
-const { data: profileData } = await useAsyncData(() => $api<IProfileResponse>("/api/profile"));
+const { data: memberData } = await useAsyncData(() => $api<IMemberResponse>("/api/member"));
 const { organizer: org } = useOrganizer();
 
 const emits = defineEmits<{
@@ -31,7 +31,7 @@ const dailyManagements = computed(() => {
     return data.value?.data?.dailyManagements.map((management) => {
         return {
             position: management,
-            profile: 0,
+            member: 0,
         }
     })
 });
@@ -192,7 +192,7 @@ const addOrganizer = async () => {
  * @returns {string | undefined} The full name of the user, or undefined if not found
  */
 const getNameFromNIM = (NIM?: number): string | undefined => {
-    return profileData.value?.data?.profiles.find((profile) => profile.NIM == NIM)?.fullName;
+    return memberData.value?.data?.members.find((member) => member.NIM == NIM)?.fullName;
 }
 
 watch(() => organizer.value.period.start, (newVal) => {
@@ -305,7 +305,7 @@ watch(() => organizer.value.period.start, (newVal) => {
                     <div class="col-span-6" v-for="(consideration, i) in organizer.considerationBoard" :key="i">
                         <UInput type="text" name="ConsiderationBoard" id="ConsiderationBoard" placeholder="21060202001"
                             required v-model="organizer.considerationBoard[i]" class="w-full" />
-                        <label :for="`${organizer.considerationBoard[i]}-profile`"
+                        <label :for="`${organizer.considerationBoard[i]}-member`"
                             class="block mt-1 text-sm font-medium text-gray-900 dark:text-white">{{
                                 getNameFromNIM(organizer.considerationBoard[i] as number)
                             }}</label>
@@ -315,7 +315,7 @@ watch(() => organizer.value.period.start, (newVal) => {
             <UTabs :items="items">
                 <template #dailyManager="{ item }">
                     <UCard>
-                        <div class="grid grid-cols-12 gap-2" v-for="(profile, i) in organizer.dailyManagement" :key="i">
+                        <div class="grid grid-cols-12 gap-2" v-for="(member, i) in organizer.dailyManagement" :key="i">
                             <div class="col-span-6">
                                 <label for="Position"
                                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Position</label>
@@ -326,10 +326,10 @@ watch(() => organizer.value.period.start, (newVal) => {
                                 <label for="NIM"
                                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIM</label>
                                 <UInput type="text" name="NIM" id="NIM" placeholder="21060202001" required
-                                    v-model="organizer.dailyManagement[i].profile" class="w-full" />
-                                <label :for="`${organizer.dailyManagement[i].profile}-profile`"
+                                    v-model="organizer.dailyManagement[i].member" class="w-full" />
+                                <label :for="`${organizer.dailyManagement[i].member}-member`"
                                     class="block mt-1 text-sm font-medium text-gray-900 dark:text-white">{{
-                                        getNameFromNIM(organizer.dailyManagement[i].profile as number)
+                                        getNameFromNIM(organizer.dailyManagement[i].member as number)
                                     }}</label>
                             </div>
                         </div>
@@ -353,7 +353,7 @@ watch(() => organizer.value.period.start, (newVal) => {
                                         <UInput type="number" name="Coordinator" id="Coordinator"
                                             placeholder="21060202001" required
                                             v-model="organizer.department[index].coordinator" class="w-full" />
-                                        <label :for="`${organizer.department[index].coordinator}-profile`"
+                                        <label :for="`${organizer.department[index].coordinator}-member`"
                                             class="block mt-1 text-sm font-medium text-gray-900 dark:text-white">{{
                                                 getNameFromNIM(organizer.department[index].coordinator as number)
                                             }}</label>
@@ -367,7 +367,7 @@ watch(() => organizer.value.period.start, (newVal) => {
                                                 <UInput type="number" name="Member" id="Member"
                                                     placeholder="21060202001" required
                                                     v-model="organizer.department[index].members[i]" class="w-full" />
-                                                <label :for="`${organizer.department[index].members[i]}-profile`"
+                                                <label :for="`${organizer.department[index].members[i]}-member`"
                                                     class="block mt-1 text-sm font-medium text-gray-900 dark:text-white">{{
                                                         getNameFromNIM(organizer.department[index].members[i] as number)
                                                     }}</label>
@@ -400,4 +400,4 @@ watch(() => organizer.value.period.start, (newVal) => {
             </template>
         </UCard>
     </UModal>
-</template>, IProfileResponse
+</template>, IMemberResponse

@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import type { IProfile } from '~/types';
+import type { IMember } from '~/types';
 import type { IResponse } from '~/types/IResponse';
 
 const toast = useToast();
@@ -8,12 +8,12 @@ const { $api } = useNuxtApp();
 
 const emit = defineEmits(["triggerRefresh"]);
 const loading = ref<boolean>(false);
-const colleger = ref<IProfile>({
+const colleger = ref<IMember>({
     fullName: "",
     NIM: 0,
     email: "",
     phone: "",
-    avatar: "/profile-blank.png",
+    avatar: "/member-blank.png",
     religion: "",
     sex: "male",
     birth: {
@@ -38,7 +38,7 @@ const colleger = ref<IProfile>({
 const addColleger = async () => {
     loading.value = true;
     try {
-        const added = await $api<IResponse>("/api/profile", {
+        const added = await $api<IResponse>("/api/member", {
             method: "post",
             body: colleger.value
         });

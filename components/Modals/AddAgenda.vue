@@ -1,14 +1,14 @@
 <script setup lang='ts'>
 import type { IAgenda } from '~/types';
-import type { IProfileResponse, IResponse } from '~/types/IResponse';
+import type { IMemberResponse, IResponse } from '~/types/IResponse';
 
 // Access Nuxt app instance and utilities
 const { $api } = useNuxtApp();
 const toast = useToast();
 const modal = useModal();
 
-// Fetch user profile data
-const { data: profile } = useLazyAsyncData(() => $api<IProfileResponse>("/api/profile"));
+// Fetch user member data
+const { data: member } = useLazyAsyncData(() => $api<IMemberResponse>("/api/member"));
 
 // Define emits for parent component communication
 const emits = defineEmits(['trigger-refresh']);
@@ -79,7 +79,7 @@ const addAgenda = async () => {
  * @returns {string|undefined} - Full name of the user
  */
 const getNameFromNIM = (NIM?: number) => {
-    return profile.value?.data?.profiles.find((profile) => profile.NIM == NIM)?.fullName;
+    return member.value?.data?.members.find((member) => member.NIM == NIM)?.fullName;
 }
 
 /**
@@ -185,10 +185,10 @@ const responsiveClasses = computed(() => ({
                                                     :size="responsiveUISizes.input" required />
                                             </div>
                                             <div class="w-full sm:w-1/4">
-                                                <label :for="`${committee.job}-profile`"
+                                                <label :for="`${committee.job}-member`"
                                                     :class="[responsiveClasses.label, 'block mb-2 font-medium text-gray-900 dark:text-white']">NIM</label>
-                                                <UInput type="number" :name="`${committee.job}-profile`"
-                                                    :id="`${committee.job}-profile`"
+                                                <UInput type="number" :name="`${committee.job}-member`"
+                                                    :id="`${committee.job}-member`"
                                                     v-model="newAgenda.committee![i].user"
                                                     :size="responsiveUISizes.input" required />
                                             </div>
@@ -197,7 +197,7 @@ const responsiveClasses = computed(() => ({
                                             class="text-red-500 dark:text-red-500 hover:text-red-400 dark:hover:text-red-400"
                                             :size="responsiveUISizes.button" variant="link" />
                                     </div>
-                                    <label :for="`${committee.job}-profile`"
+                                    <label :for="`${committee.job}-member`"
                                         :class="[responsiveClasses.label, 'block font-medium text-gray-900 dark:text-white']">
                                         {{ getNameFromNIM(newAgenda.committee![i].user as number) }}
                                     </label>
